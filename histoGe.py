@@ -1,3 +1,7 @@
+#!/home/mauricio/anaconda3/bin/python3
+
+
+
 from matplotlib import pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
@@ -23,8 +27,11 @@ def parseCalData(calStringData):
 # def gaus(x,a,x0,sigma):
 #     return a*exp(-(x-x0)**2/(2*sigma**2))
 
-def gaus(x,a,x0,sigma):
-    return a*np.exp(-(x-x0)**2/(2*sigma**2))
+def gaus(x,a,x0,sigma,c=0):
+    return a*np.exp(-(x-x0)**2/(2*sigma**2)) + c
+
+def fwhm(sigma):
+    return 2*np.sqrt(2*np.log(2))*sigma
 
 def getDictFromInfoFile(infoFileName):
     infoDict={}
@@ -74,25 +81,73 @@ def getSPEDataList(speFile):
         print("No calibration info, weird. Using normal bins.")
         return [myXvals,myYvals]
 
+def myLine(x,a,b):
+    return a*x+b
+
+def getTentParams(x4cal,y4cal):
+    C1=x4cal[0]
+    C2=x4cal[-1]
+    E1=y4cal[0]
+    E2=y4cal[-1]
+    a=(E2-E1)/(C2-C1)
+    b=E1-a*C1
+    return a,b
+    
+
 def getListFromMCA(mcaFilename):
     mcaList=[]
     str2init = "<<DATA>>"
     str2end = "<<END>>"
+    strCal = "<<CALIBRATION>>"
+    strIgn = "LABEL"
+    strCalEnd = "<<"
     appendBool = False
+    
+    calBool = False
 
+    x4cal=[]
+    y4cal=[]
+    
     for line in open(mcaFilename):
+        if line.find(strCal) != -1:
+            calBool = True
+            continue
+
         if line.find(str2init) != -1:
             appendBool = True
+            calBool = False
             continue
+        
+        if calBool:
+            if line.find(strIgn) != -1:
+                continue
+            
+            if line.find(strCalEnd) != -1:
+                calBool = False
+            x4cal.append(float(line.split()[0]))
+            y4cal.append(float(line.split()[1]))
 
         if line.find(str2end) != -1:
             appendBool = False
             continue
-
+        
         if appendBool :
             mcaList.append(float(line))
 
-    totalList=[range(len(mcaList)),mcaList]
+    if len(x4cal) > 1:
+        print("Entered the calibration part")
+        print(x4cal,y4cal)
+        a,b=getTentParams(x4cal,y4cal)
+        print(a,b)
+        popt,pcov = curve_fit(myLine,x4cal, y4cal, p0=[a,b])
+        a,b=popt
+        print(a,b)
+        #Do the calibration etc
+        xCalibrated = [a*ch+b for ch in range(len(mcaList))]
+        totalList = [xCalibrated, mcaList]
+    else:
+        totalList=[range(len(mcaList)),mcaList]
+
     return totalList
 
 def getListFromGammaVision(gvFilename):
@@ -147,15 +202,17 @@ def doFittingStuff(infoDict,myDataList):
         yVals=myDataList[1]
         a=max(yVals[minIdx:maxIdx])
         print("a = ",a)
+        c=(yVals[minIdx]+yVals[maxIdx])/2
+        print("c= ",c)
         #need to handle cases where fit fails
         popt,pcov = curve_fit(gaus,myDataList[0],\
                           myDataList[1],\
-                          p0=[a,mean,sigma])
+                          p0=[a,mean,sigma,c])
         print("popt,pcov = ",popt,pcov)
-        a,mean,sigma=popt
-        print("a,mean,sigma = ",a,mean,sigma)
+        a,mean,sigma,c=popt
+        print("a,mean,sigma,c = ",a,mean,sigma,c)
         myIntegral=a*sigma*sqrt(2*pi)
-        fittingDict[e]=[a,mean,sigma,minIdx,maxIdx]
+        fittingDict[e]=[a,mean,sigma,c,minIdx,maxIdx]
         print("myIntegral = ", myIntegral)
         # return fittingDict
     return fittingDict
@@ -203,9 +260,11 @@ def main(args):
     print("Entering fittingDict part")
     fittingDict=doFittingStuff(infoDict,myDataList)
     for e in fittingDict:
-        a,mean,sigma,minIdx,maxIdx=fittingDict[e]
+        a,mean,sigma,c,minIdx,maxIdx=fittingDict[e]
+        myFWHM=fwhm(sigma)
+        print("FWHM= ",myFWHM)
         xVals=myDataList[0][minIdx:maxIdx]
-        plt.plot(xVals,gaus(xVals,a,mean,sigma),\
+        plt.plot(xVals,gaus(xVals,a,mean,sigma,c),\
                  'r:',label=e)
         plt.annotate(e, xy=[mean,a])
 
