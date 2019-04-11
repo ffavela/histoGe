@@ -161,12 +161,24 @@ def doFittingStuff(infoDict,myDataList):
     return fittingDict
 
 def main(args):
+    functionDict = {
+            "SPE": getSPEDataList,
+            "mca": getListFromMCA,
+            "Txt": getListFromGammaVision
+            }
     infoDict={}
     #Here put the command line argument
     print("The number of arguments is ", len(args))
     if len(args) == 1:
         print("usage: %s file.SPE [-c data4fits.info]" %(args[0]))
         return 1
+
+    myFilename = args[1]
+    print("myFilename=",myFilename)
+    myExtension = myFilename.split(".")[-1]
+    
+    print(myExtension)
+
 
     if len(args) == 4:
         print("There are 4 arguments")
@@ -183,7 +195,8 @@ def main(args):
 
     # myDataList=getSPEDataList(args[1])
     # myDataList=getListFromMCA(args[1])
-    myDataList=getListFromGammaVision(args[1])
+    #myDataList=getListFromGammaVision(args[1])
+    myDataList = functionDict[myExtension](args[1])
     plt.plot(myDataList[0],myDataList[1])
 
     print()
