@@ -1,6 +1,5 @@
-#!/home/mauricio/anaconda3/bin/python3
-
-
+#!/usr/bin/python
+###!/home/mauricio/anaconda3/bin/python3
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -10,6 +9,7 @@ from math import sqrt, pi
 
 import sys
 import os.path
+from os.path import basename
 
 def is_float(n):
     try:
@@ -27,8 +27,12 @@ def parseCalData(calStringData):
 # def gaus(x,a,x0,sigma):
 #     return a*exp(-(x-x0)**2/(2*sigma**2))
 
+
 def gaus(x,a,x0,sigma,c=0):
     return a*np.exp(-(x-x0)**2/(2*sigma**2)) + c
+
+# def lineGaus(x,a,x0,sigma,c,lineCoef):
+
 
 def fwhm(sigma):
     return 2*np.sqrt(2*np.log(2))*sigma
@@ -92,7 +96,6 @@ def getTentParams(x4cal,y4cal):
     a=(E2-E1)/(C2-C1)
     b=E1-a*C1
     return a,b
-    
 
 def getListFromMCA(mcaFilename):
     mcaList=[]
@@ -102,12 +105,12 @@ def getListFromMCA(mcaFilename):
     strIgn = "LABEL"
     strCalEnd = "<<"
     appendBool = False
-    
+
     calBool = False
 
     x4cal=[]
     y4cal=[]
-    
+
     for line in open(mcaFilename):
         if line.find(strCal) != -1:
             calBool = True
@@ -117,11 +120,11 @@ def getListFromMCA(mcaFilename):
             appendBool = True
             calBool = False
             continue
-        
+
         if calBool:
             if line.find(strIgn) != -1:
                 continue
-            
+
             if line.find(strCalEnd) != -1:
                 calBool = False
             x4cal.append(float(line.split()[0]))
@@ -130,7 +133,7 @@ def getListFromMCA(mcaFilename):
         if line.find(str2end) != -1:
             appendBool = False
             continue
-        
+
         if appendBool :
             mcaList.append(float(line))
 
@@ -166,8 +169,8 @@ def getListFromGammaVision(gvFilename):
 
 def getIdxRangeVals(myDataList,xMin,xMax):
     xVals=myDataList[0]
-    xMinIdx=myDataList[0]
-    xMaxIdx=myDataList[-1]
+    xMinIdx=xVals[0]
+    xMaxIdx=xVals[-1]
     for i,x in enumerate(xVals):
         if xMin <= x:
             xMinIdx=i
@@ -179,6 +182,82 @@ def getIdxRangeVals(myDataList,xMin,xMax):
             break
 
     return [xMinIdx,xMaxIdx]
+
+def gilmoreGrossIntegral(myDataList,lowXVal,uppXVal):
+    xVals,yVals=myDataList
+    L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
+    G=sum(yVals[L:U+1])
+    return G
+
+def gilmoreBackground(myDataList,lowXVal,uppXVal):
+    xVals,yVals=myDataList
+    L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
+    n=U-L
+    C=yVals
+    B=n*(C[L-1]+C[U+1])/2
+    return B
+
+def gilmoreNetArea(myDataList,lowXVal,uppXVal):
+    xVals,yVals=myDataList
+    G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
+    B=gilmoreBackground(myDataList,lowXVal,uppXVal)
+    A=G-B
+    return A
+
+def gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal,m=5):
+    xVals,yVals=myDataList
+    L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
+    n=U-L
+    C=yVals
+    G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
+    A=G-n*(sum(C[L-m:L])+sum(C[U+1:U+m+1]))/(2*m)
+    return A
+
+def gilmoreSigma(myDataList,lowXVal,uppXVal):
+    xVals,yVals=myDataList
+    A=gilmoreNetArea(myDataList,lowXVal,uppXVal)
+    B=gilmoreBackground(myDataList,lowXVal,uppXVal)
+    sigma_A=np.sqrt(A+2*B)
+    return sigma_A
+
+def gilmoreExtendedSigma(myDataList,lowXVal,uppXVal,m):
+    xVals,yVals=myDataList
+    L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
+    n=U-L
+    A=gilmoreNetArea(myDataList,lowXVal,uppXVal)
+    B=gilmoreBackground(myDataList,lowXVal,uppXVal)
+    extSigma_A=np.sqrt(A+B*(1+n/(2*m)))
+    return extSigma_A
+
+def doGilmoreStuff(infoDict,myDataList):
+    gilmoreDict={}
+    if infoDict == {}:
+        return gilmoreDict
+    xVals,yVals=myDataList
+    for e in infoDict:
+        lowXVal,uppXVal=infoDict[e]
+
+        print(getIdxRangeVals(myDataList,lowXVal,uppXVal))
+        G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
+        B=gilmoreBackground(myDataList,lowXVal,uppXVal)
+        netArea=gilmoreNetArea(myDataList,lowXVal,uppXVal)
+        sigma_A=gilmoreSigma(myDataList,lowXVal,uppXVal)
+
+        m=5 #extended region
+        EBA=gilmoreExtendedBkgExtensionsInt(myDataList,\
+                                           lowXVal,uppXVal,m)
+        extSigma_A=gilmoreExtendedSigma(myDataList,\
+                                        lowXVal,uppXVal,m)
+
+        print("G,B,netArea,sigma_A = ",G,B,netArea,sigma_A)
+        print("EBA, extSigma_A = ",EBA,extSigma_A)
+        myFWHMSigma_A=fwhm(sigma_A)
+        myFWHMExtSigma_A=fwhm(extSigma_A)
+        print("myFWHMSigma,myFWHMExtSigma_A = ",\
+              myFWHMSigma_A,myFWHMExtSigma_A)
+
+        # return gilmoreDict
+    return gilmoreDict
 
 def doFittingStuff(infoDict,myDataList):
     fittingDict={}
@@ -205,9 +284,15 @@ def doFittingStuff(infoDict,myDataList):
         c=(yVals[minIdx]+yVals[maxIdx])/2
         print("c= ",c)
         #need to handle cases where fit fails
-        popt,pcov = curve_fit(gaus,myDataList[0],\
-                          myDataList[1],\
-                          p0=[a,mean,sigma,c])
+        try:
+            popt,pcov = curve_fit(gaus,myDataList[0],\
+                                  myDataList[1],\
+                                  p0=[a,mean,sigma,c])
+        except:
+            print("Fit failed for %s" %(e))
+            fittingDict[e]=[None,None,None,None,None,None]
+            continue
+
         print("popt,pcov = ",popt,pcov)
         a,mean,sigma,c=popt
         print("a,mean,sigma,c = ",a,mean,sigma,c)
@@ -227,15 +312,18 @@ def main(args):
     #Here put the command line argument
     print("The number of arguments is ", len(args))
     if len(args) == 1:
-        print("usage: %s file.SPE [-c data4fits.info]" %(args[0]))
+        print("usage: %s file.extension [-c data4fits.info]"\
+              %(basename(args[0])))
+        print("Valid extensions are:")
+        for ext in functionDict:
+            print("\t\t%s" %(ext))
         return 1
 
     myFilename = args[1]
     print("myFilename=",myFilename)
     myExtension = myFilename.split(".")[-1]
-    
-    print(myExtension)
 
+    print(myExtension)
 
     if len(args) == 4:
         print("There are 4 arguments")
@@ -253,20 +341,25 @@ def main(args):
     # myDataList=getSPEDataList(args[1])
     # myDataList=getListFromMCA(args[1])
     #myDataList=getListFromGammaVision(args[1])
+    print("myExtension = ",myExtension)
     myDataList = functionDict[myExtension](args[1])
     plt.plot(myDataList[0],myDataList[1])
 
-    print()
+    print("")
     print("Entering fittingDict part")
     fittingDict=doFittingStuff(infoDict,myDataList)
     for e in fittingDict:
         a,mean,sigma,c,minIdx,maxIdx=fittingDict[e]
+        if a == None:
+            continue
         myFWHM=fwhm(sigma)
         print("FWHM= ",myFWHM)
         xVals=myDataList[0][minIdx:maxIdx]
         plt.plot(xVals,gaus(xVals,a,mean,sigma,c),\
                  'r:',label=e)
         plt.annotate(e, xy=[mean,a])
+
+    gilmoreDict=doGilmoreStuff(infoDict,myDataList)
 
     #erase this part?
     # plt.hist(myArr, bins=16384)
@@ -276,4 +369,4 @@ def main(args):
     plt.show()
 
 if __name__ == "__main__":
-   main(sys.argv)
+    main(sys.argv)
