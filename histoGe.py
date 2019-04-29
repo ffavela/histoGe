@@ -385,7 +385,7 @@ def main(args):
                                              for val in\
                                              fittingDict[e]]
         floatMean=fittingDict[e][1]
-        if mean != floatMean:
+        if None != floatMean:
                     plt.annotate("%s,%2.1f" %(e,floatMean),\
                                  xy=[realXVals[max_index],max_value])
         else:
