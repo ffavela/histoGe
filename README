@@ -1,0 +1,37 @@
+This is a simple program (still in alpha) for making spectra analysis
+from germanium detectors. The name is still tentative and we'll
+probably change the repo location.
+
+The program accepts 3 different file formats, ("mca" the pocket
+version, "Txt" gamma view format, "SPE" Boulby format.)
+
+To install, simply do a:
+
+$ mkdir -p ~/.myPrograms
+$ cd ~/.myPrograms
+$ ls -s /path/to/histoGe/histoGe.py histoGe # replace with proper path
+
+Then open your shell rc file and put a line to export the new path, for
+example if you are using bash then do a:
+
+$ nano ~/.bashrc
+
+Then put the following at the end of the file:
+
+export PATH=$PATH:~/.myPrograms
+
+Save and close the file (in nano do a Ctr+X, you will be asked to save
+the changes press Y for yes). Open a new terminal and you should be
+able to do a:
+
+$ histoGe
+usage: histoGe file.extension [-c data4fits.info]
+Valid extensions are:
+		SPE
+		mca
+		Txt
+
+You should be able to see a similar output.
+
+I'll edit this document later to show a couple of examples. Remember
+this is still alpha!!
