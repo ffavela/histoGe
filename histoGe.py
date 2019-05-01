@@ -1,4 +1,7 @@
-#!/home/mauricio/anaconda3/bin/python3
+#!/usr/bin/python
+###!/home/mauricio/anaconda3/bin/python3
+
+
 
 from matplotlib import pyplot as plt
 import numpy as np
