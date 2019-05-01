@@ -1,5 +1,4 @@
-#!/usr/bin/python
-###!/home/mauricio/anaconda3/bin/python3
+#!/home/mauricio/anaconda3/bin/python3
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -52,6 +51,7 @@ def getDictFromInfoFile(infoFileName):
     return infoDict
 
 def getSPEDataList(speFile):
+    internDict = {}
     myCounter=0
     aCoef,bCoef,cCoef=[0.0,0.0,0.0]
     myXvals=[]
@@ -80,10 +80,12 @@ def getSPEDataList(speFile):
     #Creating calibrated in Energy bins
     if bCoef != 0:
         eBins=np.array([bCoef*xVal+bCoef for xVal in myXvals])
-        return [eBins,myYvals]
+        internDict["theList"]=[eBins,myYvals]
     else:
         print("No calibration info, weird. Using normal bins.")
-        return [myXvals,myYvals]
+        internDict["theList"]=[myXvals,myYvals]
+        
+    return internDict["theList"]
 
 def myLine(x,a,b):
     return a*x+b
@@ -98,12 +100,14 @@ def getTentParams(x4cal,y4cal):
     return a,b
 
 def getListFromMCA(mcaFilename):
+    internDict={}
     mcaList=[]
     str2init = "<<DATA>>"
     str2end = "<<END>>"
     strCal = "<<CALIBRATION>>"
     strIgn = "LABEL"
     strCalEnd = "<<"
+    strExpTime= "LIVE_TIME"
     appendBool = False
 
     calBool = False
@@ -112,10 +116,15 @@ def getListFromMCA(mcaFilename):
     y4cal=[]
 
     for line in open(mcaFilename):
+        if line.find(strExpTime) != -1:
+            tempList = line.split("-")
+            internDict["expoTime"]=float(tempList[1])
+            print("expo time=",internDict["expoTime"])
+            
         if line.find(strCal) != -1:
             calBool = True
             continue
-
+        
         if line.find(str2init) != -1:
             appendBool = True
             calBool = False
@@ -151,9 +160,11 @@ def getListFromMCA(mcaFilename):
     else:
         totalList=[range(len(mcaList)),mcaList]
 
-    return totalList
+    internDict["theList"]=totalList
+    return internDict["theList"]
 
 def getListFromGammaVision(gvFilename):
+    internDict = {}
     gvList=[]
     str2init = "SPECTRUM"
     appendBool = False
@@ -165,7 +176,8 @@ def getListFromGammaVision(gvFilename):
             if len(lineList) == 5:
                 gvList +=[float(e) for e in lineList[1:]]
     totalList=[range(len(gvList)),gvList]
-    return totalList
+    internDict["theList"]=totalList
+    return internDict["theList"]
 
 def getIdxRangeVals(myDataList,xMin,xMax):
     xVals=myDataList[0]
