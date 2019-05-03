@@ -133,7 +133,10 @@ def getListFromMCA(mcaFilename):
     x4cal=[]
     y4cal=[]
 
-    for line in open(mcaFilename):
+
+    #Ignoring errors for now
+    for line in open(mcaFilename, errors='ignore'):
+
         if line.find(strExpTime) != -1:
             tempList = line.split("-")
             internDict["expoTime"]=float(tempList[1])
@@ -159,7 +162,8 @@ def getListFromMCA(mcaFilename):
 
         if line.find(str2end) != -1:
             appendBool = False
-            continue
+            break #stopping here for now
+
 
         if appendBool :
             mcaList.append(float(line))
