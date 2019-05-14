@@ -51,7 +51,9 @@ def getDictFromInfoFile(infoFileName):
         print(newList)
     return infoDict
 
-def getSPEDataList(speFile):
+
+
+def getDictFromSPE(speFile):
     internDict = {}
     myCounter=0
     aCoef,bCoef,cCoef=[0.0,0.0,0.0]
@@ -103,7 +105,7 @@ def getSPEDataList(speFile):
     #         print(e)
     #         print(internDict[e])
 
-    return internDict["theList"]
+    return internDict
 
 def myLine(x,a,b):
     return a*x+b
@@ -117,7 +119,9 @@ def getTentParams(x4cal,y4cal):
     b=E1-a*C1
     return a,b
 
-def getListFromMCA(mcaFilename):
+
+
+def getDictFromMCA(mcaFilename):
     internDict={}
     mcaList=[]
     str2init = "<<DATA>>"
@@ -183,9 +187,11 @@ def getListFromMCA(mcaFilename):
         totalList=[range(len(mcaList)),mcaList]
 
     internDict["theList"]=totalList
-    return internDict["theList"]
+    return internDict
 
-def getListFromGammaVision(gvFilename):
+
+
+def getDictFromGammaVision(gvFilename):
     internDict = {}
     gvList=[]
     str2init = "SPECTRUM"
@@ -216,7 +222,9 @@ def getListFromGammaVision(gvFilename):
     if tStr in internDict:
         internDict["expoTime"]=float(internDict[tStr])
         print("internDict[\"expoTime\"] = ",internDict["expoTime"])
-    return internDict["theList"]
+    return internDict
+
+
 
 def getIdxRangeVals(myDataList,xMin,xMax):
     xVals=myDataList[0]
@@ -369,11 +377,13 @@ def doFittingStuff(infoDict,myDataList):
     return fittingDict
 
 def main(args):
+   
     functionDict = {
-            "SPE": getSPEDataList,
-            "mca": getListFromMCA,
-            "Txt": getListFromGammaVision
+            "SPE": getDictFromSPE,
+            "mca": getDictFromMCA,
+            "Txt": getDictFromGammaVision
             }
+    
     infoDict={}
     #Here put the command line argument
     print("The number of arguments is ", len(args))
@@ -408,7 +418,8 @@ def main(args):
     # myDataList=getListFromMCA(args[1])
     #myDataList=getListFromGammaVision(args[1])
     print("myExtension = ",myExtension)
-    myDataList = functionDict[myExtension](args[1])
+    mySpecialDict = functionDict[myExtension](args[1])
+    myDataList = mySpecialDict["theList"]
     plt.plot(myDataList[0],myDataList[1])
 
     print("")
@@ -453,7 +464,7 @@ def main(args):
     # plt.hist(myArr, bins=16384)
     # plt.bar(np.arange(len(li)),li)
     # plt.yscale('log', nonposy='clip')
-
+    print("exposition time = ", mySpecialDict["expoTime"])
     plt.show()
 
 if __name__ == "__main__":
