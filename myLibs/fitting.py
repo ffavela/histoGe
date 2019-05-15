@@ -7,6 +7,11 @@ def gaus(x,a,x0,sigma,c=0):
     """A gaussian bell. I added temporarly an additive constant."""
     return a*np.exp(-(x-x0)**2/(2*sigma**2)) + c
 
+def lorentzian(x,x0,w,c):
+    """I added temporarly an additive constant here too."""
+    # w is the width. Still need to test this one
+    return 1/np.pi*(w/2)/((x-x0)**2+(w/2)**2)
+
 # def lineGaus(x,a,x0,sigma,c,lineCoef): # for later
 
 def myLine(x,a,b):

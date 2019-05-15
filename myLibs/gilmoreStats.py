@@ -1,5 +1,10 @@
 """A simple implementation of the statistical equations that are
-presented in Gilmore's book"""
+presented in Gilmore's book. myDataList is a python list containing
+the histogram information lowXVal and uppXVal are values in that can
+be floats they are converted to integer indeces so they can be
+addressed easely by the closest value on myDataList.
+
+"""
 
 from math import sqrt, pi
 import numpy as np
@@ -27,6 +32,8 @@ def gilmoreNetArea(myDataList,lowXVal,uppXVal):
     return A
 
 def gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal,m=5):
+    """Takes into account the bins (5 by default) before and after the
+region of interest"""
     xVals,yVals=myDataList
     L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
     n=U-L

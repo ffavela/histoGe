@@ -89,12 +89,10 @@ def main(args):
             "mca": getDictFromMCA,
             "Txt": getDictFromGammaVision
             }
-    
+
     infoDict={} #From the info file
     #Here put the command line argument
     if len(args) == 1:
-        print(sys.path[0])
-        print("The args[0] is ", args[0])
         print("usage: %s file.extension [-c data4fits.info]"\
               %(basename(args[0])))
         print("Valid extensions are:")
