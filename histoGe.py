@@ -129,7 +129,7 @@ def getDictFromMCA(mcaFilename):
     strCal = "<<CALIBRATION>>"
     strIgn = "LABEL"
     strCalEnd = "<<"
-    strExpTime= "LIVE_TIME"
+    strExpTime= "REAL_TIME"
     appendBool = False
 
     calBool = False
