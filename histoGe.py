@@ -11,6 +11,10 @@ import sys
 import os.path
 from os.path import basename
 
+# mainPath=sys.path[0] # sources dir
+from myLibs.parsers import *
+from myLibs.gilmoreStats import *
+
 def is_float(n):
     try:
         float_n = float(n)
@@ -29,13 +33,10 @@ def parseCalData(calStringData):
 
 
 def gaus(x,a,x0,sigma,c=0):
+    """A gaussian bell. I added temporarly an additive constant."""
     return a*np.exp(-(x-x0)**2/(2*sigma**2)) + c
 
 # def lineGaus(x,a,x0,sigma,c,lineCoef):
-
-
-def fwhm(sigma):
-    return 2*np.sqrt(2*np.log(2))*sigma
 
 def getDictFromInfoFile(infoFileName):
     infoDict={}
@@ -51,62 +52,6 @@ def getDictFromInfoFile(infoFileName):
         print(newList)
     return infoDict
 
-
-
-def getDictFromSPE(speFile):
-    internDict = {}
-    myCounter=0
-    aCoef,bCoef,cCoef=[0.0,0.0,0.0]
-    myXvals=[]
-    myYvals=[]
-    calBool=False
-
-    appendBool=False
-
-    str2init = "DATA"
-    for line in open(speFile):
-        iFound = line.find("$")
-        if iFound != -1: #iFound == 0
-            fFound=line.find(":")
-            newEntry=line[iFound+1:fFound] #Avoiding the :
-            internDict[newEntry]=[]
-            print("newEntry = ", newEntry)
-            continue
-        internDict[newEntry].append(line)
-
-    print("Outside the for")
-
-    myXvals=list(range(len(internDict["DATA"][1:])))
-    myYvals=[float(yVal) for yVal in internDict["DATA"][1:]]
-
-    if "ENER_FIT" in internDict:
-        print("internDict['ENER_FIT']", internDict['ENER_FIT'])
-        aCoef,bCoef,cCoef=[float(e) for e in\
-                           internDict['ENER_FIT'][0].split()]
-        #Assuming E=bCoef*bin+aCoef, as I understood aCoef is
-        #always zero (I'm reading it anyway) and I don't know
-        #what's cCoef for.
-
-    #Creating calibrated in Energy bins
-    if bCoef != 0:
-        eBins=np.array([bCoef*xVal+bCoef for xVal in myXvals])
-        internDict["theList"]=[eBins,myYvals]
-    else:
-        print("No calibration info, weird. Using normal bins.")
-        internDict["theList"]=[myXvals,myYvals]
-
-    tStr="MEAS_TIM"
-    if tStr in internDict:
-        internDict["expoTime"]=float(internDict[tStr][0]\
-                                     .split()[0])
-    # print("New for cycle, more debugging")
-    # for e in internDict:
-    #     if e != "theList" and e != "DATA":
-    #         print(e)
-    #         print(internDict[e])
-
-    return internDict
-
 def myLine(x,a,b):
     return a*x+b
 
@@ -119,218 +64,6 @@ def getTentParams(x4cal,y4cal):
     b=E1-a*C1
     return a,b
 
-
-
-def getDictFromMCA(mcaFilename):
-    internDict={}
-    mcaList=[]
-    str2init = "<<DATA>>"
-    str2end = "<<END>>"
-    strCal = "<<CALIBRATION>>"
-    strIgn = "LABEL"
-    strCalEnd = "<<"
-    strExpTime= "REAL_TIME"
-    appendBool = False
-
-    calBool = False
-
-    x4cal=[]
-    y4cal=[]
-
-
-    #Ignoring errors for now
-    for line in open(mcaFilename, errors='ignore'):
-
-        if line.find(strExpTime) != -1:
-            tempList = line.split("-")
-            internDict["expoTime"]=float(tempList[1])
-            print("expo time=",internDict["expoTime"])
-
-        if line.find(strCal) != -1:
-            calBool = True
-            continue
-
-        if line.find(str2init) != -1:
-            appendBool = True
-            calBool = False
-            continue
-
-        if calBool:
-            if line.find(strIgn) != -1:
-                continue
-
-            if line.find(strCalEnd) != -1:
-                calBool = False
-            x4cal.append(float(line.split()[0]))
-            y4cal.append(float(line.split()[1]))
-
-        if line.find(str2end) != -1:
-            appendBool = False
-            break #stopping here for now
-
-
-        if appendBool :
-            mcaList.append(float(line))
-
-    if len(x4cal) > 1:
-        print("Entered the calibration part")
-        print(x4cal,y4cal)
-        a,b=getTentParams(x4cal,y4cal)
-        print(a,b)
-        popt,pcov = curve_fit(myLine,x4cal, y4cal, p0=[a,b])
-        a,b=popt
-        print(a,b)
-        #Do the calibration etc
-        xCalibrated = [a*ch+b for ch in range(len(mcaList))]
-        totalList = [xCalibrated, mcaList]
-    else:
-        totalList=[range(len(mcaList)),mcaList]
-
-    internDict["theList"]=totalList
-    return internDict
-
-
-
-def getDictFromGammaVision(gvFilename):
-    internDict = {}
-    gvList=[]
-    str2init = "SPECTRUM"
-    appendBool = False
-    print("Starting the gammaVision loop")
-    for line in open(gvFilename):
-        if not appendBool:
-            semicolonI = line.find(":")
-            if semicolonI != -1:
-                newKey=line[:semicolonI]
-                newVal=line[semicolonI+1:]
-                internDict[newKey]=newVal.strip()
-        if line.find(str2init) != -1:
-            appendBool = True
-        if appendBool:
-            lineList=line.split()
-            if len(lineList) == 5:
-                gvList +=[float(e) for e in lineList[1:]]
-    totalList=[range(len(gvList)),gvList]
-    internDict["theList"]=totalList
-    # for e in internDict:
-    #     if e == "theList":
-    #         continue
-    #     print(e)
-    #     print(internDict[e])
-
-    tStr="Real Time"
-    if tStr in internDict:
-        internDict["expoTime"]=float(internDict[tStr])
-        print("internDict[\"expoTime\"] = ",internDict["expoTime"])
-    return internDict
-
-
-
-def getIdxRangeVals(myDataList,xMin,xMax):
-    xVals=myDataList[0]
-    xMinIdx=xVals[0]
-    xMaxIdx=xVals[-1]
-    for i,x in enumerate(xVals):
-        if xMin <= x:
-            xMinIdx=i
-            break
-    #This needs to be optimized!
-    for i,x in enumerate(xVals):
-        if xMax <= x:
-            xMaxIdx=i
-            break
-
-    return [xMinIdx,xMaxIdx]
-
-def gilmoreGrossIntegral(myDataList,lowXVal,uppXVal):
-    xVals,yVals=myDataList
-    L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
-    G=sum(yVals[L:U+1])
-    return G
-
-def gilmoreBackground(myDataList,lowXVal,uppXVal):
-    xVals,yVals=myDataList
-    L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
-    n=U-L
-    C=yVals
-    B=n*(C[L-1]+C[U+1])/2
-    return B
-
-def gilmoreNetArea(myDataList,lowXVal,uppXVal):
-    xVals,yVals=myDataList
-    G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
-    B=gilmoreBackground(myDataList,lowXVal,uppXVal)
-    A=G-B
-    return A
-
-def gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal,m=5):
-    xVals,yVals=myDataList
-    L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
-    n=U-L
-    C=yVals
-    G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
-    A=G-n*(sum(C[L-m:L])+sum(C[U+1:U+m+1]))/(2*m)
-    return A
-
-def gilmoreSigma(myDataList,lowXVal,uppXVal):
-    xVals,yVals=myDataList
-    A=gilmoreNetArea(myDataList,lowXVal,uppXVal)
-    B=gilmoreBackground(myDataList,lowXVal,uppXVal)
-    sigma_A=np.sqrt(A+2*B)
-    return sigma_A
-
-def gilmoreExtendedSigma(myDataList,lowXVal,uppXVal,m):
-    xVals,yVals=myDataList
-    L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
-    n=U-L
-    A=gilmoreNetArea(myDataList,lowXVal,uppXVal)
-    B=gilmoreBackground(myDataList,lowXVal,uppXVal)
-    extSigma_A=np.sqrt(A+B*(1+n/(2*m)))
-    return extSigma_A
-
-def doGilmoreStuff(infoDict,myDataList):
-    gilmoreDict={}
-    if infoDict == {}:
-        return gilmoreDict
-    xVals,yVals=myDataList
-    for e in infoDict:
-        print(e)
-        lowXVal,uppXVal=infoDict[e]
-
-        print(getIdxRangeVals(myDataList,lowXVal,uppXVal))
-        minX,maxX=getIdxRangeVals(myDataList,lowXVal,uppXVal)
-        max_value = max(yVals[minX:maxX])
-        max_index = minX+yVals[minX:maxX].index(max_value)
-        print("max_index,max_value = ",max_index,max_value)
-        print("testing maxYval with the index ", yVals[max_index])
-        print("testing maxXval with the index ", xVals[max_index])
-        G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
-        B=gilmoreBackground(myDataList,lowXVal,uppXVal)
-        netArea=gilmoreNetArea(myDataList,lowXVal,uppXVal)
-        sigma_A=gilmoreSigma(myDataList,lowXVal,uppXVal)
-
-        m=5 #extended region
-        EBA=gilmoreExtendedBkgExtensionsInt(myDataList,\
-                                           lowXVal,uppXVal,m)
-        extSigma_A=gilmoreExtendedSigma(myDataList,\
-                                        lowXVal,uppXVal,m)
-        print("G,B,netArea,sigma_A = ",G,B,netArea,sigma_A)
-        print("EBA, extSigma_A = ",EBA,extSigma_A)
-        myFWHMSigma_A=fwhm(sigma_A)
-        myFWHMExtSigma_A=fwhm(extSigma_A)
-        print("myFWHMSigma,myFWHMExtSigma_A = ",\
-              myFWHMSigma_A,myFWHMExtSigma_A)
-
-        gilmoreDict[e]=[G,B,netArea,\
-                        sigma_A,EBA,\
-                        extSigma_A,\
-                        myFWHMSigma_A,\
-                        myFWHMExtSigma_A,\
-                        max_index,\
-                        max_value]
-
-        # return gilmoreDict
-    return gilmoreDict
 
 def doFittingStuff(infoDict,myDataList):
     fittingDict={}
@@ -377,17 +110,19 @@ def doFittingStuff(infoDict,myDataList):
     return fittingDict
 
 def main(args):
-   
+    #The following is adictionary that maps keys (file extensions) to
+    #the proper parsing function. See parse
     functionDict = {
             "SPE": getDictFromSPE,
             "mca": getDictFromMCA,
             "Txt": getDictFromGammaVision
             }
     
-    infoDict={}
+    infoDict={} #From the info file
     #Here put the command line argument
-    print("The number of arguments is ", len(args))
     if len(args) == 1:
+        print(sys.path[0])
+        print("The args[0] is ", args[0])
         print("usage: %s file.extension [-c data4fits.info]"\
               %(basename(args[0])))
         print("Valid extensions are:")
@@ -414,9 +149,6 @@ def main(args):
         print("infoDict = ")
         print(infoDict)
 
-    # myDataList=getSPEDataList(args[1])
-    # myDataList=getListFromMCA(args[1])
-    #myDataList=getListFromGammaVision(args[1])
     print("myExtension = ",myExtension)
     mySpecialDict = functionDict[myExtension](args[1])
     myDataList = mySpecialDict["theList"]
