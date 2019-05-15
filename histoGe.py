@@ -14,29 +14,12 @@ from os.path import basename
 # mainPath=sys.path[0] # sources dir
 from myLibs.parsers import *
 from myLibs.gilmoreStats import *
-
-def is_float(n):
-    try:
-        float_n = float(n)
-    except ValueError:
-        return False
-    else:
-        return True
+from myLibs.fitting import *
 
 def parseCalData(calStringData):
     myStrArray=calStringData.split(" ")
     myValueArray=[float(val) for val in myStrArray]
     return myValueArray
-
-# def gaus(x,a,x0,sigma):
-#     return a*exp(-(x-x0)**2/(2*sigma**2))
-
-
-def gaus(x,a,x0,sigma,c=0):
-    """A gaussian bell. I added temporarly an additive constant."""
-    return a*np.exp(-(x-x0)**2/(2*sigma**2)) + c
-
-# def lineGaus(x,a,x0,sigma,c,lineCoef):
 
 def getDictFromInfoFile(infoFileName):
     infoDict={}
@@ -52,20 +35,9 @@ def getDictFromInfoFile(infoFileName):
         print(newList)
     return infoDict
 
-def myLine(x,a,b):
-    return a*x+b
-
-def getTentParams(x4cal,y4cal):
-    C1=x4cal[0]
-    C2=x4cal[-1]
-    E1=y4cal[0]
-    E2=y4cal[-1]
-    a=(E2-E1)/(C2-C1)
-    b=E1-a*C1
-    return a,b
-
-
 def doFittingStuff(infoDict,myDataList):
+    """Need 2 put this in fitting.py but for some reason fitting fails
+there"""
     fittingDict={}
     if infoDict == {}: #minor optimization
         return fittingDict
@@ -158,6 +130,7 @@ def main(args):
     print("Entering fittingDict part")
     fittingDict=doFittingStuff(infoDict,myDataList)
     for e in fittingDict:
+        print("###################################################################################################################################################################################################")
         a,mean,sigma,c,minIdx,maxIdx,myFWHM=fittingDict[e]
         if a == None:
             print("Skipping failed fit")
