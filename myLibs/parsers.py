@@ -60,8 +60,7 @@ def getDictFromSPE(speFile):
 
 def getDictFromMCA(mcaFilename):
     """Parses the .mca file format comming from either the micro mca or
-the px5, the later has a BUG while parsing so a few bins are not
-read. Need to FIX this!!
+the px5.
 
     """
     internDict={}
@@ -79,10 +78,8 @@ read. Need to FIX this!!
     x4cal=[]
     y4cal=[]
 
-
-    #Ignoring errors for now
+    #Ignoring errors for now, however bins are not skipped
     for line in open(mcaFilename, errors='ignore'):
-
         if line.find(strExpTime) != -1:
             tempList = line.split("-")
             internDict["expoTime"]=float(tempList[1])
