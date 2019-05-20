@@ -7,6 +7,8 @@ time.
 """
 
 import numpy as np
+from scipy.optimize import curve_fit
+from myLibs.fitting import *
 
 def getDictFromSPE(speFile):
     """Parses the .SPE file format that is used in Boulby"""
