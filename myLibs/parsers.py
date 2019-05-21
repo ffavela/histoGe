@@ -157,4 +157,3 @@ def getDictFromGammaVision(gvFilename):
         internDict["expoTime"]=float(internDict[tStr])
         print("internDict[\"expoTime\"] = ",internDict["expoTime"])
     return internDict
-

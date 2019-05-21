@@ -28,3 +28,14 @@ def getIdxRangeVals(myDataList,xMin,xMax):
 def fwhm(sigma):
     return 2*np.sqrt(2*np.log(2))*sigma
 
+def getRescaledList(myDataList,tRatio):
+    newYVals=[yVal*tRatio for yVal in myDataList[1]]
+    newDataList=[myDataList[0],newYVals]
+    return newDataList
+
+def getSubstractedList(myDataList,myRescaledList):
+    dataYVals=myDataList[1]
+    rescaledYVals=myRescaledList[1]
+    subsYVals=[datY-rescY for \
+               datY,rescY in zip(dataYVals,rescaledYVals)]
+    return [myDataList[0],subsYVals]

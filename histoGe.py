@@ -10,6 +10,7 @@ from math import sqrt, pi
 import sys
 import os.path
 from os.path import basename
+import re
 
 # mainPath=sys.path[0] # sources dir
 from myLibs.parsers import *
@@ -25,8 +26,13 @@ def getDictFromInfoFile(infoFileName):
     infoDict={}
     for line in open(infoFileName):
         print(line)
+        if len(re.split('\n\s*\n',line)[0])<=1:
+            print("skipping empty line")
+            print(line)
+            continue
         if line[0] == "#":
             print("skipping comment")
+            print(line)
             continue
         newList=line.split()
         infoDict[newList[2]]=[float(val)\
@@ -89,7 +95,7 @@ def main(args):
             "mca": getDictFromMCA,
             "Txt": getDictFromGammaVision
             }
-
+    mySubsList = None
     infoDict={} #From the info file
     #Here put the command line argument
     if len(args) == 1:
@@ -107,22 +113,52 @@ def main(args):
     print(myExtension)
 
     if len(args) == 4:
-        print("There are 4 arguments")
         print(args)
-        if args[2] != '-c':
-            print("error: second argument should be -c")
+        if args[2] not in ['-c','-r']:
+            print("error: second argument should be -c or -r")
             return False
         if not os.path.isfile(args[3]):
             print("error: %s does not exist" %(args[3]))
             return False
-        infoDict=getDictFromInfoFile(args[3])
+        if args[2] == "-c":
+            infoDict=getDictFromInfoFile(args[3])
+        elif args[2] == "-r":
+            print("Calling the new function")
+            myNewFilename = args[3]
+            print("myNewFilename=",myNewFilename)
+            myNewExtension = myNewFilename.split(".")[-1]
+            if myExtension != myNewExtension:
+                print("Error: background substraction needs the same extension as the main file. (for now)")
+                return 666
+            mySubsDict = functionDict[myNewExtension](args[3])
+            mySubsList = mySubsDict["theList"]
+
+
         print("infoDict = ")
         print(infoDict)
 
     print("myExtension = ",myExtension)
     mySpecialDict = functionDict[myExtension](args[1])
     myDataList = mySpecialDict["theList"]
-    plt.plot(myDataList[0],myDataList[1])
+
+    myLen1=len(myDataList[1])
+    plt.plot(myDataList[0],myDataList[1],label="data")
+
+    if mySubsList: # != None
+        myLen2=len(mySubsList[1])
+        print("myLens = ",myLen1, myLen2)
+        if myLen1 != myLen2:
+            print("Error: histograms do not hace the same length (can't continue (for now))")
+            return 667
+        time1=mySpecialDict["expoTime"]
+        time2=mySubsDict["expoTime"]
+        print("times are = ", time1,time2)
+        tRatio=time1/time2
+        print("tRatio = ",tRatio)
+        rescaledList=getRescaledList(mySubsList,tRatio)
+        subsTractedL=getSubstractedList(myDataList,rescaledList)
+        plt.plot(rescaledList[0],rescaledList[1],label="rescaledB")
+        plt.plot(subsTractedL[0],subsTractedL[1],label="substracted")
 
     print("")
     print("Entering fittingDict part")
@@ -168,6 +204,7 @@ def main(args):
     # plt.bar(np.arange(len(li)),li)
     # plt.yscale('log', nonposy='clip')
     print("exposition time = ", mySpecialDict["expoTime"])
+    plt.legend(loc='best')
     plt.show()
 
 if __name__ == "__main__":
