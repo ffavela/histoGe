@@ -65,15 +65,38 @@ def checkIfValidOpts(myOptDict, accOpts):
             return False
     return True
 
-def printHelp(argv, functionDict):
+def printHelp(argv, functionDict, extBool=False):
     # print("%s [-h|--help]\n" %(basename(argv[0])))
     # print("%s file0.fits [file1.fits ...] #displays fits file info\n" %(basename(argv[0])))
-    print("usage: %s file.extension [-c data4fits.info]"\
+
+    print("usage:\t%s -h #for extended help"\
           %(basename(argv[0])))
-    print("Valid extensions are:")
-    for ext in functionDict:
-        print("\t\t%s" %(ext))
-    return 1
+    print("\t%s [options] file.extension\n"\
+          %(basename(argv[0])))
+    if extBool:
+        print("If no options are provided then it simply plots the file.")
+        print("\noptions:")
+        print("\t-c:\tNeeds an .info file as argument.")
+        print("\t\tit uses the defined ranges for getting")
+        print("\t\trelevant statistics.\n")
+        print("\t-r:\tNeeds a spectrum file as argument.\n")
+        print("Valid extensions are:")
+        for ext in functionDict:
+            print("\t\t%s" %(ext))
+        print("\nExamples:\n")
+        print("\tThe files for the following examples can be downloaded from:\n")
+        print("\tPut url here!\n")
+        print("\tPut more readable names for the files!\n")
+        print("\tFor simply plotting the file:\n")
+        print("\t\t$ histoGe am241_blindaje_calibracion_645.mca\n")
+        print("\tFor doing peak statistics on the ranges defined\n\
+        inside an info file:\n")
+        print("\t\t$ histoGe am241_blindaje_calibracion_645.mca\
+ -c am241_blindaje_calibracion_645.info\n")
+        print("\tFor substracting the background:\n")
+        print("\t\t$ histoGe am241_blindaje_calibracion_645.mca\
+ -r bkgd_0_70_no_scope_3380.mca\n")
+    return
 
 def parseCalData(calStringData):
     myStrArray=calStringData.split(" ")
@@ -158,7 +181,10 @@ def main(argv):
     #Here put the command line argument
     myOptDict=getMyOptDict(argv)
     if len(argv) == 1 or '-h' in myOptDict:
-        printHelp(argv, functionDict)
+        extBool=True
+        if len(argv) == 1:
+            extBool=False
+        printHelp(argv, functionDict, extBool)
         return 1
 
 
