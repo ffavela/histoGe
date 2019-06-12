@@ -17,6 +17,64 @@ from myLibs.parsers import *
 from myLibs.gilmoreStats import *
 from myLibs.fitting import *
 
+accOpts=['-h', '--help','-c',\
+         '-r']
+
+def getMyOptDict(myArgs):
+    myOptDict={}
+    myOptDict['specFiles']=[]
+    myOptDict['infoFiles']=[]
+
+    tmpOpt=''
+    for i in range(len(myArgs)):
+        e=myArgs[i]
+        if e[0] == '-': #only changes if new option is found
+            myOptDict[e]=[]
+            tmpOpt=e
+            continue #Just skipping the option
+
+        if tmpOpt == '-r':
+            myOptDict[tmpOpt].append(i)
+            # so files with extensions are unambiguosly stored here
+            # and we avoid them getting into the specFiles entry
+            continue
+
+        if e.endswith('.Txt') or e.endswith('.SPE') or e.endswith('.mca'):
+            myOptDict['specFiles'].append(i)
+
+        if e.endswith('.info'):
+            myOptDict['infoFiles'].append(i)
+            #leaving the tmpOpt conditional after this one for now
+
+        if tmpOpt != '':
+            myOptDict[tmpOpt].append(i)
+
+    return myOptDict
+
+def checkIfValidOpts(myOptDict, accOpts):
+    if len(myOptDict['specFiles'])==0:
+        print("error: a spectrum file needs to be provided")
+        return False
+
+    for e in myOptDict:
+        if e == 'specFiles' or e == 'infoFiles':
+            #just ommiting these ones, they're not really options
+            continue
+        if e not in accOpts:
+            print("error: %s is not a valid option" %(e))
+            return False
+    return True
+
+def printHelp(argv, functionDict):
+    # print("%s [-h|--help]\n" %(basename(argv[0])))
+    # print("%s file0.fits [file1.fits ...] #displays fits file info\n" %(basename(argv[0])))
+    print("usage: %s file.extension [-c data4fits.info]"\
+          %(basename(argv[0])))
+    print("Valid extensions are:")
+    for ext in functionDict:
+        print("\t\t%s" %(ext))
+    return 1
+
 def parseCalData(calStringData):
     myStrArray=calStringData.split(" ")
     myValueArray=[float(val) for val in myStrArray]
@@ -87,8 +145,8 @@ there"""
         # return fittingDict
     return fittingDict
 
-def main(args):
-    #The following is adictionary that maps keys (file extensions) to
+def main(argv):
+    #The following is a dictionary that maps keys (file extensions) to
     #the proper parsing function. See parse
     functionDict = {
             "SPE": getDictFromSPE,
@@ -98,47 +156,55 @@ def main(args):
     mySubsList = None
     infoDict={} #From the info file
     #Here put the command line argument
-    if len(args) == 1:
-        print("usage: %s file.extension [-c data4fits.info]"\
-              %(basename(args[0])))
-        print("Valid extensions are:")
-        for ext in functionDict:
-            print("\t\t%s" %(ext))
+    myOptDict=getMyOptDict(argv)
+    if len(argv) == 1 or '-h' in myOptDict:
+        printHelp(argv, functionDict)
         return 1
 
-    myFilename = args[1]
+
+    print(myOptDict)
+    if not checkIfValidOpts(myOptDict, accOpts):
+        return 4
+
+    myFilename = argv[myOptDict['specFiles'][0]]
     print("myFilename=",myFilename)
     myExtension = myFilename.split(".")[-1]
 
-    print(myExtension)
-
-    if len(args) == 4:
-        print(args)
-        if args[2] not in ['-c','-r']:
-            print("error: second argument should be -c or -r")
+    if '-c' in myOptDict:
+        if len(myOptDict['-c']) == 0:
+            print("error: -c option needs an argument")
             return False
-        if not os.path.isfile(args[3]):
-            print("error: %s does not exist" %(args[3]))
+        infoFile=argv[myOptDict['-c'][0]]
+        if not os.path.isfile(infoFile):
+            print("error: %s does not exist, are you in the right path?"\
+                  %(infoFile))
             return False
-        if args[2] == "-c":
-            infoDict=getDictFromInfoFile(args[3])
-        elif args[2] == "-r":
-            print("Calling the new function")
-            myNewFilename = args[3]
-            print("myNewFilename=",myNewFilename)
-            myNewExtension = myNewFilename.split(".")[-1]
-            if myExtension != myNewExtension:
-                print("Error: background substraction needs the same extension as the main file. (for now)")
-                return 666
-            mySubsDict = functionDict[myNewExtension](args[3])
-            mySubsList = mySubsDict["theList"]
+        if not infoFile.endswith('.info'):
+            print("error: %s needs a .info extension" % (infoFile))
+            return False
+        infoDict=getDictFromInfoFile(infoFile)
+    elif '-r' in myOptDict:
+        if len(myOptDict['-r']) == 0:
+            print("error: -r option needs an argument")
+            return False
+        myNewFilename = argv[myOptDict['-r'][0]]
+        if not os.path.isfile(myNewFilename):
+            print("error: %s does not exist, are you in the right path?"\
+                  %(myNewFilename))
+            return False
 
+        if not myNewFilename.endswith(myExtension):
+            print("Error: background substraction needs the same extension as the main file. (for now)")
+            return False
+
+        mySubsDict = functionDict[myExtension](myNewFilename)
+        mySubsList = mySubsDict["theList"]
 
         print("infoDict = ")
         print(infoDict)
 
     print("myExtension = ",myExtension)
-    mySpecialDict = functionDict[myExtension](args[1])
+    mySpecialDict = functionDict[myExtension](argv[1])
     myDataList = mySpecialDict["theList"]
 
     myLen1=len(myDataList[1])
