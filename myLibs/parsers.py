@@ -28,17 +28,13 @@ def getDictFromSPE(speFile):
             fFound=line.find(":")
             newEntry=line[iFound+1:fFound] #Avoiding the :
             internDict[newEntry]=[]
-            print("newEntry = ", newEntry)
             continue
         internDict[newEntry].append(line)
-
-    print("Outside the for")
 
     myXvals=list(range(len(internDict["DATA"][1:])))
     myYvals=[float(yVal) for yVal in internDict["DATA"][1:]]
 
     if "ENER_FIT" in internDict:
-        print("internDict['ENER_FIT']", internDict['ENER_FIT'])
         aCoef,bCoef,cCoef=[float(e) for e in\
                            internDict['ENER_FIT'][0].split()]
         #Assuming E=bCoef*bin+aCoef, as I understood aCoef is
@@ -85,7 +81,6 @@ the px5.
         if line.find(strExpTime) != -1:
             tempList = line.split("-")
             internDict["expoTime"]=float(tempList[1])
-            print("expo time=",internDict["expoTime"])
 
         if line.find(strCal) != -1:
             calBool = True
@@ -114,13 +109,9 @@ the px5.
             mcaList.append(float(line))
 
     if len(x4cal) > 1:
-        print("Entered the calibration part")
-        print(x4cal,y4cal)
         a,b=getTentParams(x4cal,y4cal)
-        print(a,b)
         popt,pcov = curve_fit(myLine,x4cal, y4cal, p0=[a,b])
         a,b=popt
-        print(a,b)
         #Do the calibration etc
         xCalibrated = [a*ch+b for ch in range(len(mcaList))]
         totalList = [xCalibrated, mcaList]
@@ -136,7 +127,6 @@ def getDictFromGammaVision(gvFilename):
     gvList=[]
     str2init = "SPECTRUM"
     appendBool = False
-    print("Starting the gammaVision loop")
     for line in open(gvFilename):
         if not appendBool:
             semicolonI = line.find(":")
@@ -155,5 +145,4 @@ def getDictFromGammaVision(gvFilename):
     tStr="Real Time"
     if tStr in internDict:
         internDict["expoTime"]=float(internDict[tStr])
-        print("internDict[\"expoTime\"] = ",internDict["expoTime"])
     return internDict

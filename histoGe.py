@@ -18,7 +18,10 @@ from myLibs.gilmoreStats import *
 from myLibs.fitting import *
 
 accOpts=['-h', '--help','-c',\
-         '-r']
+         '-r','--ROI','-n',\
+         '--noPlot','--netArea',\
+         '--grossInt','--bkgd',\
+         '--extBkInt']
 
 def getMyOptDict(myArgs):
     myOptDict={}
@@ -28,7 +31,9 @@ def getMyOptDict(myArgs):
     tmpOpt=''
     for i in range(len(myArgs)):
         e=myArgs[i]
-        if e[0] == '-': #only changes if new option is found
+        if e[0] == '-' and not isFloat(e): #only changes if new option
+                                           #is found negative numbers
+                                           #are not options
             myOptDict[e]=[]
             tmpOpt=e
             continue #Just skipping the option
@@ -106,20 +111,13 @@ def parseCalData(calStringData):
 def getDictFromInfoFile(infoFileName):
     infoDict={}
     for line in open(infoFileName):
-        print(line)
         if len(re.split('\n\s*\n',line)[0])<=1:
-            print("skipping empty line")
-            print(line)
             continue
         if line[0] == "#":
-            print("skipping comment")
-            print(line)
             continue
         newList=line.split()
         infoDict[newList[2]]=[float(val)\
                               for val in newList[0:2]]
-        print("newList = ")
-        print(newList)
     return infoDict
 
 def doFittingStuff(infoDict,myDataList):
@@ -131,23 +129,16 @@ there"""
     for e in infoDict:
         xMin,xMax=infoDict[e]
         mean=(xMin+xMax)*0.5
-        print("calculated mean = ",mean)
 
         # mean=1460.68
-        print("xMin,xMax = ",xMin,xMax)
         minIdx,maxIdx=getIdxRangeVals(myDataList,\
                                       xMin,xMax)
         xVals=myDataList[0]
-        print("minIdx,maxIdx = ",minIdx,maxIdx)
-        print("xVals[minIdx],xVals[maxIdx] = ",\
-              xVals[minIdx],xVals[maxIdx])
         sigma=1.0 #need to automate this!!
         # a=150
         yVals=myDataList[1]
         a=max(yVals[minIdx:maxIdx])
-        print("a = ",a)
         c=(yVals[minIdx]+yVals[maxIdx])/2
-        print("c= ",c)
         #need to handle cases where fit fails
         try:
             popt,pcov = curve_fit(gaus,myDataList[0],\
@@ -158,15 +149,25 @@ there"""
             fittingDict[e]=[None,None,None,None,None,None,None]
             continue
 
-        print("popt,pcov = ",popt,pcov)
         a,mean,sigma,c=popt
-        print("a,mean,sigma,c = ",a,mean,sigma,c)
         myIntegral=a*sigma*sqrt(2*pi)
         myFWHM=fwhm(sigma)
         fittingDict[e]=[a,mean,sigma,c,minIdx,maxIdx,myFWHM]
-        print("myIntegral = ", myIntegral)
         # return fittingDict
     return fittingDict
+
+def isFloat(myStr):
+    try:
+        float(myStr)
+    except ValueError:
+        return False
+    return True
+
+def checkIfFloatVals(myList):
+    for v in myList:
+        if not isFloat(v):
+            return False
+    return True
 
 def main(argv):
     #The following is a dictionary that maps keys (file extensions) to
@@ -187,13 +188,10 @@ def main(argv):
         printHelp(argv, functionDict, extBool)
         return 1
 
-
-    print(myOptDict)
     if not checkIfValidOpts(myOptDict, accOpts):
         return 4
 
     myFilename = argv[myOptDict['specFiles'][0]]
-    print("myFilename=",myFilename)
     myExtension = myFilename.split(".")[-1]
 
     if '-c' in myOptDict:
@@ -220,37 +218,97 @@ def main(argv):
             return False
 
         if not myNewFilename.endswith(myExtension):
-            print("Error: background substraction needs the same extension as the main file. (for now)")
+            print("error: background substraction needs the same extension as the main file. (for now)")
             return False
+
 
         mySubsDict = functionDict[myExtension](myNewFilename)
         mySubsList = mySubsDict["theList"]
 
-        print("infoDict = ")
-        print(infoDict)
 
-    print("myExtension = ",myExtension)
+    if '--ROI' in myOptDict:
+        #This part should use somehow the infoDict
+        myROIIdxList=myOptDict['--ROI']
+        if len(myROIIdxList) == 0:
+            print("error: --ROI option needs arguments")
+            return False
+        if len(myROIIdxList) < 2:#should be == 2 but need to handle other
+                              #stuff first
+            print("error: --ROI needs 2 arguments")
+            return False
+        myROIIdxList=myROIIdxList[:2] #Just stripping any extra stuff
+        floatBool=checkIfFloatVals([argv[e] for e in myROIIdxList])
+        if not floatBool:
+            print("error: --ROI needs all arguments to be floats")
+            return False
+        myROIList=[float(argv[e]) for e in myROIIdxList]
+        if myROIList[0] >= myROIList[1]:
+            print("error: %.1f %.1f is an invalid range" %\
+                  (myROIList[0],myROIList[1]))
+            return False
+        print(myROIList)
+
+
+        if '--netArea' in myOptDict:
+            if myOptDict == {}:
+                print("error: --netArea needs the -c option used")
+                return 679
+
     mySpecialDict = functionDict[myExtension](argv[1])
     myDataList = mySpecialDict["theList"]
 
     myLen1=len(myDataList[1])
+
+    # there is an "Qt::AA_EnableHighDpiScaling" error here.
     plt.plot(myDataList[0],myDataList[1],label="data")
 
     if mySubsList: # != None
         myLen2=len(mySubsList[1])
         print("myLens = ",myLen1, myLen2)
         if myLen1 != myLen2:
-            print("Error: histograms do not hace the same length (can't continue (for now))")
+            print("error: histograms do not have the same length (can't continue (for now))")
             return 667
         time1=mySpecialDict["expoTime"]
         time2=mySubsDict["expoTime"]
-        print("times are = ", time1,time2)
         tRatio=time1/time2
-        print("tRatio = ",tRatio)
         rescaledList=getRescaledList(mySubsList,tRatio)
         subsTractedL=getSubstractedList(myDataList,rescaledList)
         plt.plot(rescaledList[0],rescaledList[1],label="rescaledB")
         plt.plot(subsTractedL[0],subsTractedL[1],label="substracted")
+
+    if '--netArea' in myOptDict:
+        print("--netArea option is present")
+        for e in infoDict:
+            lowXVal,uppXVal=infoDict[e]
+            myNetArea=gilmoreNetArea(myDataList,lowXVal,uppXVal)
+            print(e, myNetArea)
+
+    if '--grossInt' in myOptDict:
+        print("--grossInt option is present")
+        for e in infoDict:
+            lowXVal,uppXVal=infoDict[e]
+            myGrossInt=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
+            print(e, myGrossInt)
+
+    if '--bkgd' in myOptDict:
+        print("--bkgd option is present")
+        for e in infoDict:
+            lowXVal,uppXVal=infoDict[e]
+            myBkgd=gilmoreBackground(myDataList,lowXVal,uppXVal)
+            print(e, myBkgd)
+
+    if  '--extBkInt' in myOptDict:
+        print("--extBkInt option is present")
+        for e in infoDict:
+            lowXVal,uppXVal=infoDict[e]
+            myExtBkInt=gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal)
+            print(e, myExtBkInt)
+
+    if '--netArea' in myOptDict or\
+       '--grossInt' in myOptDict or\
+       '--bkgd' in myOptDict or\
+       '--extBkInt' in myOptDict:
+        return 0
 
     print("")
     print("Entering fittingDict part")
@@ -297,7 +355,13 @@ def main(argv):
     # plt.yscale('log', nonposy='clip')
     print("exposition time = ", mySpecialDict["expoTime"])
     plt.legend(loc='best')
-    plt.show()
+
+    if '--noPlot' in myOptDict:
+        #this option and -n are equivalent.
+        myOptDict['-n']=[]
+
+    if '-n' not in myOptDict:
+        plt.show()
 
 if __name__ == "__main__":
     main(sys.argv)

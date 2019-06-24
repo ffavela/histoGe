@@ -101,4 +101,3 @@ def doGilmoreStuff(infoDict,myDataList):
 
         # return gilmoreDict
     return gilmoreDict
-
