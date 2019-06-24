@@ -49,7 +49,7 @@ def gilmoreSigma(myDataList,lowXVal,uppXVal):
     sigma_A=np.sqrt(A+2*B)
     return sigma_A
 
-def gilmoreExtendedSigma(myDataList,lowXVal,uppXVal,m):
+def gilmoreExtendedSigma(myDataList,lowXVal,uppXVal,m=5):
     xVals,yVals=myDataList
     L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
     n=U-L

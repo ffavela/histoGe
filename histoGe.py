@@ -20,7 +20,8 @@ accOpts=['-h', '--help','-c',\
          '-r','--ROI','-n',\
          '--noPlot','--netArea',\
          '--grossInt','--bkgd',\
-         '--extBkInt']
+         '--extBkInt','--gSigma',\
+         '--extSigma']
 
 def getMyOptDict(myArgs):
     myOptDict={}
@@ -84,6 +85,16 @@ def printHelp(argv, functionDict, extBool=False):
         print("\t\tit uses the defined ranges for getting")
         print("\t\trelevant statistics.\n")
         print("\t-r:\tNeeds a spectrum file as argument.\n")
+        print("Extra options (-c is required, Gilmore Stats):\n")
+        print("\t--netArea:\tCalculates net area.\n")
+        print("\t--grossInt:\t Calculates gross integral\n")
+        print("\t--extBkIn:\t Calculates integral taking into")
+        print("\t\t account surrounding bins (5 by default)")
+        print("\t\t before and after the region of interest\n")
+        print("\t--gSigma:\t Calculates Sigma using Gilmore's")
+        print("\t\t method\n")
+        print("\t--extSigma:\t same as gSigma but using 5 bins")
+        print("\t\t before and after region\n")
         print("Valid extensions are:")
         for ext in functionDict:
             print("\t\t%s" %(ext))
@@ -275,7 +286,7 @@ def main(argv):
         plt.plot(rescaledList[0],rescaledList[1],label="rescaledB")
         plt.plot(subsTractedL[0],subsTractedL[1],label="substracted")
 
-    myHStr="#tags"
+    myHStr="#tags" #Header String
     myStatsD={e: [] for e in infoDict}
     if '--netArea' in myOptDict:
         myHStr+="\tnetArea"
@@ -302,13 +313,30 @@ def main(argv):
         myHStr+="\textBkInt"
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
-            myExtBkInt=gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal)
-            myStatsD[e].append(myExtBkInt)
+            myExtBk=gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal)
+            myStatsD[e].append(myExtBk)
+
+    if  '--gSigma' in myOptDict:
+        myHStr+="\tgSigma"
+        for e in infoDict:
+            lowXVal,uppXVal=infoDict[e]
+            mygSigma=gilmoreSigma(myDataList,lowXVal,uppXVal)
+            myStatsD[e].append(mygSigma)
+
+    if  '--extSigma' in myOptDict:
+        myHStr+="\textSigma"
+        for e in infoDict:
+            lowXVal,uppXVal=infoDict[e]
+            myExtSigma=gilmoreExtendedSigma(myDataList,lowXVal,uppXVal)
+            myStatsD[e].append(myExtSigma)	
+           
 
     if '--netArea' in myOptDict or\
        '--grossInt' in myOptDict or\
        '--bkgd' in myOptDict or\
-       '--extBkInt' in myOptDict:
+       '--extBkInt' in myOptDict or\
+       '--gSigma' in myOptDict or\
+       '--extSigma' in myOptDict:
         print(myHStr)
         myFStr="%s"
         for e in myStatsD:
