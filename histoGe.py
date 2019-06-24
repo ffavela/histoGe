@@ -1,5 +1,4 @@
-#!/usr/bin/python
-###!/home/mauricio/anaconda3/bin/python3
+#!/usr/bin/python3
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -276,38 +275,49 @@ def main(argv):
         plt.plot(rescaledList[0],rescaledList[1],label="rescaledB")
         plt.plot(subsTractedL[0],subsTractedL[1],label="substracted")
 
+    myHStr="#tags"
+    myStatsD={e: [] for e in infoDict}
     if '--netArea' in myOptDict:
-        print("--netArea option is present")
+        myHStr+="\tnetArea"
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             myNetArea=gilmoreNetArea(myDataList,lowXVal,uppXVal)
-            print(e, myNetArea)
+            myStatsD[e].append(myNetArea)
 
     if '--grossInt' in myOptDict:
-        print("--grossInt option is present")
+        myHStr+="\tgrInt"
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             myGrossInt=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
-            print(e, myGrossInt)
+            myStatsD[e].append(myGrossInt)
 
     if '--bkgd' in myOptDict:
-        print("--bkgd option is present")
+        myHStr+="\tbkgd"
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             myBkgd=gilmoreBackground(myDataList,lowXVal,uppXVal)
-            print(e, myBkgd)
+            myStatsD[e].append(myBkgd)
 
     if  '--extBkInt' in myOptDict:
-        print("--extBkInt option is present")
+        myHStr+="\textBkInt"
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             myExtBkInt=gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal)
-            print(e, myExtBkInt)
+            myStatsD[e].append(myExtBkInt)
 
     if '--netArea' in myOptDict or\
        '--grossInt' in myOptDict or\
        '--bkgd' in myOptDict or\
        '--extBkInt' in myOptDict:
+        print(myHStr)
+        myFStr="%s"
+        for e in myStatsD:
+            myLen=len(myStatsD[e])
+            break
+        for i in range(myLen):
+            myFStr+="\t%0.2f"
+        for e in myStatsD:
+            print(myFStr %tuple([e]+myStatsD[e]))
         return 0
 
     print("")
