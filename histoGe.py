@@ -38,10 +38,14 @@ def getMyOptDict(myArgs):
             tmpOpt=e
             continue #Just skipping the option
 
-        if tmpOpt == '-r':
-            myOptDict[tmpOpt].append(i)
-            # so files with extensions are unambiguosly stored here
-            # and we avoid them getting into the specFiles entry
+        if tmpOpt == '-r' and '-r' not in myOptDict:
+            #There should be only one argument in -r. If there are
+            #more (hence the '-r' not in myOptDict) then they are
+            #taken as specFiles.
+
+            myOptDict[tmpOpt].append(i) #only 1 should be appended, we
+                                        #avoid them getting this into
+                                        #the specFiles entry
             continue
 
         if e.endswith('.Txt') or e.endswith('.SPE') or e.endswith('.mca'):
@@ -328,8 +332,8 @@ def main(argv):
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             myExtSigma=gilmoreExtendedSigma(myDataList,lowXVal,uppXVal)
-            myStatsD[e].append(myExtSigma)	
-           
+            myStatsD[e].append(myExtSigma)
+
 
     if '--netArea' in myOptDict or\
        '--grossInt' in myOptDict or\
