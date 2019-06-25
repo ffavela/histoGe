@@ -38,11 +38,12 @@ def getMyOptDict(myArgs):
             tmpOpt=e
             continue #Just skipping the option
 
-        if tmpOpt == '-r' and '-r' not in myOptDict:
+        if tmpOpt == '-r':
             #There should be only one argument in -r. If there are
             #more (hence the '-r' not in myOptDict) then they are
             #taken as specFiles.
 
+            print("here HERE")
             myOptDict[tmpOpt].append(i) #only 1 should be appended, we
                                         #avoid them getting this into
                                         #the specFiles entry
@@ -205,7 +206,11 @@ def main(argv):
     if not checkIfValidOpts(myOptDict, accOpts):
         return 4
 
-    myFilename = argv[myOptDict['specFiles'][0]]
+    myFList=[argv[myOptDict['specFiles'][i]]\
+             for i in range(len(myOptDict['specFiles']))]
+    print("myFList = ", myFList)
+    # myFilename = argv[myOptDict['specFiles'][0]]
+    myFilename = myFList[0]
     myExtension = myFilename.split(".")[-1]
 
     if '-c' in myOptDict:
@@ -268,15 +273,30 @@ def main(argv):
                 print("error: --netArea needs the -c option used")
                 return 679
 
-    mySpecialDict = functionDict[myExtension](argv[1])
+    if len(myFList) > 1:
+        print("Doing multiplot stuff")
+        specialX=None
+        for e in myFList:
+            print(e)
+            mySpecialDict = functionDict[myExtension](e)
+            myDataList = mySpecialDict["theList"]
+            if specialX == None:
+                #Will only use the x values of the first file
+                #even if calibration is different.
+                specialX=myDataList[0]
+            plt.plot(specialX,myDataList[1],label=e)
+        plt.show()
+        return 3905
+
+    mySpecialDict = functionDict[myExtension](myFilename)
     myDataList = mySpecialDict["theList"]
 
-    myLen1=len(myDataList[1])
 
     # there is an "Qt::AA_EnableHighDpiScaling" error here.
     plt.plot(myDataList[0],myDataList[1],label="data")
 
     if mySubsList: # != None
+        myLen1=len(myDataList[1])
         myLen2=len(mySubsList[1])
         print("myLens = ",myLen1, myLen2)
         if myLen1 != myLen2:
