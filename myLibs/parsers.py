@@ -10,7 +10,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 from myLibs.fitting import *
 
-def getDictFromSPE(speFile):
+def getDictFromSPE(speFile,calFlag=True):
     """Parses the .SPE file format that is used in Boulby"""
     internDict = {}
     myCounter=0
@@ -34,7 +34,7 @@ def getDictFromSPE(speFile):
     myXvals=list(range(len(internDict["DATA"][1:])))
     myYvals=[float(yVal) for yVal in internDict["DATA"][1:]]
 
-    if "ENER_FIT" in internDict:
+    if "ENER_FIT" in internDict and calFlag:
         aCoef,bCoef,cCoef=[float(e) for e in\
                            internDict['ENER_FIT'][0].split()]
         #Assuming E=bCoef*bin+aCoef, as I understood aCoef is
@@ -56,7 +56,7 @@ def getDictFromSPE(speFile):
 
     return internDict
 
-def getDictFromMCA(mcaFilename):
+def getDictFromMCA(mcaFilename,calFlag=True):
     """Parses the .mca file format comming from either the micro mca or
 the px5.
 
@@ -91,7 +91,7 @@ the px5.
             calBool = False
             continue
 
-        if calBool:
+        if calBool and calFlag:
             if line.find(strIgn) != -1:
                 continue
 
@@ -121,7 +121,7 @@ the px5.
     internDict["theList"]=totalList
     return internDict
 
-def getDictFromGammaVision(gvFilename):
+def getDictFromGammaVision(gvFilename, calFlag=True):
     """Parses the .Txt files from gammaVision"""
     internDict = {}
     gvList=[]

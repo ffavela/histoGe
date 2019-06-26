@@ -21,7 +21,7 @@ accOpts=['-h', '--help','-c',\
          '--noPlot','--netArea',\
          '--grossInt','--bkgd',\
          '--extBkInt','--gSigma',\
-         '--extSigma']
+         '--extSigma','--noCal']
 
 def getMyOptDict(myArgs):
     myOptDict={}
@@ -43,7 +43,6 @@ def getMyOptDict(myArgs):
             #more (hence the '-r' not in myOptDict) then they are
             #taken as specFiles.
 
-            print("here HERE")
             myOptDict[tmpOpt].append(i) #only 1 should be appended, we
                                         #avoid them getting this into
                                         #the specFiles entry
@@ -81,25 +80,31 @@ def printHelp(argv, functionDict, extBool=False):
 
     print("usage:\t%s -h #for extended help"\
           %(basename(argv[0])))
-    print("\t%s [options] file.extension\n"\
+    print("\t%s [options] file.extension"\
+          %(basename(argv[0])))
+    print("\t%s file1.extension [file2.extension ...] #multifile plot"\
           %(basename(argv[0])))
     if extBool:
+        print("")
         print("If no options are provided then it simply plots the file.")
         print("\noptions:")
         print("\t-c:\tNeeds an .info file as argument.")
         print("\t\tit uses the defined ranges for getting")
         print("\t\trelevant statistics.\n")
         print("\t-r:\tNeeds a spectrum file as argument.\n")
-        print("Extra options (-c is required, Gilmore Stats):\n")
+        print("Extra options:\n")
+        print("\t--noCal:\tWill not use any calibration info.")
+        print("\t\t\tMight mess with your ranges (used with -c).\n")
+        print("Extra options 2 (-c is required), Gilmore Stats:\n")
         print("\t--netArea:\tCalculates net area.\n")
-        print("\t--grossInt:\t Calculates gross integral\n")
-        print("\t--extBkIn:\t Calculates integral taking into")
-        print("\t\t account surrounding bins (5 by default)")
-        print("\t\t before and after the region of interest\n")
-        print("\t--gSigma:\t Calculates Sigma using Gilmore's")
-        print("\t\t method\n")
-        print("\t--extSigma:\t same as gSigma but using 5 bins")
-        print("\t\t before and after region\n")
+        print("\t--grossInt:\tCalculates gross integral.\n")
+        print("\t--extBkIn:\tCalculates integral taking into")
+        print("\t\t\taccount surrounding bins (5 by default)")
+        print("\t\t\tbefore and after the region of interest.\n")
+        print("\t--gSigma:\tCalculates Sigma using Gilmore's")
+        print("\t\t\tmethod.\n")
+        print("\t--extSigma:\tSame as gSigma but using 5 bins")
+        print("\t\t\tbefore and after region.\n")
         print("Valid extensions are:")
         for ext in functionDict:
             print("\t\t%s" %(ext))
@@ -240,8 +245,12 @@ def main(argv):
             print("error: background substraction needs the same extension as the main file. (for now)")
             return False
 
-
-        mySubsDict = functionDict[myExtension](myNewFilename)
+        if '--noCal' in myOptDict:
+            print("Entered --noCal part")
+            mySubsDict = functionDict[myExtension](myNewFilename,\
+                                                   False)
+        else:
+            mySubsDict = functionDict[myExtension](myNewFilename)
         mySubsList = mySubsDict["theList"]
 
 
@@ -278,7 +287,12 @@ def main(argv):
         specialX=None
         for e in myFList:
             print(e)
-            mySpecialDict = functionDict[myExtension](e)
+            if '--noCal' in myOptDict:
+                mySpecialDict = functionDict[myExtension](e,\
+                                                          False)
+            else:
+                mySpecialDict = functionDict[myExtension](e)
+
             myDataList = mySpecialDict["theList"]
             if specialX == None:
                 #Will only use the x values of the first file
@@ -287,8 +301,10 @@ def main(argv):
             plt.plot(specialX,myDataList[1],label=e)
         plt.show()
         return 3905
-
-    mySpecialDict = functionDict[myExtension](myFilename)
+    if '--noCal' in myOptDict:
+        mySpecialDict = functionDict[myExtension](myFilename,False)
+    else:
+        mySpecialDict = functionDict[myExtension](myFilename)
     myDataList = mySpecialDict["theList"]
 
 
