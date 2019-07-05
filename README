@@ -9,7 +9,7 @@ To install, simply do a:
 
 $ mkdir -p ~/.myPrograms
 $ cd ~/.myPrograms
-$ ls -s /path/to/histoGe/histoGe.py histoGe # replace with proper path
+$ ln -s /path/to/histoGe/histoGe.py histoGe # replace with proper path
 
 Then open your shell rc file and put a line to export the new path, for
 example if you are using bash then do a:
