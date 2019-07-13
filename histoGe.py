@@ -15,13 +15,15 @@ import re
 from myLibs.parsers import *
 from myLibs.gilmoreStats import *
 from myLibs.fitting import *
+from myLibs.autoPeakFunk import *
 
 accOpts=['-h', '--help','-c',\
          '-r','--ROI','-n','--dump',\
          '--noPlot','--netArea',\
          '--grossInt','--bkgd',\
          '--extBkInt','--gSigma',\
-         '--extSigma','--noCal']
+         '--extSigma','--noCal',\
+         '--autoPeak']
 
 def isValidSpecFile(strVal):
     if strVal.endswith('.Txt') or\
@@ -103,6 +105,7 @@ def printHelp(argv, functionDict, extBool=False):
           %(basename(argv[0])))
     print("\t%s file1.extension [file2.extension ...] #multifile plot"\
           %(basename(argv[0])))
+    print("\t%s file.extension --autoPeak" %(basename(argv[0])))
     if extBool:
         print("")
         print("If no options are provided then it simply plots the file.")
@@ -293,7 +296,6 @@ def main(argv):
             return False
         print(myROIList)
 
-
         if '--netArea' in myOptDict:
             if myOptDict == {}:
                 print("error: --netArea needs the -c option used")
@@ -342,7 +344,8 @@ def main(argv):
         return 0
 
     # there is an "Qt::AA_EnableHighDpiScaling" error here.
-    plt.plot(myDataList[0],myDataList[1],label="data")
+    if "--autoPeak" not in myOptDict:
+        plt.plot(myDataList[0],myDataList[1],label="data")
 
     if mySubsList: # != None
         myLen1=len(myDataList[1])
@@ -418,6 +421,15 @@ def main(argv):
             myFStr+="\t%0.2f"
         for e in myStatsD:
             print(myFStr %tuple([e]+myStatsD[e]))
+        return 0
+
+    if '--autoPeak' in myOptDict:
+        print('autoPeak option found')
+        printTest()
+        x = np.random.randn(100)
+        x[60:81] = np.nan
+        ind = detect_peaks(myDataList[1],mph=10, mpd=80, show=True)
+        print(ind)
         return 0
 
     print("")
