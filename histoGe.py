@@ -17,11 +17,24 @@ from myLibs.gilmoreStats import *
 from myLibs.fitting import *
 
 accOpts=['-h', '--help','-c',\
-         '-r','--ROI','-n',\
+         '-r','--ROI','-n','--dump',\
          '--noPlot','--netArea',\
          '--grossInt','--bkgd',\
          '--extBkInt','--gSigma',\
          '--extSigma','--noCal']
+
+def isValidSpecFile(strVal):
+    if strVal.endswith('.Txt') or\
+       strVal.endswith('.SPE') or\
+       strVal.endswith('.mca'):
+        return True
+    return False
+
+def isDataFile(strVal):
+    if isValidSpecFile(strVal) or\
+       strVal.endswith('.info'):
+        return True
+    return False
 
 def getMyOptDict(myArgs):
     myOptDict={}
@@ -48,7 +61,8 @@ def getMyOptDict(myArgs):
                                         #the specFiles entry
             continue
 
-        if e.endswith('.Txt') or e.endswith('.SPE') or e.endswith('.mca'):
+        # if e.endswith('.Txt') or e.endswith('.SPE') or e.endswith('.mca'):
+        if isValidSpecFile(e):
             myOptDict['specFiles'].append(i)
 
         if e.endswith('.info'):
@@ -56,8 +70,11 @@ def getMyOptDict(myArgs):
             #leaving the tmpOpt conditional after this one for now
 
         if tmpOpt != '':
-            myOptDict[tmpOpt].append(i)
-
+            if tmpOpt != '--dump':
+                myOptDict[tmpOpt].append(i)
+            else:
+                if not isDataFile(e):
+                    myOptDict[tmpOpt].append(i)
     return myOptDict
 
 def checkIfValidOpts(myOptDict, accOpts):
@@ -81,6 +98,8 @@ def printHelp(argv, functionDict, extBool=False):
     print("usage:\t%s -h #for extended help"\
           %(basename(argv[0])))
     print("\t%s [options] file.extension"\
+          %(basename(argv[0])))
+    print("\t%s --dump [number] file.extension"\
           %(basename(argv[0])))
     print("\t%s file1.extension [file2.extension ...] #multifile plot"\
           %(basename(argv[0])))
@@ -213,7 +232,6 @@ def main(argv):
 
     myFList=[argv[myOptDict['specFiles'][i]]\
              for i in range(len(myOptDict['specFiles']))]
-    print("myFList = ", myFList)
     # myFilename = argv[myOptDict['specFiles'][0]]
     myFilename = myFList[0]
     myExtension = myFilename.split(".")[-1]
@@ -252,7 +270,6 @@ def main(argv):
         else:
             mySubsDict = functionDict[myExtension](myNewFilename)
         mySubsList = mySubsDict["theList"]
-
 
     if '--ROI' in myOptDict:
         #This part should use somehow the infoDict
@@ -307,6 +324,22 @@ def main(argv):
         mySpecialDict = functionDict[myExtension](myFilename)
     myDataList = mySpecialDict["theList"]
 
+    if '--dump' in myOptDict:
+        dumpSize=None
+        if myOptDict['--dump'] != []:
+            dumpSize=int(argv[myOptDict['--dump'][0]])
+
+        print("#chanOrE\tcounts")
+        mDX,mDY = myDataList
+        if dumpSize != None:
+            if dumpSize >= 0:
+                mDX,mDY=mDX[:dumpSize],mDY[:dumpSize]
+            else:
+                mDX,mDY=mDX[dumpSize:],mDY[dumpSize:]
+
+        for xDVal,yDVal in zip(mDX,mDY):
+            print("%0.4f\t%0.4f" %(xDVal,yDVal))
+        return 0
 
     # there is an "Qt::AA_EnableHighDpiScaling" error here.
     plt.plot(myDataList[0],myDataList[1],label="data")
@@ -369,7 +402,6 @@ def main(argv):
             lowXVal,uppXVal=infoDict[e]
             myExtSigma=gilmoreExtendedSigma(myDataList,lowXVal,uppXVal)
             myStatsD[e].append(myExtSigma)
-
 
     if '--netArea' in myOptDict or\
        '--grossInt' in myOptDict or\
