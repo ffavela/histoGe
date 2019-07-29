@@ -74,18 +74,6 @@ class gamma_spectrum:
         np.savez(outName, detector_flag=self.detectorFlag, counts_in_bins=self.countsInBins, first_bin_value=self.firstBinValue, bin_width=self.binWidth, energy_calibration_offsets=self.energyCalibration_bValues, energy_calibration_multipliers=self.energyCalibration_aValues, energy_calibration_exponents=self.energyCalibration_cValues, life_time=self.lifeTime)
 
 
-if __name__ == "__main__":
-    # fetch input parameters
-    parser = argparse.ArgumentParser(description='This is for testing the function writting the gamma spectrum')
-    parser.add_argument('inputFile', metavar='f', type=str, nargs='?', help='Input file')
-    parser.add_argument('-d', help='Detector flag (currently only \"boulby\" is defined', type=str, default="")
-    args = parser.parse_args()
 
-    spectrum = gamma_spectrum(args.inputFile, args.d)
-    spectrum.read_spectrum_from_raw_file()
-
-    spectrum.get_bin_energies()
-
-    spectrum.write_to_npz()
 
 
