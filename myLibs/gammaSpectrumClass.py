@@ -87,8 +87,9 @@ class gamma_spectrum:
         # ... if yes: do nothing
         else: print("Spectrum already set-up from %s" %(self.fileName))
 
-        
-            
+    # get a list with all the bin contents
+    def get_bin_contents(self):
+        return self.countsInBins
 
     # create a list of bins
     def get_bin_list(self):
