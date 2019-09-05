@@ -23,7 +23,7 @@ accOpts=['-h', '--help','-c',\
          '--grossInt','--bkgd',\
          '--extBkInt','--gSigma',\
          '--extSigma','--noCal',\
-         '--autoPeak']
+         '--autoPeak','--log']
 
 def isValidSpecFile(strVal):
     if strVal.endswith('.Txt') or\
@@ -318,6 +318,10 @@ def main(argv):
                 #even if calibration is different.
                 specialX=myDataList[0]
             plt.plot(specialX,myDataList[1],label=e)
+            plt.legend(loc='best')
+            #print(e)
+        if '--log' in myOptDict:
+            plt.yscale('log')
         plt.show()
         return 3905
     if '--noCal' in myOptDict:
@@ -345,7 +349,7 @@ def main(argv):
 
     # there is an "Qt::AA_EnableHighDpiScaling" error here.
     if "--autoPeak" not in myOptDict:
-        plt.plot(myDataList[0],myDataList[1],label="data")
+        plt.plot(myDataList[0],myDataList[1],label=myFilename)
 
     if mySubsList: # != None
         myLen1=len(myDataList[1])
@@ -483,6 +487,8 @@ def main(argv):
         myOptDict['-n']=[]
 
     if '-n' not in myOptDict:
+        if '--log' in myOptDict:
+            plt.yscale('log')
         plt.show()
 
 if __name__ == "__main__":
