@@ -18,7 +18,7 @@ def getDictFromSPE(speFile,calFlag=True):
     myXvals=[]
     myYvals=[]
     calBool=False
-
+    internDict['calBoolean']=False
     appendBool=False
 
     str2init = "DATA"
@@ -45,6 +45,7 @@ def getDictFromSPE(speFile,calFlag=True):
     if bCoef != 0:
         eBins=np.array([bCoef*xVal+bCoef for xVal in myXvals])
         internDict["theList"]=[eBins,myYvals]
+        internDict['calBoolean']=True
     else:
         print("No calibration info, weird. Using normal bins.")
         internDict["theList"]=[myXvals,myYvals]
@@ -70,7 +71,7 @@ the px5.
     strCalEnd = "<<"
     strExpTime= "REAL_TIME"
     appendBool = False
-
+    internDict['calBoolean']=False
     calBool = False
 
     x4cal=[]
@@ -115,6 +116,7 @@ the px5.
         #Do the calibration etc
         xCalibrated = [a*ch+b for ch in range(len(mcaList))]
         totalList = [xCalibrated, mcaList]
+        internDict['calBoolean']=True
     else:
         totalList=[range(len(mcaList)),mcaList]
 
@@ -127,6 +129,7 @@ def getDictFromGammaVision(gvFilename, calFlag=True):
     gvList=[]
     str2init = "SPECTRUM"
     appendBool = False
+    internDict['calBoolean']=False
     for line in open(gvFilename):
         if not appendBool:
             semicolonI = line.find(":")

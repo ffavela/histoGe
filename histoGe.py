@@ -23,7 +23,8 @@ accOpts=['-h', '--help','-c',\
          '--grossInt','--bkgd',\
          '--extBkInt','--gSigma',\
          '--extSigma','--noCal',\
-         '--autoPeak','--log']
+         '--autoPeak','--log',\
+         '--noBkgd']
 
 def isValidSpecFile(strVal):
     if strVal.endswith('.Txt') or\
@@ -320,8 +321,16 @@ def main(argv):
             plt.plot(specialX,myDataList[1],label=e)
             plt.legend(loc='best')
             #print(e)
-        if '--log' in myOptDict:
-            plt.yscale('log')
+        if '-n' not in myOptDict:
+            if '--log' in myOptDict:
+               plt.yscale('log')
+            if '--noCal' not in myOptDict and mySpecialDict['calBoolean'] == True:
+                plt.xlabel('Energies [KeV]')
+            else:
+                plt.xlabel('Channels')
+        plt.ylabel('Counts')
+        plt.title(myFilename)
+
         plt.show()
         return 3905
     if '--noCal' in myOptDict:
@@ -363,7 +372,8 @@ def main(argv):
         tRatio=time1/time2
         rescaledList=getRescaledList(mySubsList,tRatio)
         subsTractedL=getSubstractedList(myDataList,rescaledList)
-        plt.plot(rescaledList[0],rescaledList[1],label="rescaledB")
+        if "--noBkgd" not in myOptDict:
+            plt.plot(rescaledList[0],rescaledList[1],label="rescaledB")
         plt.plot(subsTractedL[0],subsTractedL[1],label="substracted")
 
     myHStr="#tags" #Header String
@@ -489,6 +499,14 @@ def main(argv):
     if '-n' not in myOptDict:
         if '--log' in myOptDict:
             plt.yscale('log')
+        if '--noCal' not in myOptDict and mySpecialDict['calBoolean'] == True:
+            plt.xlabel('Energies [KeV]')
+        else:
+            plt.xlabel('Channels')
+
+
+        plt.ylabel('Counts')
+        plt.title(myFilename)
         plt.show()
 
 if __name__ == "__main__":
