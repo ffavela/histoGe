@@ -27,7 +27,7 @@ accOpts=['-h', '--help','-c',\
          '--extSigma','--noCal',\
          '--autoPeak','--log',\
          '--noBkgd','--rebin',\
-         '-q']
+         '-q','--query']
 
 def isValidSpecFile(strVal):
     if strVal.endswith('.Txt') or\
@@ -81,6 +81,10 @@ def getMyOptDict(myArgs):
             else:
                 if not isDataFile(e):
                     myOptDict[tmpOpt].append(i)
+
+    if '--query' in myOptDict:
+        myOptDict['-q']=myOptDict['--query']
+
     return myOptDict
 
 def checkIfValidOpts(myOptDict, accOpts):
@@ -105,6 +109,8 @@ def printHelp(argv, functionDict, extBool=False):
     # print("%s file0.fits [file1.fits ...] #displays fits file info\n" %(basename(argv[0])))
 
     print("usage:\t%s -h #for extended help"\
+          %(basename(argv[0])))
+    print("\t%s (-q|--query) iEner fEner #DB handling"\
           %(basename(argv[0])))
     print("\t%s [options] file.extension"\
           %(basename(argv[0])))
@@ -222,6 +228,28 @@ def checkIfFloatVals(myList):
             return False
     return True
 
+def checkQOption(myOptDict,argv):
+    if '-q' not in myOptDict:
+        print("this is a programming error, -q should be defined!")
+        return False
+    myList=[argv[i] for i in myOptDict["-q"]]
+    if not checkIfFloatVals(myList):
+        print("error: query values should be floats")
+        return False
+
+    if len(myList) != 2:
+        print("error: query option needs exactly 2 values")
+        return False
+
+    iEner=myList[0]
+    fEner=myList[1]
+
+    if iEner > fEner:
+        print("error: initial value has to be lower than final")
+        return False
+
+    return True
+
 def checkRebinOpt(myOptDict,argv):
     if '--rebin' not in myOptDict:
         print("error: this function should not have been called, this is a\
@@ -266,8 +294,10 @@ def main(argv):
         return 4
 
     if '-q' in myOptDict:
-        #print("Hello world!!")
-        #print("Do database query stuff here")
+        if not checkQOption(myOptDict,argv):
+            print("there were errors in the query")
+            return False
+
         conexion = OpenDatabase()
         try:
             iEner=float(argv[myOptDict['-q'][0]])
@@ -523,10 +553,25 @@ def main(argv):
     if '--autoPeak' in myOptDict:
         print('autoPeak option found')
         printTest()
-        x = np.random.randn(100)
-        x[60:81] = np.nan
-        ind = detect_peaks(myDataList[1],mph=10, mpd=80, show=True)
+        # x = np.random.randn(100)
+        # x[60:81] = np.nan
+        ind = detect_peaks(myDataList[1],mph=10, mpd=80, show=False)
+
         print(ind)
+        peakXVals=[myDataList[0][i] for i in ind]
+        peakYVals=[myDataList[1][i] for i in ind]
+        print(peakXVals,peakYVals)
+        if '--noPlot' not in myOptDict:
+            if '--log' in myOptDict:
+                plt.yscale('log')
+            if '--noCal' not in myOptDict and mySpecialDict['calBoolean'] == True:
+                plt.xlabel('Energies [KeV]')
+            else:
+                plt.xlabel('Channels')
+
+            plt.plot(myDataList[0],myDataList[1],label="testing")
+            plt.plot(peakXVals, peakYVals, 'ro')
+            plt.show()
         return 0
 
     print("")
