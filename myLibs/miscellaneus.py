@@ -39,3 +39,15 @@ def getSubstractedList(myDataList,myRescaledList):
     subsYVals=[datY-rescY for \
                datY,rescY in zip(dataYVals,rescaledYVals)]
     return [myDataList[0],subsYVals]
+
+def getRebinedList(myDataList,rebInt):
+    xVals,yVals=myDataList
+    assert (len(xVals) == len(yVals)), "Can't continue if arrays are not the same size!!"
+    newYVals = np.add.reduceat(yVals, np.arange(0, len(yVals), rebInt))
+    newXVals = xVals[rebInt//2::rebInt] #numpy slice.
+    if len(newYVals) != len(newXVals):
+        #If here then only 1 xValue was truncated.
+        res=len(xVals)%rebInt
+        theIdx=(len(xVals)//rebInt)*rebInt+res//2
+        newXVals=np.append(newXVals,[xVals[theIdx]])
+    return [newXVals,newYVals]

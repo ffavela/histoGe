@@ -24,7 +24,7 @@ accOpts=['-h', '--help','-c',\
          '--extBkInt','--gSigma',\
          '--extSigma','--noCal',\
          '--autoPeak','--log',\
-         '--noBkgd']
+         '--noBkgd','--rebin']
 
 def isValidSpecFile(strVal):
     if strVal.endswith('.Txt') or\
@@ -115,6 +115,9 @@ def printHelp(argv, functionDict, extBool=False):
         print("\t\tit uses the defined ranges for getting")
         print("\t\trelevant statistics.\n")
         print("\t-r:\tNeeds a spectrum file as argument.\n")
+        print("\t--rebin:\tNeeds a positive integer for")
+        print("\t\tgrouping the contents of consecutive bins")
+        print("\t\ttogether.\n")
         print("Extra options:\n")
         print("\t--noCal:\tWill not use any calibration info.")
         print("\t\t\tMight mess with your ranges (used with -c).\n")
@@ -213,6 +216,27 @@ def checkIfFloatVals(myList):
             return False
     return True
 
+def checkRebinOpt(myOptDict,argv):
+    if '--rebin' not in myOptDict:
+        print("error: this function should not have been called, this is a\
+programming error.")
+        return False
+
+    if len(myOptDict['--rebin']) != 1:
+        print('error: --rebin option needs exactly one argument')
+        return False
+
+    rebinStr=argv[myOptDict['--rebin'][0]]
+    if not rebinStr.isdigit():
+        print("error: --rebin argument has to be a non-negative integer.")
+        return False
+
+    if int(rebinStr) == 0:
+        print("error: rebin value can't be zero!")
+        return False
+
+    return True
+
 def main(argv):
     #The following is a dictionary that maps keys (file extensions) to
     #the proper parsing function. See parse
@@ -240,6 +264,14 @@ def main(argv):
     # myFilename = argv[myOptDict['specFiles'][0]]
     myFilename = myFList[0]
     myExtension = myFilename.split(".")[-1]
+
+    if '--rebin' in myOptDict:
+        if not checkRebinOpt(myOptDict,argv):
+            print("error: correct the error and retry running")
+            return False
+        # else:
+        #     print("passed all the --rebin tests. Stopping here for now")
+        #     return True
 
     if '-c' in myOptDict:
         if len(myOptDict['-c']) == 0:
@@ -275,6 +307,11 @@ def main(argv):
         else:
             mySubsDict = functionDict[myExtension](myNewFilename)
         mySubsList = mySubsDict["theList"]
+        if '--rebin' in myOptDict:
+            rebInt=int(argv[myOptDict['--rebin'][0]])
+            if "theRebinedList" not in mySubsList:
+                mySubsDict["theRebinedList"]=getRebinedList(mySubsDict["theList"],rebInt)
+                mySubsList = mySubsList["theRebinedList"]
 
     if '--ROI' in myOptDict:
         #This part should use somehow the infoDict
@@ -315,7 +352,13 @@ def main(argv):
                 mySpecialDict = functionDict[myExtension](e)
 
             myDataList = mySpecialDict["theList"]
-            if specialX == None:
+            if '--rebin' in myOptDict:
+                rebInt=int(argv[myOptDict['--rebin'][0]])
+                if "theRebinedList" not in mySpecialDict:
+                    mySpecialDict["theRebinedList"]=getRebinedList(mySpecialDict["theList"],rebInt)
+                    myDataList = mySpecialDict["theRebinedList"]
+
+            if specialX is None:
                 #Will only use the x values of the first file
                 #even if calibration is different.
                 specialX=myDataList[0]
@@ -339,6 +382,11 @@ def main(argv):
     else:
         mySpecialDict = functionDict[myExtension](myFilename)
     myDataList = mySpecialDict["theList"]
+    if '--rebin' in myOptDict:
+        rebInt=int(argv[myOptDict['--rebin'][0]])
+        if "theRebinedList" not in mySpecialDict:
+            mySpecialDict["theRebinedList"]=getRebinedList(mySpecialDict["theList"],rebInt)
+            myDataList = mySpecialDict["theRebinedList"]
 
     if '--dump' in myOptDict:
         dumpSize=None
