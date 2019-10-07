@@ -21,7 +21,15 @@ Then put the following at the end of the file:
 export PATH=$PATH:~/.myPrograms
 
 Save and close the file (in nano do a Ctr+X, you will be asked to save
-the changes press Y for yes). Open a new terminal and you should be
+the changes press Y for yes).
+
+Download the database from this link:
+
+https://drive.google.com/file/d/1nigPNaMV5-doyG1vmTFVWKtg4JtMA-8c/view?usp=sharing
+
+Save it under the "Path/to/histoGe/myDatabase/" folder.
+
+Open a new terminal and you should be
 able to do a:
 
 $ histoGe
