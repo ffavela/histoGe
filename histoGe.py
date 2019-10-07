@@ -533,10 +533,25 @@ def main(argv):
     if '--autoPeak' in myOptDict:
         print('autoPeak option found')
         printTest()
-        x = np.random.randn(100)
-        x[60:81] = np.nan
-        ind = detect_peaks(myDataList[1],mph=10, mpd=80, show=True)
+        # x = np.random.randn(100)
+        # x[60:81] = np.nan
+        ind = detect_peaks(myDataList[1],mph=10, mpd=80, show=False)
+
         print(ind)
+        peakXVals=[myDataList[0][i] for i in ind]
+        peakYVals=[myDataList[1][i] for i in ind]
+        print(peakXVals,peakYVals)
+        if '--noPlot' not in myOptDict:
+            if '--log' in myOptDict:
+                plt.yscale('log')
+            if '--noCal' not in myOptDict and mySpecialDict['calBoolean'] == True:
+                plt.xlabel('Energies [KeV]')
+            else:
+                plt.xlabel('Channels')
+
+            plt.plot(myDataList[0],myDataList[1],label="testing")
+            plt.plot(peakXVals, peakYVals, 'ro')
+            plt.show()
         return 0
 
     print("")
