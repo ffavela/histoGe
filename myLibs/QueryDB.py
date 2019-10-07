@@ -1,4 +1,10 @@
 import sqlite3
+import os
+
+def OpenDatabase():
+    dbpath = os.getcwd() + '/myDatabase/RadioactiveIsotopes.db'
+    conexion = sqlite3.connect(dbpath)
+    return conexion
 
 def EnergyRange(conexion,min,max,element = None,order = None):
     Command = 'SELECT * FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy <= ' + str(max)
@@ -41,28 +47,13 @@ def LookForElement(conexion,element,Field = None,order = None):
         Isotopes = cursor.fetchall()
         return Isotopes
 
-def Energy2Dict(Isotopes):
-    EnergyDict = {}
-    for Energy in Isotopes:
-        EnergyDict[Energy[-1]] = (Energy[1])
-    return EnergyDict
+def CloseDatabase(conexion):
+    conexion.close()
 
-conexion = sqlite3.connect('RadioactiveIsotopes.db')
-cursor = conexion.cursor()
+def Energy2Dict(Dict,Isotope):
+    pass
 
-#cursor.execute("SELECT * FROM Isotopes WHERE Energy >= 1000 and Energy <= 1400 and Element = '60Co' ORDER BY ENERGY DESC" )
-#cursor.execute("SELECT * FROM Isotopes WHERE Element='60Co' ORDER BY Energy DESC")
-#Isotopes = cursor.fetchall()
 
-#Isotopes = EnergyRange(conexion,46.1,46.3,None,'DESC')
-#EnergyDict = Energy2Dict(Isotopes)
-Isotopes = LookForElement(conexion,'60Co',order = 'ASC')
-#Isotopes = LookForElement(conexion,'210Pb',Field = None,order = 'ASC')
-#for row in Isotopes['60Co']:
-for row in Isotopes:
-    print(row)
-
-conexion.close()
 
 
 

@@ -11,11 +11,13 @@ import os.path
 from os.path import basename
 import re
 
+
 # mainPath=sys.path[0] # sources dir
 from myLibs.parsers import *
 from myLibs.gilmoreStats import *
 from myLibs.fitting import *
 from myLibs.autoPeakFunk import *
+from myLibs.QueryDB import *
 
 accOpts=['-h', '--help','-c',\
          '-r','--ROI','-n','--dump',\
@@ -264,11 +266,31 @@ def main(argv):
         return 4
 
     if '-q' in myOptDict:
-        print("Hello world!!")
-        print("Do database query stuff here")
-        iEner=float(argv[myOptDict['-q'][0]])
-        fEner=float(argv[myOptDict['-q'][1]])
-        print("The energy ranges are",iEner,fEner)
+        #print("Hello world!!")
+        #print("Do database query stuff here")
+        conexion = OpenDatabase()
+        try:
+            iEner=float(argv[myOptDict['-q'][0]])
+            fEner=float(argv[myOptDict['-q'][1]])
+        except ValueError:
+            print('ERROR: Argument cannot be converted to float')
+            return 10
+        if iEner > fEner:
+            iEnerAux = iEner
+            iEner = fEner
+            fEner = iEnerAux
+            del iEnerAux
+
+        DBInfo = EnergyRange(conexion,iEner,fEner)
+        if len(DBInfo) == 0:
+            print('The energy ranges consulted are from {} keV to {} keV.'.format(iEner,fEner))
+            print('No results were found.')
+        else:
+            print('The energy ranges consulted are from {} keV to {} keV.'.format(iEner,fEner))
+            print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
+            for Ele in DBInfo:
+                print('{} {}\t{} {}\t{}\t{} {} {}\t{}'.format(Ele[1],Ele[2],Ele[3],Ele[4],Ele[5],Ele[6],Ele[7],Ele[8],Ele[10]))
+
         return True
 
     myFList=[argv[myOptDict['specFiles'][i]]\
