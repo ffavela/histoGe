@@ -507,7 +507,7 @@ def main(argv):
 
 
         plt.ylabel('Counts')
-        plt.title(myFilename)
+        plt.title(myFilename + ', exposition time = ' + str(mySpecialDict["expoTime"]))
         plt.show()
 
 if __name__ == "__main__":
