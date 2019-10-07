@@ -24,7 +24,8 @@ accOpts=['-h', '--help','-c',\
          '--extBkInt','--gSigma',\
          '--extSigma','--noCal',\
          '--autoPeak','--log',\
-         '--noBkgd','--rebin']
+         '--noBkgd','--rebin',\
+         '-q']
 
 def isValidSpecFile(strVal):
     if strVal.endswith('.Txt') or\
@@ -81,6 +82,9 @@ def getMyOptDict(myArgs):
     return myOptDict
 
 def checkIfValidOpts(myOptDict, accOpts):
+    if '-q' in myOptDict:
+        return True
+
     if len(myOptDict['specFiles'])==0:
         print("error: a spectrum file needs to be provided")
         return False
@@ -258,6 +262,14 @@ def main(argv):
 
     if not checkIfValidOpts(myOptDict, accOpts):
         return 4
+
+    if '-q' in myOptDict:
+        print("Hello world!!")
+        print("Do database query stuff here")
+        iEner=float(argv[myOptDict['-q'][0]])
+        fEner=float(argv[myOptDict['-q'][1]])
+        print("The energy ranges are",iEner,fEner)
+        return True
 
     myFList=[argv[myOptDict['specFiles'][i]]\
              for i in range(len(myOptDict['specFiles']))]
