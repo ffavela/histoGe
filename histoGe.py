@@ -298,7 +298,9 @@ def main(argv):
             print("there were errors in the query")
             return False
 
-        conexion = OpenDatabase()
+        pathfile = os.path.realpath(__file__)
+        pathfile = pathfile.strip('histoGe.py')
+        conexion = OpenDatabase(pathfile)
         try:
             iEner=float(argv[myOptDict['-q'][0]])
             fEner=float(argv[myOptDict['-q'][1]])
@@ -313,14 +315,15 @@ def main(argv):
 
         DBInfo = EnergyRange(conexion,iEner,fEner)
         if len(DBInfo) == 0:
-            print('The energy ranges consulted are from {} keV to {} keV.'.format(iEner,fEner))
+            print('\nThe energy range consulted is %.2f keV +- %.2f keV.\n' % (iEner,fEner))
             print('No results were found.')
         else:
-            print('The energy ranges consulted are from {} keV to {} keV.'.format(iEner,fEner))
+            print('\nThe energy range consulted is %.2f keV +- %.2f keV.\n' % (iEner,fEner))
             print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
             for Ele in DBInfo:
                 print('{} {}\t{} {}\t{}\t{} {} {}\t{}'.format(Ele[1],Ele[2],Ele[3],Ele[4],Ele[5],Ele[6],Ele[7],Ele[8],Ele[10]))
-
+        
+        CloseDatabase(conexion)
         return True
 
     myFList=[argv[myOptDict['specFiles'][i]]\
@@ -561,6 +564,21 @@ def main(argv):
         peakXVals=[myDataList[0][i] for i in ind]
         peakYVals=[myDataList[1][i] for i in ind]
         print(peakXVals,peakYVals)
+        Eps = 0.1
+        pathfile = os.path.realpath(__file__)
+        pathfile = pathfile.strip('histoGe.py')
+        conexion = OpenDatabase(pathfile)
+        for energyP in peakXVals:
+            iEner = energyP - Eps
+            fEner = energyP + Eps
+            DBInfo = EnergyRange(conexion,iEner,fEner)
+            print('\nThe energy range consulted is %.2f keV +- %.2f keV.\n' % (energyP,Eps))
+            print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
+            for Ele in DBInfo:
+                print('{} {}\t{} {}\t{}\t{} {} {}\t{}'.format(Ele[1],Ele[2],Ele[3],Ele[4],Ele[5],Ele[6],Ele[7],Ele[8],Ele[10]))
+            
+
+        CloseDatabase(conexion)
         if '--noPlot' not in myOptDict:
             if '--log' in myOptDict:
                 plt.yscale('log')

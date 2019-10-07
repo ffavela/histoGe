@@ -1,8 +1,8 @@
 import sqlite3
 import os
 
-def OpenDatabase():
-    dbpath = os.getcwd() + '/myDatabase/RadioactiveIsotopes.db'
+def OpenDatabase(pathfile):
+    dbpath = pathfile + '/myDatabase/RadioactiveIsotopes.db'
     conexion = sqlite3.connect(dbpath)
     return conexion
 
