@@ -220,6 +220,28 @@ def checkIfFloatVals(myList):
             return False
     return True
 
+def checkQOption(myOptDict,argv):
+    if '-q' not in myOptDict:
+        print("this is a programming error, -q should be defined!")
+        return False
+    myList=[argv[i] for i in myOptDict["-q"]]
+    if not checkIfFloatVals(myList):
+        print("error: query values should be floats")
+        return False
+
+    if len(myList) != 2:
+        print("error: query option needs exactly 2 values")
+        return False
+
+    iEner=myList[0]
+    fEner=myList[1]
+
+    if iEner > fEner:
+        print("error: initial value has to be lower than final")
+        return False
+
+    return True
+
 def checkRebinOpt(myOptDict,argv):
     if '--rebin' not in myOptDict:
         print("error: this function should not have been called, this is a\
@@ -266,6 +288,10 @@ def main(argv):
     if '-q' in myOptDict:
         print("Hello world!!")
         print("Do database query stuff here")
+        if not checkQOption(myOptDict,argv):
+            print("there were errors in the query")
+            return False
+
         iEner=float(argv[myOptDict['-q'][0]])
         fEner=float(argv[myOptDict['-q'][1]])
         print("The energy ranges are",iEner,fEner)
