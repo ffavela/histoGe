@@ -25,7 +25,7 @@ accOpts=['-h', '--help','-c',\
          '--extSigma','--noCal',\
          '--autoPeak','--log',\
          '--noBkgd','--rebin',\
-         '-q']
+         '-q','--query']
 
 def isValidSpecFile(strVal):
     if strVal.endswith('.Txt') or\
@@ -79,6 +79,10 @@ def getMyOptDict(myArgs):
             else:
                 if not isDataFile(e):
                     myOptDict[tmpOpt].append(i)
+
+    if '--query' in myOptDict:
+        myOptDict['-q']=myOptDict['--query']
+
     return myOptDict
 
 def checkIfValidOpts(myOptDict, accOpts):
@@ -103,6 +107,8 @@ def printHelp(argv, functionDict, extBool=False):
     # print("%s file0.fits [file1.fits ...] #displays fits file info\n" %(basename(argv[0])))
 
     print("usage:\t%s -h #for extended help"\
+          %(basename(argv[0])))
+    print("\t%s (-q|--query) iEner fEner #DB handling"\
           %(basename(argv[0])))
     print("\t%s [options] file.extension"\
           %(basename(argv[0])))
