@@ -27,7 +27,8 @@ accOpts=['-h', '--help','-c',\
          '--extSigma','--noCal',\
          '--autoPeak','--log',\
          '--noBkgd','--rebin',\
-         '-q','--query']
+         '-q','--query',\
+         '-i','--isotope']
 
 def isValidSpecFile(strVal):
     if strVal.endswith('.Txt') or\
@@ -84,6 +85,9 @@ def getMyOptDict(myArgs):
 
     if '--query' in myOptDict:
         myOptDict['-q']=myOptDict['--query']
+
+    if '--isotope' in myOptDict:
+        myOptDict['-i'] = myOptDict['--isotope']
 
     return myOptDict
 
@@ -144,6 +148,8 @@ def printHelp(argv, functionDict, extBool=False):
         print("\t--extSigma:\tSame as gSigma but using 5 bins")
         print("\t\t\tbefore and after region.\n")
         print("\t--log:\t\tprint Y axis with Log scale ")
+        print("\t--query:\tQuery the database RadioactiveIsoptopes.db using a range of energies.")
+        print("\t--isotope:\tLook for that isotope in the database.")
         print("Valid extensions are:")
         for ext in functionDict:
             print("\t\t%s" %(ext))
@@ -250,6 +256,18 @@ def checkQOption(myOptDict,argv):
 
     return True
 
+def checkIOption(myOptDict,argv):
+    if '-i' not in myOptDict:
+        print("this is a programming error, -q should be defined!")
+        return False
+    myList=[argv[i] for i in myOptDict["-i"]]
+
+    if len(myList) != 1:
+        print("error: isotope option needs exactly 1 value")
+        return False
+
+    return True
+
 def checkRebinOpt(myOptDict,argv):
     if '--rebin' not in myOptDict:
         print("error: this function should not have been called, this is a\
@@ -290,6 +308,35 @@ def main(argv):
         printHelp(argv, functionDict, extBool)
         return 1
 
+    if '-i' in myOptDict:
+        if not checkIOption(myOptDict,argv):
+            print("there were errors in the query")
+            return False
+
+        pathfile = os.path.realpath(__file__)
+        pathfile = pathfile.strip('histoGe.py')
+
+        try:
+            conexion = OpenDatabase(pathfile)
+            element = argv[2]
+            Isotope = LookForElement(conexion,element,order = 'ASC')
+        except:
+            print('ERROR: Database cannot be read. Please, be sure that database is in the folder myDatabase.')
+
+        if len(Isotope) == 0:
+            print('\nThe isotope consulted is ' + element)
+            print('The query did not give any result.')
+        else:
+            print('\nThe isotope consulted is ' + element)
+            print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
+            for Ele in Isotope:
+                print('{} {}\t{} {}\t{}\t{} {} {}\t{}'.format(Ele[1],Ele[2],Ele[3],Ele[4],Ele[5],Ele[6],Ele[7],Ele[8],Ele[10]))
+            print('\n')
+
+        CloseDatabase(conexion)
+
+        return True
+
     if not checkIfValidOpts(myOptDict, accOpts):
         return 4
 
@@ -315,10 +362,10 @@ def main(argv):
 
         DBInfo = EnergyRange(conexion,iEner,fEner)
         if len(DBInfo) == 0:
-            print('\nThe energy range consulted is %.2f keV +- %.2f keV.\n' % (iEner,fEner))
+            print('\nThe energy range consulted is %.2f keV to %.2f keV.\n' % (iEner,fEner))
             print('No results were found.')
         else:
-            print('\nThe energy range consulted is %.2f keV +- %.2f keV.\n' % (iEner,fEner))
+            print('\nThe energy range consulted is %.2f keV to %.2f keV.\n' % (iEner,fEner))
             print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
             for Ele in DBInfo:
                 print('{} {}\t{} {}\t{}\t{} {} {}\t{}'.format(Ele[1],Ele[2],Ele[3],Ele[4],Ele[5],Ele[6],Ele[7],Ele[8],Ele[10]))

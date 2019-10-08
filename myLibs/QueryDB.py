@@ -30,8 +30,9 @@ def LookForElement(conexion,element,Field = None,order = None):
         cursor = conexion.cursor()
         cursor.execute(Command)
         Isotopes = cursor.fetchall()
-        IsotopesDict = {element:Isotopes}
-        return IsotopesDict 
+        return Isotopes
+        #IsotopesDict = {element:Isotopes}
+        #return IsotopesDict
 
     if (order == 'ASC' or order == 'DESC') and Field == None:
         cursor = conexion.cursor()
