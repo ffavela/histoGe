@@ -116,6 +116,8 @@ def printHelp(argv, functionDict, extBool=False):
           %(basename(argv[0])))
     print("\t%s (-q|--query) iEner fEner #DB handling"\
           %(basename(argv[0])))
+    print("\t%s (-i|--isotope) IsotopeName #DB handling"\
+          %(basename(argv[0])))
     print("\t%s [options] file.extension"\
           %(basename(argv[0])))
     print("\t%s --dump [number] file.extension"\
@@ -318,7 +320,7 @@ def main(argv):
 
         try:
             conexion = OpenDatabase(pathfile)
-            element = argv[2]
+            element = argv[myOptDict['-i'][0]]
             Isotope = LookForElement(conexion,element,order = 'ASC')
         except:
             print('ERROR: Database cannot be read. Please, be sure that database is in the folder myDatabase.')
