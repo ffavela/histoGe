@@ -371,7 +371,7 @@ def main(argv):
             print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
             for Ele in DBInfo:
                 print('{} {}\t{} {}\t{}\t{} {} {}\t{}'.format(Ele[1],Ele[2],Ele[3],Ele[4],Ele[5],Ele[6],Ele[7],Ele[8],Ele[10]))
-        
+
         CloseDatabase(conexion)
         return True
 
@@ -603,11 +603,7 @@ def main(argv):
         return 0
 
     if '--autoPeak' in myOptDict:
-        print('autoPeak option found')
-        printTest()
-        # x = np.random.randn(100)
-        # x[60:81] = np.nan
-        ind = detect_peaks(myDataList[1],mph=10, mpd=80, show=False)
+        ind = peakFinder(myDataList)
 
         print(ind)
         peakXVals=[myDataList[0][i] for i in ind]
@@ -625,7 +621,7 @@ def main(argv):
             print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
             for Ele in DBInfo:
                 print('{} {}\t{} {}\t{}\t{} {} {}\t{}'.format(Ele[1],Ele[2],Ele[3],Ele[4],Ele[5],Ele[6],Ele[7],Ele[8],Ele[10]))
-            
+
 
         CloseDatabase(conexion)
         if '--noPlot' not in myOptDict:
@@ -637,7 +633,7 @@ def main(argv):
                 plt.xlabel('Channels')
 
             plt.plot(myDataList[0],myDataList[1],label="testing")
-            plt.plot(peakXVals, peakYVals, 'ro')
+            plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
             plt.show()
         return 0
 
