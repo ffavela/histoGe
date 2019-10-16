@@ -490,9 +490,10 @@ def main(argv):
                 plt.xlabel('Channels')
         plt.ylabel('Counts')
         plt.title(myFilename)
-        pid = os.fork()
-        if pid == 0:
-            plt.show()
+        #pid = os.fork()
+        #if pid == 0:
+            #plt.show()
+        plt.show()
         return 3905
     if '--noCal' in myOptDict:
         mySpecialDict = functionDict[myExtension](myFilename,False)
@@ -635,9 +636,10 @@ def main(argv):
 
             plt.plot(myDataList[0],myDataList[1],label="testing")
             plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
-            pid = os.fork()
-            if pid == 0:
-                plt.show()
+            #pid = os.fork()
+            #if pid == 0:
+            #    plt.show()
+            plt.show()
         return 0
 
     print("")
@@ -701,9 +703,10 @@ def main(argv):
 
         plt.ylabel('Counts')
         plt.title(myFilename + ', exposition time = ' + str(mySpecialDict["expoTime"]))
-        pid = os.fork()
-        if pid == 0:
-            plt.show()
+        plt.show()
+        #pid = os.fork()
+        #if pid == 0:
+        #    plt.show()
 
 if __name__ == "__main__":
     main(sys.argv)
