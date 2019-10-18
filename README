@@ -5,6 +5,12 @@ probably change the repo location.
 The program accepts 3 different file formats, ("mca" the pocket
 version, "Txt" gamma view format, "SPE" Boulby format.)
 
+Before you install, make sure you have:
+    Matplotlib package (python3-matplotlib)
+    Numpy package (python3-numpy)
+    Scipy package (python3-scipy)
+    Pandas Package (python3-pandas)
+
 To install, simply do a:
 
 $ mkdir -p ~/.myPrograms
