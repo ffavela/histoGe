@@ -5,6 +5,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 from scipy import asarray as ar,exp
 from math import sqrt, pi
+import pandas as pd #para imprimir en forma de tabla
 
 import sys
 import os.path
@@ -606,11 +607,8 @@ def main(argv):
 
     if '--autoPeak' in myOptDict:
         ind = peakFinder(myDataList)
-
-        print(ind)
         peakXVals=[myDataList[0][i] for i in ind]
         peakYVals=[myDataList[1][i] for i in ind]
-        print(peakXVals,peakYVals)
         Eps = 0.1
         pathfile = os.path.realpath(__file__)
         pathfile = pathfile.strip('histoGe.py')
@@ -620,10 +618,20 @@ def main(argv):
             fEner = energyP + Eps
             DBInfo = EnergyRange(conexion,iEner,fEner)
             print('\nThe energy range consulted is %.2f keV +- %.2f keV.\n' % (energyP,Eps))
-            print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
+           # print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
+            Eg , DEg , Ig , DIg , Decay, Half , DHalf , Parent = [],[],[],[],[],[],[],[]
             for Ele in DBInfo:
-                print('{} {}\t{} {}\t{}\t{} {} {}\t{}'.format(Ele[1],Ele[2],Ele[3],Ele[4],Ele[5],Ele[6],Ele[7],Ele[8],Ele[10]))
-
+                Eg.append(Ele[1])
+                DEg.append(str(Ele[2]))
+                Ig.append(Ele[3])
+                DIg.append(str(Ele[4]))
+                Decay.append(Ele[5])
+                Half.append(str(Ele[6])+' '+Ele[7])
+                DHalf.append(str(Ele[8]))
+                Parent.append(Ele[10])
+            pd.set_option('display.max_rows', len(Eg))#imprime todas las filas
+            df = pd.DataFrame(list(zip(Eg,DEg,Ig,DIg,Decay,Half,DHalf,Parent)),columns=['Eg (keV)','DEg','Ig (%)','DIg','Decay mode','Half Life','DHL','Parent'])#crea  la tabla
+            print(df) #imprime la tabla
 
         CloseDatabase(conexion)
         if '--noPlot' not in myOptDict:
@@ -685,7 +693,7 @@ def main(argv):
     # plt.hist(myArr, bins=16384)
     # plt.bar(np.arange(len(li)),li)
     # plt.yscale('log', nonposy='clip')
-    print("exposition time = ", mySpecialDict["expoTime"])
+    print("exposure time = ", mySpecialDict["expoTime"])
     plt.legend(loc='best')
 
     if '--noPlot' in myOptDict:
@@ -702,7 +710,7 @@ def main(argv):
 
 
         plt.ylabel('Counts')
-        plt.title(myFilename + ', exposition time = ' + str(mySpecialDict["expoTime"]))
+        plt.title(myFilename + ', exposure time = ' + str(mySpecialDict["expoTime"]))
         plt.show()
         #pid = os.fork()
         #if pid == 0:
