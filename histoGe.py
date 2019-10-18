@@ -545,9 +545,12 @@ def main(argv):
         plt.plot(subsTractedL[0],subsTractedL[1],label="substracted")
 
     myHStr="#tags" #Header String
-    myStatsD={e: [] for e in infoDict}
+    myHStrL=['#tags']
+    myStatsD={e: [e] for e in infoDict}
+    
     if '--netArea' in myOptDict:
         myHStr+="\tnetArea"
+        myHStrL.append('netArea')
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             myNetArea=gilmoreNetArea(myDataList,lowXVal,uppXVal)
@@ -555,6 +558,7 @@ def main(argv):
 
     if '--grossInt' in myOptDict:
         myHStr+="\tgrInt"
+        myHStrL.append('grInt')
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             myGrossInt=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
@@ -562,6 +566,7 @@ def main(argv):
 
     if '--bkgd' in myOptDict:
         myHStr+="\tbkgd"
+        myHStrL.append('bkgd')
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             myBkgd=gilmoreBackground(myDataList,lowXVal,uppXVal)
@@ -569,6 +574,7 @@ def main(argv):
 
     if  '--extBkInt' in myOptDict:
         myHStr+="\textBkInt"
+        myHStrL.append('extBkInt')
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             myExtBk=gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal)
@@ -576,6 +582,7 @@ def main(argv):
 
     if  '--gSigma' in myOptDict:
         myHStr+="\tgSigma"
+        myHStrL.append('gSigma')
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             mygSigma=gilmoreSigma(myDataList,lowXVal,uppXVal)
@@ -583,6 +590,7 @@ def main(argv):
 
     if  '--extSigma' in myOptDict:
         myHStr+="\textSigma"
+        myHStrL.append('extSigma')
         for e in infoDict:
             lowXVal,uppXVal=infoDict[e]
             myExtSigma=gilmoreExtendedSigma(myDataList,lowXVal,uppXVal)
@@ -594,16 +602,12 @@ def main(argv):
        '--extBkInt' in myOptDict or\
        '--gSigma' in myOptDict or\
        '--extSigma' in myOptDict:
-        print(myHStr)
-        myFStr="%s"
-        for e in myStatsD:
-            myLen=len(myStatsD[e])
-            break
-        for i in range(myLen):
-            myFStr+="\t%0.2f"
-        for e in myStatsD:
-            print(myFStr %tuple([e]+myStatsD[e]))
+        pd.set_option('display.max_rows', len(myStatsD))#imprime todas las filas       
+        df = pd.DataFrame([myStatsD[v] for v in myStatsD] , columns = myHStrL)
+        print(df)
+        
         return 0
+        
 
     if '--autoPeak' in myOptDict:
         ind = peakFinder(myDataList)
@@ -618,7 +622,6 @@ def main(argv):
             fEner = energyP + Eps
             DBInfo = EnergyRange(conexion,iEner,fEner)
             print('\nThe energy range consulted is %.2f keV +- %.2f keV.\n' % (energyP,Eps))
-           # print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
             Eg , DEg , Ig , DIg , Decay, Half , DHalf , Parent = [],[],[],[],[],[],[],[]
             for Ele in DBInfo:
                 Eg.append(Ele[1])
@@ -654,24 +657,32 @@ def main(argv):
     print("Entering fittingDict part")
     fittingDict=doFittingStuff(infoDict,myDataList)
     for e in fittingDict:
-        print("###################################################################################################################################################################################################")
+        #print("###################################################################################################################################################################################################")
         a,mean,sigma,c,minIdx,maxIdx,myFWHM=fittingDict[e]
         if a == None:
             print("Skipping failed fit")
             continue
-        print("FWHM= ",myFWHM)
+        #print("FWHM= ",myFWHM)
         xVals=myDataList[0][minIdx:maxIdx]
         plt.plot(xVals,gaus(xVals,a,mean,sigma,c),\
                  'r:',label=e)
         # plt.annotate(e, xy=[mean,a])
 
-    print("Entering gilmore dict part")
+    #print("Entering gilmore dict part")
     gilmoreDict=doGilmoreStuff(infoDict,myDataList)
-    realXVals=myDataList[0]
-    # yet another "for" for pretty printing
-    print("tag\tnetArea\tG\tB\tsigma_A\tEBA\textSigma_A\tmyFWHMSigma_A\tmyFWHMExtSigma_A")
+    data4print=[]
     for e in gilmoreDict:
-        G,B,netArea,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,max_index,max_value=gilmoreDict[e]
+        gL=gilmoreDict[e]
+        data4print.append(gL[0:6])
+    realXVals=myDataList[0]
+    
+    myHStr4=['#tags','GrossInt','Background','netArea','Sigma_A','EBA']    
+    pd.set_option('display.max_rows', len(data4print))#imprime todas las filas    
+    df = pd.DataFrame([data for data in data4print], columns = myHStr4)
+    print(df)
+    
+    for e in gilmoreDict:
+        tag,G,B,netArea,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,max_index,max_value=gilmoreDict[e]
         a,mean,sigma,c,minIdx,maxIdx,myFWHM=[str(val)\
                                              for val in\
                                              fittingDict[e]]
@@ -686,7 +697,7 @@ def main(argv):
 
         # print("%s\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f" %(e,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A))
 
-        print("%s\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%s\t%s\t%s\t%s\t%s" %(e,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,a,mean,sigma,c,myFWHM))
+     #   print("%s\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%s\t%s\t%s\t%s\t%s" %(e,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,a,mean,sigma,c,myFWHM))
 
         # print("%s\t%s\t%s\t%s\t%s" %(a,mean,sigma,c,myFWHM))
     #erase this part?

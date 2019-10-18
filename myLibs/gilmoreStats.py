@@ -64,16 +64,16 @@ def doGilmoreStuff(infoDict,myDataList):
         return gilmoreDict
     xVals,yVals=myDataList
     for e in infoDict:
-        print(e)
+        #print(e)
         lowXVal,uppXVal=infoDict[e]
 
-        print(getIdxRangeVals(myDataList,lowXVal,uppXVal))
+        #print(getIdxRangeVals(myDataList,lowXVal,uppXVal))
         minX,maxX=getIdxRangeVals(myDataList,lowXVal,uppXVal)
         max_value = max(yVals[minX:maxX])
         max_index = minX+yVals[minX:maxX].index(max_value)
-        print("max_index,max_value = ",max_index,max_value)
-        print("testing maxYval with the index ", yVals[max_index])
-        print("testing maxXval with the index ", xVals[max_index])
+        #print("max_index,max_value = ",max_index,max_value)
+        #print("testing maxYval with the index ", yVals[max_index])
+        #print("testing maxXval with the index ", xVals[max_index])
         G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
         B=gilmoreBackground(myDataList,lowXVal,uppXVal)
         netArea=gilmoreNetArea(myDataList,lowXVal,uppXVal)
@@ -84,14 +84,14 @@ def doGilmoreStuff(infoDict,myDataList):
                                            lowXVal,uppXVal,m)
         extSigma_A=gilmoreExtendedSigma(myDataList,\
                                         lowXVal,uppXVal,m)
-        print("G,B,netArea,sigma_A = ",G,B,netArea,sigma_A)
-        print("EBA, extSigma_A = ",EBA,extSigma_A)
+        #print("G,B,netArea,sigma_A = ",G,B,netArea,sigma_A)
+        #print("EBA, extSigma_A = ",EBA,extSigma_A)
         myFWHMSigma_A=fwhm(sigma_A)
         myFWHMExtSigma_A=fwhm(extSigma_A)
-        print("myFWHMSigma,myFWHMExtSigma_A = ",\
-              myFWHMSigma_A,myFWHMExtSigma_A)
+        #print("myFWHMSigma,myFWHMExtSigma_A = ",\
+              #myFWHMSigma_A,myFWHMExtSigma_A)
 
-        gilmoreDict[e]=[G,B,netArea,\
+        gilmoreDict[e]=[e,G,B,netArea,\
                         sigma_A,EBA,\
                         extSigma_A,\
                         myFWHMSigma_A,\
