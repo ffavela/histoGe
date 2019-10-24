@@ -39,10 +39,10 @@ region of interest"""
     n=U-L
     C=yVals
     G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
-    A=G-n*(sum(C[L-m:L])+sum(C[U+1:U+m+1]))/(2*m)
+    A=G-n*(sum(C[L-m:L-1])+sum(C[U+1:U+m+1]))/(2*m)
     return A
 
-def gilmoreSigma(myDataList,lowXVal,uppXVal):
+def gilmoreSigma(myDataList,lowXVal,uppXVal):   
     xVals,yVals=myDataList
     A=gilmoreNetArea(myDataList,lowXVal,uppXVal)
     B=gilmoreBackground(myDataList,lowXVal,uppXVal)
@@ -91,8 +91,8 @@ def doGilmoreStuff(infoDict,myDataList):
         #print("myFWHMSigma,myFWHMExtSigma_A = ",\
               #myFWHMSigma_A,myFWHMExtSigma_A)
 
-        gilmoreDict[e]=[e,G,B,netArea,\
-                        sigma_A,EBA,\
+        gilmoreDict[e]=[e,netArea,EBA,G,B,\
+                        sigma_A,\
                         extSigma_A,\
                         myFWHMSigma_A,\
                         myFWHMExtSigma_A,\

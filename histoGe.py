@@ -330,11 +330,20 @@ def main(argv):
             print('\nThe isotope consulted is ' + element)
             print('The query did not give any result.')
         else:
-            print('\nThe isotope consulted is ' + element)
-            print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
+            Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
             for Ele in Isotope:
-                print('{} {}\t{} {}\t{}\t{} {} {}\t{}'.format(Ele[1],Ele[2],Ele[3],Ele[4],Ele[5],Ele[6],Ele[7],Ele[8],Ele[10]))
-            print('\n')
+                Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
+                #DEg.append(str(Ele[2]))
+                Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
+                #DIg.append(str(Ele[4]))
+                Decay.append(Ele[5])
+                Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
+                #DHalf.append(str(Ele[8]))
+                Parent.append(Ele[10])
+            pd.set_option('display.max_rows', None)#imprime todas las filas
+            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
+            print(df) #imprime la tabla
+
 
         CloseDatabase(conexion)
 
@@ -369,9 +378,19 @@ def main(argv):
             print('No results were found.')
         else:
             print('\nThe energy range consulted is %.2f keV to %.2f keV.\n' % (iEner,fEner))
-            print('Eg (keV)\tIg (%)\tDecay mode\tHalf life\tParent')
+            Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
             for Ele in DBInfo:
-                print('{} {}\t{} {}\t{}\t{} {} {}\t{}'.format(Ele[1],Ele[2],Ele[3],Ele[4],Ele[5],Ele[6],Ele[7],Ele[8],Ele[10]))
+                Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
+                #DEg.append(str(Ele[2]))
+                Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
+                #DIg.append(str(Ele[4]))
+                Decay.append(Ele[5])
+                Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
+                #DHalf.append(str(Ele[8]))
+                Parent.append(Ele[10])
+            pd.set_option('display.max_rows', None)#imprime todas las filas
+            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
+            print(df) #imprime la tabla
 
         CloseDatabase(conexion)
         return True
@@ -622,18 +641,18 @@ def main(argv):
             fEner = energyP + Eps
             DBInfo = EnergyRange(conexion,iEner,fEner)
             print('\nThe energy range consulted is %.2f keV +- %.2f keV.\n' % (energyP,Eps))
-            Eg , DEg , Ig , DIg , Decay, Half , DHalf , Parent = [],[],[],[],[],[],[],[]
+            Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
             for Ele in DBInfo:
-                Eg.append(Ele[1])
-                DEg.append(str(Ele[2]))
-                Ig.append(Ele[3])
-                DIg.append(str(Ele[4]))
+                Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
+                #DEg.append(str(Ele[2]))
+                Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
+                #DIg.append(str(Ele[4]))
                 Decay.append(Ele[5])
-                Half.append(str(Ele[6])+' '+Ele[7])
-                DHalf.append(str(Ele[8]))
+                Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
+                #DHalf.append(str(Ele[8]))
                 Parent.append(Ele[10])
-            pd.set_option('display.max_rows', len(Eg))#imprime todas las filas
-            df = pd.DataFrame(list(zip(Eg,DEg,Ig,DIg,Decay,Half,DHalf,Parent)),columns=['Eg (keV)','DEg','Ig (%)','DIg','Decay mode','Half Life','DHL','Parent'])#crea  la tabla
+            pd.set_option('display.max_rows', len(Ele))#imprime todas las filas
+            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
             print(df) #imprime la tabla
 
         CloseDatabase(conexion)
@@ -654,21 +673,25 @@ def main(argv):
         return 0
 
     print("")
-    print("Entering fittingDict part")
+    print("Gilmore statistics")
     fittingDict=doFittingStuff(infoDict,myDataList)
+    gaussData4Print=[]
     for e in fittingDict:
         #print("###################################################################################################################################################################################################")
         a,mean,sigma,c,minIdx,maxIdx,myFWHM=fittingDict[e]
         if a == None:
             print("Skipping failed fit")
             continue
+        gaussData4Print.append([e,a,mean,sigma,c])
         #print("FWHM= ",myFWHM)
         xVals=myDataList[0][minIdx:maxIdx]
         plt.plot(xVals,gaus(xVals,a,mean,sigma,c),\
-                 'r:',label=e)
+                 'r:')
         # plt.annotate(e, xy=[mean,a])
-
-    #print("Entering gilmore dict part")
+    myGaussRows=['#tags','a','mean','sigma','c']
+    pd.set_option('display.max_rows', None)
+    dfG = pd.DataFrame(gaussData4Print, columns = myGaussRows)
+    
     gilmoreDict=doGilmoreStuff(infoDict,myDataList)
     data4print=[]
     for e in gilmoreDict:
@@ -676,13 +699,15 @@ def main(argv):
         data4print.append(gL[0:6])
     realXVals=myDataList[0]
     
-    myHStr4=['#tags','GrossInt','Background','netArea','Sigma_A','EBA']    
+    myHStr4=['#tags','NetArea[counts]','NetArea ExtBkgd','GrossInt','Background','Sigma_A']
     pd.set_option('display.max_rows', len(data4print))#imprime todas las filas    
     df = pd.DataFrame([data for data in data4print], columns = myHStr4)
     print(df)
+    print('\nGauss Parameters')
+    print(dfG)
     
     for e in gilmoreDict:
-        tag,G,B,netArea,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,max_index,max_value=gilmoreDict[e]
+        tag,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,max_index,max_value=gilmoreDict[e]
         a,mean,sigma,c,minIdx,maxIdx,myFWHM=[str(val)\
                                              for val in\
                                              fittingDict[e]]
