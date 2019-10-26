@@ -10,12 +10,12 @@ from scipy.sparse.linalg import spsolve
 from scipy.signal import savgol_filter
 
 #This still needs to be improved!!
-def peakFinder(theList):
+def peakRangeFinder(theList):
     energy,counts=theList
 
     sg = savgol_filter(counts, 5, 1)
 
-    ind=[]
+    indRange=[]
 
     data = [0]*len(counts)
     filtered = [0]*len(counts)
@@ -48,6 +48,17 @@ def peakFinder(theList):
         elif sub[i] < 3*std[i] and overT:
             overT = False
             end = i-1
-            ind.append((start+end)//2)
+            # ind.append((start+end)//2)
+            indRange.append([start,end])
 
-    return ind
+    return indRange
+
+def peakFinder(theList):
+    #put some conditional in case the list is empty
+    idxRList=peakRangeFinder(theList)
+    indList=[]
+    for rEle in idxRList:
+        start,end=rEle
+        indVal=(start+end)//2
+        indList.append(indVal)
+    return indList
