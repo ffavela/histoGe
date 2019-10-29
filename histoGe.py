@@ -20,6 +20,7 @@ from myLibs.gilmoreStats import *
 from myLibs.fitting import *
 from myLibs.autoPeakFunk import *
 from myLibs.QueryDB import *
+from myLibs.plotting import *
 
 accOpts=['-h', '--help','-c',\
          '-r','--ROI','-n','--dump',\
@@ -30,7 +31,8 @@ accOpts=['-h', '--help','-c',\
          '--autoPeak','--log',\
          '--noBkgd','--rebin',\
          '-q','--query',\
-         '-i','--isotope']
+         '-i','--isotope',\
+         '--testing']
 
 def isValidSpecFile(strVal):
     if strVal.endswith('.Txt') or\
@@ -305,6 +307,12 @@ def main(argv):
     infoDict={} #From the info file
     #Here put the command line argument
     myOptDict=getMyOptDict(argv)
+    
+    if '--testing' in myOptDict:
+        print('inside Testing')
+        plotCos()
+        return 666
+    
     if len(argv) == 1 or '-h' in myOptDict:
         extBool=True
         if len(argv) == 1:
@@ -516,6 +524,7 @@ def main(argv):
         #    plt.show()
         plt.show()
         return 3905
+
     if '--noCal' in myOptDict:
         mySpecialDict = functionDict[myExtension](myFilename,False)
     else:
@@ -547,6 +556,7 @@ def main(argv):
     # there is an "Qt::AA_EnableHighDpiScaling" error here.
     if "--autoPeak" not in myOptDict:
         plt.plot(myDataList[0],myDataList[1],label=myFilename)
+        #myPlotF(myDataList)
 
     if mySubsList: # != None
         myLen1=len(myDataList[1])
