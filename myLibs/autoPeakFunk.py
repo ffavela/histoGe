@@ -69,10 +69,15 @@ def peakFinder(theList):
     return indList
 
 
-def getSimpleIdxAve(pairIdxL):
+def getSimpleIdxAve(pairIdxL,theList):
     indList=[]
-    for pairVal in pairIdxL:
-        start,end=pairVal
-        indVal=(start+end)//2
-        indList.append(indVal)
+    my_list = theList[1]
+    for rEle in pairIdxL:
+        start,end=rEle
+        end += 1
+        max_value = int(max(my_list[start:end]))
+        my_sublist = my_list[start:end]
+        result = np.where(my_sublist == max_value)
+        max_index = start + result[0][0]
+        indList.append(max_index)
     return indList

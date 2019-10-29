@@ -630,7 +630,9 @@ def main(argv):
         
 
     if '--autoPeak' in myOptDict:
-        ind = peakFinder(myDataList)
+        idxPairL = peakRangeFinder(myDataList)
+        ind = getSimpleIdxAve(idxPairL,myDataList)
+        #ind = peakFinder(myDataList)
         peakXVals=[myDataList[0][i] for i in ind]
         peakYVals=[myDataList[1][i] for i in ind]
         Eps = 0.1
