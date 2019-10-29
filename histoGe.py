@@ -513,7 +513,7 @@ def main(argv):
         plt.title(myFilename)
         #pid = os.fork()
         #if pid == 0:
-            #plt.show()
+        #    plt.show()
         plt.show()
         return 3905
     if '--noCal' in myOptDict:
@@ -632,15 +632,14 @@ def main(argv):
     if '--autoPeak' in myOptDict:
         idxPairL = peakRangeFinder(myDataList)
         ind = getSimpleIdxAve(idxPairL,myDataList)
-        #ind = peakFinder(myDataList)
         peakXVals=[myDataList[0][i] for i in ind]
         peakYVals=[myDataList[1][i] for i in ind]
-        #Eps = 0.1
         pathfile = os.path.realpath(__file__)
         pathfile = pathfile.strip('histoGe.py')
         conexion = OpenDatabase(pathfile)
-        #for energyP in peakXVals:
         energyArr = myDataList[0]
+        isoPeakLL = []
+        isoCountD = {}
         for idxR in idxPairL:
             start,end = idxR
             iEner = energyArr[start]
@@ -648,7 +647,14 @@ def main(argv):
             DBInfo = EnergyRange(conexion,iEner,fEner)
             print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
             Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
+            isoPeakL = []
             for Ele in DBInfo:
+                iso = Ele[-1]
+                if [iso,1] not in isoPeakL:
+                    isoPeakL.append([iso,1])
+                if iso not in isoCountD:
+                    isoCountD[iso] = 0
+                isoCountD[iso] += 1
                 Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
                 #DEg.append(str(Ele[2]))
                 Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
@@ -657,10 +663,20 @@ def main(argv):
                 Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
                 #DHalf.append(str(Ele[8]))
                 Parent.append(Ele[10])
+            isoPeakLL.append(isoPeakL)
             pd.set_option('display.max_rows', len(Ele))#imprime todas las filas
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
             print(df) #imprime la tabla
-
+        for isoLL in isoPeakLL:
+            for isoL in isoLL:
+                iso = isoL[0]
+                isoC = isoCountD[iso]
+                isoL[1] = isoC
+            isoLL.sort(key = lambda x: x[1],reverse = True)
+            #print(isoLL)
+        #print(isoPeakLL)
+        #print(isoCountD)
+        #print(isoCountD['60Co'])
         CloseDatabase(conexion)
         if '--noPlot' not in myOptDict:
             if '--log' in myOptDict:
