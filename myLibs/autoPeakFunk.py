@@ -49,7 +49,7 @@ def peakRangeFinder(theList):
             overT = False
             end = i-1
             # ind.append((start+end)//2)
-            indRange.append([start,end])
+            indRange.append([start,end+1])
 
     return indRange
 
@@ -60,7 +60,6 @@ def peakFinder(theList):
     my_list = theList[1]
     for rEle in idxRList:
         start,end=rEle
-        end += 1
         max_value = int(max(my_list[start:end]))
         my_sublist = my_list[start:end]
         result = np.where(my_sublist == max_value)
@@ -74,7 +73,6 @@ def getSimpleIdxAve(pairIdxL,theList):
     my_list = theList[1]
     for rEle in pairIdxL:
         start,end=rEle
-        end += 1
         max_value = int(max(my_list[start:end]))
         my_sublist = my_list[start:end]
         result = np.where(my_sublist == max_value)

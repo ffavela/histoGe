@@ -635,15 +635,18 @@ def main(argv):
         #ind = peakFinder(myDataList)
         peakXVals=[myDataList[0][i] for i in ind]
         peakYVals=[myDataList[1][i] for i in ind]
-        Eps = 0.1
+        #Eps = 0.1
         pathfile = os.path.realpath(__file__)
         pathfile = pathfile.strip('histoGe.py')
         conexion = OpenDatabase(pathfile)
-        for energyP in peakXVals:
-            iEner = energyP - Eps
-            fEner = energyP + Eps
+        #for energyP in peakXVals:
+        energyArr = myDataList[0]
+        for idxR in idxPairL:
+            start,end = idxR
+            iEner = energyArr[start]
+            fEner = energyArr[end]
             DBInfo = EnergyRange(conexion,iEner,fEner)
-            print('\nThe energy range consulted is %.2f keV +- %.2f keV.\n' % (energyP,Eps))
+            print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
             Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
             for Ele in DBInfo:
                 Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
