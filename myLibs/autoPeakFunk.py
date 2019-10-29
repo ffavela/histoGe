@@ -62,3 +62,12 @@ def peakFinder(theList):
         indVal=(start+end)//2
         indList.append(indVal)
     return indList
+
+
+def getSimpleIdxAve(pairIdxL):
+    indList=[]
+    for pairVal in pairIdxL:
+        start,end=pairVal
+        indVal=(start+end)//2
+        indList.append(indVal)
+    return indList
