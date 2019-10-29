@@ -57,10 +57,15 @@ def peakFinder(theList):
     #put some conditional in case the list is empty
     idxRList=peakRangeFinder(theList)
     indList=[]
+    my_list = theList[1]
     for rEle in idxRList:
         start,end=rEle
-        indVal=(start+end)//2
-        indList.append(indVal)
+        end += 1
+        max_value = int(max(my_list[start:end]))
+        my_sublist = my_list[start:end]
+        result = np.where(my_sublist == max_value)
+        max_index = start + result[0][0]
+        indList.append(max_index)
     return indList
 
 
