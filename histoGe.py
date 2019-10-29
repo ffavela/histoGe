@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
+import pandas as pd #para imprimir en forma de tabla
 from matplotlib import pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 from scipy import asarray as ar,exp
 from math import sqrt, pi
-import pandas as pd #para imprimir en forma de tabla
+
 
 import sys
 import os.path
