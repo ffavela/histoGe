@@ -1,17 +1,17 @@
 #!/usr/bin/python3
 
+import sys
+import os.path
+from os.path import basename
+import re
 import pandas as pd #para imprimir en forma de tabla
 from matplotlib import pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 from scipy import asarray as ar,exp
 from math import sqrt, pi
+import time
 
-
-import sys
-import os.path
-from os.path import basename
-import re
 
 
 # mainPath=sys.path[0] # sources dir
@@ -511,10 +511,11 @@ def main(argv):
                 plt.xlabel('Channels')
         plt.ylabel('Counts')
         plt.title(myFilename)
-        #pid = os.fork()
-        #if pid == 0:
-        #    plt.show()
-        plt.show()
+        pid = os.fork()
+        if pid == 0:
+            time.sleep(0.1)
+            plt.show()
+        #plt.show()
         return 3905
     if '--noCal' in myOptDict:
         mySpecialDict = functionDict[myExtension](myFilename,False)
@@ -640,13 +641,18 @@ def main(argv):
         energyArr = myDataList[0]
         isoPeakLL = []
         isoCountD = {}
+        DBInfoL = []
+        DBInfoDL = []
         for idxR in idxPairL:
             start,end = idxR
             iEner = energyArr[start]
             fEner = energyArr[end]
-            DBInfo = EnergyRange(conexion,iEner,fEner)
-            print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
-            Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
+            DBInfoL.append(EnergyRange(conexion,iEner,fEner))
+            DBInfo = DBInfoL[-1]
+            DBInfoD = {}
+            for e in DBInfo:
+                DBInfoD[e[-1]] = e
+            DBInfoDL.append(DBInfoD)    
             isoPeakL = []
             for Ele in DBInfo:
                 iso = Ele[-1]
@@ -654,30 +660,36 @@ def main(argv):
                     isoPeakL.append([iso,1])
                 if iso not in isoCountD:
                     isoCountD[iso] = 0
-                isoCountD[iso] += 1
-                Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
-                #DEg.append(str(Ele[2]))
-                Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
-                #DIg.append(str(Ele[4]))
-                Decay.append(Ele[5])
-                Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
-                #DHalf.append(str(Ele[8]))
-                Parent.append(Ele[10])
+                isoCountD[iso] += 1  
             isoPeakLL.append(isoPeakL)
-            pd.set_option('display.max_rows', len(Ele))#imprime todas las filas
-            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
-            print(df) #imprime la tabla
+
         for isoLL in isoPeakLL:
             for isoL in isoLL:
                 iso = isoL[0]
                 isoC = isoCountD[iso]
                 isoL[1] = isoC
             isoLL.sort(key = lambda x: x[1],reverse = True)
-            #print(isoLL)
-        #print(isoPeakLL)
-        #print(isoCountD)
-        #print(isoCountD['60Co'])
+        for idxR, isoPeakL, DBInfoD in zip(idxPairL,isoPeakLL,DBInfoDL):
+            start,end = idxR
+            iEner = energyArr[start]
+            fEner = energyArr[end]
+            print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
+            Eg , Ig , Decay, Half , Parent, rank = [],[],[],[],[],[]
+            for pInfo in isoPeakL:
+                iso = pInfo[0]
+                Ele = DBInfoD[iso]
+                Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
+                Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
+                Decay.append(Ele[5])
+                Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
+                Parent.append(Ele[10])
+                rank.append(pInfo[1])
+            #pd.set_option('display.max_rows', len(Ele))
+            pd.set_option('display.max_rows', None)#imprime todas las filas
+            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank'])#crea  la tabla
+            print(df) #imprime la tabla
         CloseDatabase(conexion)
+
         if '--noPlot' not in myOptDict:
             if '--log' in myOptDict:
                 plt.yscale('log')
@@ -688,10 +700,11 @@ def main(argv):
 
             plt.plot(myDataList[0],myDataList[1],label="testing")
             plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
-            #pid = os.fork()
-            #if pid == 0:
-            #    plt.show()
-            plt.show()
+            pid = os.fork()
+            if pid == 0:
+                time.sleep(0.1)
+                plt.show()
+            #plt.show()
         return 0
 
     print("")
@@ -769,10 +782,11 @@ def main(argv):
 
         plt.ylabel('Counts')
         plt.title(myFilename + ', exposure time = ' + str(mySpecialDict["expoTime"]))
-        plt.show()
-        #pid = os.fork()
-        #if pid == 0:
-        #    plt.show()
+        #plt.show()
+        pid = os.fork()
+        if pid == 0:
+            time.sleep(0.1)
+            plt.show()
 
 if __name__ == "__main__":
     main(sys.argv)
