@@ -710,11 +710,11 @@ def main(argv):
 
             plt.plot(myDataList[0],myDataList[1],label="testing")
             plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
-            pid = os.fork()
-            if pid == 0:
-                time.sleep(0.1)
-                plt.show()
-            #plt.show()
+            # pid = os.fork()
+            # if pid == 0:
+            #     time.sleep(0.1)
+            #     plt.show()
+            plt.show()
         return 0
 
     print("")
