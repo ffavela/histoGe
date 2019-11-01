@@ -53,8 +53,28 @@ def CloseDatabase(conexion):
 
 def Energy2Dict(Dict,Isotope):
     pass
+    
+def meanLifeUnit(Ele):
+    y=31536000
+    d=8640
+    h=3600
+    m=60
+    if Ele[7] == 'y':
+        meanLife=Ele[6]*y
+    elif Ele[7] == 'd':
+        meanLife=Ele[6]*d
+    elif Ele[7] == 'h':
+        meanLife=Ele[6]*h
+    elif Ele[7] == 'm':
+        meanLife=Ele[6]*m
+    elif Ele[7] == 'ms':
+        meanLife=Ele[6]/1000
+    else: meanLife=Ele[6]
+    
+    units=str(meanLife)+ ' [s] ' + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')'
+    return units 
 
-
+#df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
 
 
 
