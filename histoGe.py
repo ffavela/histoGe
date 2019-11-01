@@ -307,12 +307,12 @@ def main(argv):
     infoDict={} #From the info file
     #Here put the command line argument
     myOptDict=getMyOptDict(argv)
-    
+
     if '--testing' in myOptDict:
         print('inside Testing')
         plotCos()
         return 666
-    
+
     if len(argv) == 1 or '-h' in myOptDict:
         extBool=True
         if len(argv) == 1:
@@ -519,11 +519,11 @@ def main(argv):
                 plt.xlabel('Channels')
         plt.ylabel('Counts')
         plt.title(myFilename)
-        pid = os.fork()
-        if pid == 0:
-            time.sleep(0.1)
-            plt.show()
-        #plt.show()
+        # pid = os.fork()
+        # if pid == 0:
+        #     time.sleep(0.1)
+        #     plt.show()
+        plt.show()
         return 3905
 
     if '--noCal' in myOptDict:
@@ -578,7 +578,7 @@ def main(argv):
     myHStr="#tags" #Header String
     myHStrL=['#tags']
     myStatsD={e: [e] for e in infoDict}
-    
+
     if '--netArea' in myOptDict:
         myHStr+="\tnetArea"
         myHStrL.append('netArea')
@@ -633,12 +633,12 @@ def main(argv):
        '--extBkInt' in myOptDict or\
        '--gSigma' in myOptDict or\
        '--extSigma' in myOptDict:
-        pd.set_option('display.max_rows', len(myStatsD))#imprime todas las filas       
+        pd.set_option('display.max_rows', len(myStatsD))#imprime todas las filas
         df = pd.DataFrame([myStatsD[v] for v in myStatsD] , columns = myHStrL)
         print(df)
-        
+
         return 0
-        
+
 
     if '--autoPeak' in myOptDict:
         idxPairL = peakRangeFinder(myDataList)
@@ -662,7 +662,7 @@ def main(argv):
             DBInfoD = {}
             for e in DBInfo:
                 DBInfoD[e[-1]] = e
-            DBInfoDL.append(DBInfoD)    
+            DBInfoDL.append(DBInfoD)
             isoPeakL = []
             for Ele in DBInfo:
                 iso = Ele[-1]
@@ -670,7 +670,7 @@ def main(argv):
                     isoPeakL.append([iso,1])
                 if iso not in isoCountD:
                     isoCountD[iso] = 0
-                isoCountD[iso] += 1  
+                isoCountD[iso] += 1
             isoPeakLL.append(isoPeakL)
 
         for isoLL in isoPeakLL:
@@ -736,21 +736,21 @@ def main(argv):
     myGaussRows=['#tags','a','mean','sigma','c']
     pd.set_option('display.max_rows', None)
     dfG = pd.DataFrame(gaussData4Print, columns = myGaussRows)
-    
+
     gilmoreDict=doGilmoreStuff(infoDict,myDataList)
     data4print=[]
     for e in gilmoreDict:
         gL=gilmoreDict[e]
         data4print.append(gL[0:6])
     realXVals=myDataList[0]
-    
+
     myHStr4=['#tags','NetArea[counts]','NetArea ExtBkgd','GrossInt','Background','Sigma_A']
-    pd.set_option('display.max_rows', len(data4print))#imprime todas las filas    
+    pd.set_option('display.max_rows', len(data4print))#imprime todas las filas
     df = pd.DataFrame([data for data in data4print], columns = myHStr4)
     print(df)
     print('\nGauss Parameters')
     print(dfG)
-    
+
     for e in gilmoreDict:
         tag,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,max_index,max_value=gilmoreDict[e]
         a,mean,sigma,c,minIdx,maxIdx,myFWHM=[str(val)\
@@ -792,11 +792,11 @@ def main(argv):
 
         plt.ylabel('Counts')
         plt.title(myFilename + ', exposure time = ' + str(mySpecialDict["expoTime"]))
-        #plt.show()
-        pid = os.fork()
-        if pid == 0:
-            time.sleep(0.1)
-            plt.show()
+        plt.show()
+        # pid = os.fork()
+        # if pid == 0:
+        #     time.sleep(0.1)
+        #     plt.show()
 
 if __name__ == "__main__":
     main(sys.argv)
