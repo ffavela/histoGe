@@ -642,6 +642,10 @@ def main(argv):
 
 
     if '--autoPeak' in myOptDict:
+        print("#This might take a while, be patient")
+        #Energy range of the histogram
+        tMinE,tMaxE=myDataList[0][0],myDataList[0][-1]
+
         idxPairL = peakRangeFinder(myDataList)
         ind = getSimpleIdxAve(idxPairL,myDataList)
         peakXVals=[myDataList[0][i] for i in ind]
@@ -667,27 +671,31 @@ def main(argv):
             isoPeakL = []
             for Ele in DBInfo:
                 iso = Ele[-1]
-                if [iso,1] not in isoPeakL:
-                    isoPeakL.append([iso,1])
+                if [iso,1,0] not in isoPeakL:
+                    isoPeakL.append([iso,1,0])
                     #So that there is only one count of each isotope
                     #per peak
                     if iso not in isoCountD:
-                        isoCountD[iso] = 0
-                    isoCountD[iso] += 1
+                        #Considering the number of entries in the
+                        #energy range of the histogram
+                        nInRange=len(EnergyRange(conexion,tMinE,tMaxE,iso))
+                        isoCountD[iso] = [0,nInRange]
+                    isoCountD[iso][0] += 1
             isoPeakLL.append(isoPeakL)
 
         for isoLL in isoPeakLL:
             for isoL in isoLL:
                 iso = isoL[0]
-                isoC = isoCountD[iso]
+                isoC = isoCountD[iso][0]
                 isoL[1] = isoC
-            isoLL.sort(key = lambda x: x[1],reverse = True)
+                isoL[2] = isoC/isoCountD[iso][1]
+            isoLL.sort(key = lambda x: x[2],reverse = True)
         for idxR, isoPeakL, DBInfoD in zip(idxPairL,isoPeakLL,DBInfoDL):
             start,end = idxR
             iEner = energyArr[start]
             fEner = energyArr[end]
             print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
-            Eg , Ig , Decay, Half , Parent, rank = [],[],[],[],[],[]
+            Eg , Ig , Decay, Half , Parent, rank, rank2 = [],[],[],[],[],[],[]
             for pInfo in isoPeakL:
                 iso = pInfo[0]
                 Ele = DBInfoD[iso]
@@ -698,12 +706,14 @@ def main(argv):
                 Half.append(meanLifeUnit(Ele))
                 Parent.append(Ele[10])
                 rank.append(pInfo[1])
-            #pd.set_option('display.max_rows', len(Ele))
-            pd.set_option('display.max_rows', None)#imprime todas las filas
-            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank'])#crea  la tabla
+                rank2.append(pInfo[2])
+            pd.set_option('display.max_rows', len(Ele))
+            # pd.set_option('display.max_rows', None)#imprime todas las filas
+            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2'])#crea  la tabla
             print(df) #imprime la tabla
         CloseDatabase(conexion)
 
+        # print("Histogram energy range is = ",tMinE,tMaxE)
         if '--noPlot' not in myOptDict:
             if '--log' in myOptDict:
                 plt.yscale('log')
