@@ -669,9 +669,11 @@ def main(argv):
                 iso = Ele[-1]
                 if [iso,1] not in isoPeakL:
                     isoPeakL.append([iso,1])
-                if iso not in isoCountD:
-                    isoCountD[iso] = 0
-                isoCountD[iso] += 1
+                    #So that there is only one count of each isotope
+                    #per peak
+                    if iso not in isoCountD:
+                        isoCountD[iso] = 0
+                    isoCountD[iso] += 1
             isoPeakLL.append(isoPeakL)
 
         for isoLL in isoPeakLL:
