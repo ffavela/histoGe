@@ -572,7 +572,9 @@ def main(argv):
         subsTractedL=getSubstractedList(myDataList,rescaledList)
         if "--noBkgd" not in myOptDict:
             plt.plot(rescaledList[0],rescaledList[1],label="rescaledB")
+            #myPlotF(rescaledList[0],rescaledList[1],label="rescaledB")
         plt.plot(subsTractedL[0],subsTractedL[1],label="substracted")
+        #myPlotF(subsTractedL[0],subsTractedL[1],label="substracted")
 
     myHStr="#tags" #Header String
     myHStrL=['#tags']
