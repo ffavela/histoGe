@@ -12,7 +12,7 @@ from scipy.signal import savgol_filter
 #This still needs to be improved!!
 def peakRangeFinder(theList):
     energy,counts=theList
-
+    maxIdx=len(energy)
     sg = savgol_filter(counts, 5, 1)
 
     indRange=[]
@@ -49,7 +49,14 @@ def peakRangeFinder(theList):
             overT = False
             end = i-1
             # ind.append((start+end)//2)
-            indRange.append([start,end+1])
+
+            #making sure the rebining doesn't affect
+            #negatively the start the range
+            if start != 0:
+                start-=1
+            if end < maxIdx:
+                end+=1
+            indRange.append([start,end])
 
     return indRange
 
