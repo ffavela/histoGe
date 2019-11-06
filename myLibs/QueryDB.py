@@ -59,6 +59,15 @@ def halfLifeUnit(Ele):
     d=8640
     h=3600
     m=60
+    Ele=list(Ele)
+    Ele[6]=str(Ele[6])
+    if Ele[6].isnumeric() == False:
+        x=Ele[6].split('~')
+        Ele[6]=x[len(x)-1]
+        if Ele[6] == '':
+            Ele[6]=0
+    Ele[6]=float(Ele[6])
+
     if Ele[7] == 'y':
         halfLifeInSecs=Ele[6]*y
     elif Ele[7] == 'd':

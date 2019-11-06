@@ -346,12 +346,7 @@ def main(argv):
                 Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
                 #DIg.append(str(Ele[4]))
                 Decay.append(Ele[5])
-                x=halfLifeUnit(Ele)
-                if x == '':
-                    y = str(x)
-                else: 
-                    y = str('{0:.2e}'.format(x))
-                Half.append(y+ ' [s] ' + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
+                Half.append(str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
                 #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
                 #DHalf.append(str(Ele[8]))
                 Parent.append(Ele[10])
@@ -400,16 +395,11 @@ def main(argv):
                 Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
                 #DIg.append(str(Ele[4]))
                 Decay.append(Ele[5])
-                x=halfLifeUnit(Ele)
-                if x == '':
-                    y = str(x)
-                else: 
-                    y = str('{0:.2e}'.format(x))
-                Half.append(y+ ' [s] ' + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
+                Half.append(str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
                 #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
                 #DHalf.append(str(Ele[8]))
                 Parent.append(Ele[10])
-            pd.set_option('display.max_rows', None)#imprime todas las filas
+            pd.set_option('display.max_rows', 30)#imprime todas las filas
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
             print(df) #imprime la tabla
 
@@ -717,7 +707,7 @@ def main(argv):
                 Decay.append(Ele[5])
                 #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')x=halfLifeUnit(Ele)
                 x=halfLifeUnit(Ele)
-                if x == '':
+                if x == 0:
                     y = str(x)
                 else: 
                     y = str('{0:.2e}'.format(x))
