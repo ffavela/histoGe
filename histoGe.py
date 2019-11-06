@@ -255,8 +255,8 @@ def checkQOption(myOptDict,argv):
         print("error: query option needs exactly 2 values")
         return False
 
-    iEner=myList[0]
-    fEner=myList[1]
+    iEner=float(myList[0])
+    fEner=float(myList[1])
 
     if iEner > fEner:
         print("error: initial value has to be lower than final")
