@@ -755,7 +755,7 @@ def main(argv):
                         Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
                         Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
                         Decay.append(Ele[5])
-                        Half.append(meanLifeUnit(Ele))
+                        Half.append(halfLifeUnit(Ele))
                         Parent.append(Ele[10])
 
                     if '--all' not in myOptDict:
