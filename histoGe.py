@@ -647,6 +647,9 @@ def main(argv):
         #Energy range of the histogram
         tMinE,tMaxE=myDataList[0][0],myDataList[0][-1]
 
+        #For memoizing the database queries for the histogram energy
+        #range
+        memoLenDict={}
         idxPairL = peakRangeFinder(myDataList)
         ind = getSimpleIdxAve(idxPairL,myDataList)
         peakXVals=[myDataList[0][i] for i in ind]
@@ -659,7 +662,7 @@ def main(argv):
             pathfile = pathfile.strip('histoGe.py')
             conexion = OpenDatabase(pathfile)
             energyArr = myDataList[0]
-            if '--noRank' not in myOptDict: 
+            if '--noRank' not in myOptDict:
                 isoPeakLL = []
                 isoCountD = {}
                 DBInfoL = []
@@ -675,7 +678,7 @@ def main(argv):
                         DBInfoD[e[-1]] = e
                     DBInfoDL.append(DBInfoD)
                     isoPeakL = []
-                    
+
                     for Ele in DBInfo:
                         iso = Ele[-1]
                         if [iso,1,0] not in isoPeakL:
@@ -686,7 +689,10 @@ def main(argv):
                             if iso not in isoCountD:
                                 #Considering the number of entries in the
                                 #energy range of the histogram
-                                nInRange=len(EnergyRange(conexion,tMinE,tMaxE,iso))
+                                if iso not in memoLenDict:
+                                    memoLenDict[iso]=\
+                                        len(EnergyRange(conexion,tMinE,tMaxE,iso))
+                                nInRange=memoLenDict[iso]
                                 isoCountD[iso] = [0,nInRange]
                             isoCountD[iso][0] += 1
                     isoPeakLL.append(isoPeakL)
@@ -717,7 +723,7 @@ def main(argv):
                         x=halfLifeUnit(Ele)
                         if x == 0:
                             y = str(x)
-                        else: 
+                        else:
                             y = str('{0:.2e}'.format(x))
                         Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
                 #
@@ -729,9 +735,9 @@ def main(argv):
                         pd.set_option('display.max_rows', len(Ele))
                     else:
                         pd.set_option('display.max_rows', None)#imprime todas las filas
-                    
+
                     df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2'])#crea  la tabla
-                    
+
                     if '--all' not in myOptDict:
                         print(df.head(10)) #imprime la tabla
                     else:
@@ -764,12 +770,12 @@ def main(argv):
                         pd.set_option('display.max_rows', None)#imprime todas las filas
 
                     df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])
-                    
+
                     if '--all' not in myOptDict:
                         print(df.head(10)) #imprime la tabla
                     else:
                         print(df)
-                                    
+
             CloseDatabase(conexion)
         # print("Histogram energy range is = ",tMinE,tMaxE)
         if '--noPlot' not in myOptDict:
