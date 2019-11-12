@@ -351,7 +351,7 @@ def main(argv):
                 Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
                 #DIg.append(str(Ele[4]))
                 Decay.append(Ele[5])
-                Half.append(meanLifeUnit(Ele))
+                Half.append(str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
                 #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
                 #DHalf.append(str(Ele[8]))
                 Parent.append(Ele[10])
@@ -400,10 +400,11 @@ def main(argv):
                 Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
                 #DIg.append(str(Ele[4]))
                 Decay.append(Ele[5])
-                Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
+                Half.append(str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
+                #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
                 #DHalf.append(str(Ele[8]))
                 Parent.append(Ele[10])
-            pd.set_option('display.max_rows', None)#imprime todas las filas
+            pd.set_option('display.max_rows', 30)#imprime todas las filas
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
             print(df) #imprime la tabla
 
@@ -579,7 +580,9 @@ def main(argv):
         subsTractedL=getSubstractedList(myDataList,rescaledList)
         if "--noBkgd" not in myOptDict:
             plt.plot(rescaledList[0],rescaledList[1],label="rescaledB")
+            #myPlotF(rescaledList[0],rescaledList[1],label="rescaledB")
         plt.plot(subsTractedL[0],subsTractedL[1],label="substracted")
+        #myPlotF(subsTractedL[0],subsTractedL[1],label="substracted")
 
     myHStr="#tags" #Header String
     myHStrL=['#tags']
@@ -648,10 +651,14 @@ def main(argv):
         #Energy range of the histogram
         tMinE,tMaxE=myDataList[0][0],myDataList[0][-1]
 
+        #For memoizing the database queries for the histogram energy
+        #range
+        memoLenDict={}
         idxPairL = peakRangeFinder(myDataList)
         ind = getSimpleIdxAve(idxPairL,myDataList)
         peakXVals=[myDataList[0][i] for i in ind]
         peakYVals=[myDataList[1][i] for i in ind]
+
         if '--noQuery' not in myOptDict:
             if '--noRank' not in myOptDict:
                 print("#This might take a while, be patient")
@@ -659,7 +666,7 @@ def main(argv):
             pathfile = pathfile.strip('histoGe.py')
             conexion = OpenDatabase(pathfile)
             energyArr = myDataList[0]
-            if '--noRank' not in myOptDict: 
+            if '--noRank' not in myOptDict:
                 isoPeakLL = []
                 isoCountD = {}
                 DBInfoL = []
@@ -675,7 +682,7 @@ def main(argv):
                         DBInfoD[e[-1]] = e
                     DBInfoDL.append(DBInfoD)
                     isoPeakL = []
-                    
+
                     for Ele in DBInfo:
                         iso = Ele[-1]
                         if [iso,1,0] not in isoPeakL:
@@ -686,7 +693,10 @@ def main(argv):
                             if iso not in isoCountD:
                                 #Considering the number of entries in the
                                 #energy range of the histogram
-                                nInRange=len(EnergyRange(conexion,tMinE,tMaxE,iso))
+                                if iso not in memoLenDict:
+                                    memoLenDict[iso]=\
+                                        len(EnergyRange(conexion,tMinE,tMaxE,iso))
+                                nInRange=memoLenDict[iso]
                                 isoCountD[iso] = [0,nInRange]
                             isoCountD[iso][0] += 1
                     isoPeakLL.append(isoPeakL)
@@ -714,7 +724,13 @@ def main(argv):
                         Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
                         Decay.append(Ele[5])
                         #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
-                        Half.append(meanLifeUnit(Ele))
+                        x=halfLifeUnit(Ele)
+                        if x == 0:
+                            y = str(x)
+                        else:
+                            y = str('{0:.2e}'.format(x))
+                        Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
+                #
                         Parent.append(Ele[10])
                         rank.append(pInfo[1])
                         rank2.append(pInfo[2])
@@ -723,9 +739,9 @@ def main(argv):
                         pd.set_option('display.max_rows', len(Ele))
                     else:
                         pd.set_option('display.max_rows', None)#imprime todas las filas
-                    
+
                     df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2'])#crea  la tabla
-                    
+
                     if '--all' not in myOptDict:
                         print(df.head(10)) #imprime la tabla
                         #print('\nOnly the first 10')
@@ -750,7 +766,7 @@ def main(argv):
                         Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
                         Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
                         Decay.append(Ele[5])
-                        Half.append(meanLifeUnit(Ele))
+                        Half.append(halfLifeUnit(Ele))
                         Parent.append(Ele[10])
 
                     if '--all' not in myOptDict:
@@ -759,14 +775,13 @@ def main(argv):
                         pd.set_option('display.max_rows', None)#imprime todas las filas
 
                     df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])
-                    
+
                     if '--all' not in myOptDict:
                         print(df.head(10)) #imprime la tabla
                     else:
                         print(df)
-                                    
-            CloseDatabase(conexion)
 
+            CloseDatabase(conexion)
         # print("Histogram energy range is = ",tMinE,tMaxE)
         if '--noPlot' not in myOptDict:
             if '--log' in myOptDict:
