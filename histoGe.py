@@ -142,6 +142,10 @@ def printHelp(argv, functionDict, extBool=False):
         print("\t--rebin:\tNeeds a positive integer for")
         print("\t\tgrouping the contents of consecutive bins")
         print("\t\ttogether.\n")
+        print("\t--autoPeak:\tFind peaks in histogram and make a rank to help identify")
+        print("\t\t\tthe isotopes that generates that peak. It should be used with rebin option.\n")
+        print("\t--query:\tQuery the database RadioactiveIsoptopes.db using a range of energies.\n")
+        print("\t--isotope:\tLook for that isotope in the database.\n")
         print("Extra options:\n")
         print("\t--noCal:\tWill not use any calibration info.")
         print("\t\t\tMight mess with your ranges (used with -c).\n")
@@ -156,8 +160,8 @@ def printHelp(argv, functionDict, extBool=False):
         print("\t--extSigma:\tSame as gSigma but using 5 bins")
         print("\t\t\tbefore and after region.\n")
         print("\t--log:\t\tprint Y axis with Log scale ")
-        print("\t--query:\tQuery the database RadioactiveIsoptopes.db using a range of energies.")
-        print("\t--isotope:\tLook for that isotope in the database.")
+        print("\t--noRank: No rank in autoPeak option.\n")
+        print("\t--noQuery: autoPeak only shows figures with the identified peaks.\n")
         print("Valid extensions are:")
         for ext in functionDict:
             print("\t\t%s" %(ext))
@@ -724,6 +728,7 @@ def main(argv):
                     
                     if '--all' not in myOptDict:
                         print(df.head(10)) #imprime la tabla
+                        #print('\nOnly the first 10')
                     else:
                         print(df)
 
