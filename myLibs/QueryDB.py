@@ -84,5 +84,19 @@ def halfLifeUnit(Ele):
 
 #df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
 
+def stripList(ListDB):
+    ListRC = ['*','<','~']
+    #ListRC = '~'
+    index = 3
+    
+    for Element,i in zip(ListDB,range(len(ListDB))):    
+        Element = list(Element)
+        for character in ListRC:
+            Element[index] = Element[index].strip(character)
+        Element = tuple(Element)
+        ListDB[i] = Element
+    return ListDB
+
+
 
 

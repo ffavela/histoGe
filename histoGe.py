@@ -391,6 +391,7 @@ def main(argv,pidParent):
             del iEnerAux
 
         DBInfo = EnergyRange(conexion,iEner,fEner)
+        #DBInfo = stripList(DBInfo)
         if len(DBInfo) == 0:
             print('\nThe energy range consulted is %.2f keV to %.2f keV.\n' % (iEner,fEner))
             print('No results were found.')
@@ -408,7 +409,7 @@ def main(argv,pidParent):
                 #DHalf.append(str(Ele[8]))
                 Parent.append(Ele[10])
             pd.set_option('display.max_rows', 30)#imprime todas las filas
-            
+
             if '--all' not in myOptDict:
                 pd.set_option('display.max_rows', len(Ele))
             else:
