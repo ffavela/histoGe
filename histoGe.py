@@ -667,6 +667,7 @@ def main(argv,pidParent):
         if '--noQuery' not in myOptDict:
             if '--noRank' not in myOptDict:
                 print("#This might take a while, be patient.\n#Output will be comming shortly.")
+                print("#Terminal was liberated but process continues in the background.")
             pathfile = os.path.realpath(__file__)
             pathfile = pathfile.strip('histoGe.py')
             conexion = OpenDatabase(pathfile)
