@@ -408,6 +408,12 @@ def main(argv,pidParent):
                 #DHalf.append(str(Ele[8]))
                 Parent.append(Ele[10])
             pd.set_option('display.max_rows', 30)#imprime todas las filas
+            
+            if '--all' not in myOptDict:
+                pd.set_option('display.max_rows', len(Ele))
+            else:
+                pd.set_option('display.max_rows', None)#imprime todas las filas
+
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
             print(df) #imprime la tabla
             # if pidParent > 0:
