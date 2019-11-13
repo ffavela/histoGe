@@ -11,6 +11,7 @@ from scipy.optimize import curve_fit
 from scipy import asarray as ar,exp
 from math import sqrt, pi
 import time
+import signal
 
 
 
@@ -301,7 +302,7 @@ programming error.")
 
     return True
 
-def main(argv):
+def main(argv,pidParent):
     #The following is a dictionary that maps keys (file extensions) to
     #the proper parsing function. See parse
     functionDict = {
@@ -358,7 +359,9 @@ def main(argv):
             pd.set_option('display.max_rows', None)#imprime todas las filas
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
             print(df) #imprime la tabla
-
+            # if pidParent > 0:
+            #     os.kill(pidParent,signal.SIGUSR1)
+            #     print(str(pidParent))
 
         CloseDatabase(conexion)
 
@@ -407,6 +410,9 @@ def main(argv):
             pd.set_option('display.max_rows', 30)#imprime todas las filas
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
             print(df) #imprime la tabla
+            # if pidParent > 0:
+            #     os.kill(pidParent,signal.SIGUSR1)
+            #     print(str(pidParent))
 
         CloseDatabase(conexion)
         return True
@@ -526,10 +532,6 @@ def main(argv):
                 plt.xlabel('Channels')
         plt.ylabel('Counts')
         plt.title(myFilename)
-        # pid = os.fork()
-        # if pid == 0:
-        #     time.sleep(0.1)
-        #     plt.show()
         plt.show()
         return 3905
 
@@ -645,6 +647,9 @@ def main(argv):
         pd.set_option('display.max_rows', len(myStatsD))#imprime todas las filas
         df = pd.DataFrame([myStatsD[v] for v in myStatsD] , columns = myHStrL)
         print(df)
+        # if pidParent > 0:
+        #     os.kill(pidParent,signal.SIGUSR1)
+        #     print(str(pidParent))
         return 0
 
     if '--autoPeak' in myOptDict:
@@ -747,6 +752,10 @@ def main(argv):
                         #print('\nOnly the first 10')
                     else:
                         print(df)
+                        # if pidParent > 0:
+                        #     print('El proceso padre es: ',pidParent)
+                        #     os.kill(pidParent,signal.SIGUSR1)
+                        #     print(str(pidParent))
 
             else:
                 DBInfoL = []
@@ -780,6 +789,9 @@ def main(argv):
                         print(df.head(10)) #imprime la tabla
                     else:
                         print(df)
+                        # if pidParent > 0:
+                        #     os.kill(pidParent,signal.SIGUSR1)
+                        #     print(str(pidParent))
 
             CloseDatabase(conexion)
         # print("Histogram energy range is = ",tMinE,tMaxE)
@@ -793,10 +805,6 @@ def main(argv):
 
             plt.plot(myDataList[0],myDataList[1],label="testing")
             plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
-            # pid = os.fork()
-            # if pid == 0:
-            #     time.sleep(0.1)
-            #     plt.show()
             plt.show()
         return 0
 
@@ -831,6 +839,10 @@ def main(argv):
     pd.set_option('display.max_rows', len(data4print))#imprime todas las filas
     df = pd.DataFrame([data for data in data4print], columns = myHStr4)
     print(df)
+    # if pidParent > 0:
+    #     os.kill(pidParent,signal.SIGUSR1)
+    #     print(str(pidParent))
+
     print('\nGauss Parameters')
     print(dfG)
 
@@ -876,10 +888,39 @@ def main(argv):
         plt.ylabel('Counts')
         plt.title(myFilename + ', exposure time = ' + str(mySpecialDict["expoTime"]))
         plt.show()
-        # pid = os.fork()
-        # if pid == 0:
-        #     time.sleep(0.1)
-        #     plt.show()
+        # if pidParent > 0:
+        #     os.kill(pidParent,signal.SIGUSR1)
+        #     print('Bandera')
+
+def TerminateProcess():
+    sys.exit()
 
 if __name__ == "__main__":
-    main(sys.argv)
+    try:
+        pidParent = os.getgid()
+        #signal.signal(signal.SIGUSR1,TerminateProcess)
+        pid = os.fork()
+
+        #pid, fd = os.forkpty()
+        #print(fd)
+        #print(pidParent)
+        #print(type(pidParent))
+        if pid == 0:
+            #print(os.getpid())
+            #print(sys.argv)
+            #print("Child Process")
+            main(sys.argv,pidParent)
+            #os.kill(pidParent,signal.SIGUSR1)
+            #sys.exit(0)
+
+        #else:
+        #    pass
+            #while 1:
+            #signal.pause() #sys.exit(0)#signal.sigwait(signal.SIGUSR1)#signal.signal(signal.SIGUSR1,)
+    except OSError:
+        pidParent = 0
+        #print('Fork Failed')
+        main(sys.argv,pidParent)
+    
+
+    
