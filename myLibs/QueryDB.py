@@ -7,7 +7,7 @@ def OpenDatabase(pathfile):
     return conexion
 
 def EnergyRange(conexion,min,max,element = None,order = None):
-    Command = 'SELECT * FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy <= ' + str(max)
+    Command = 'SELECT * FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
     if element != None:
         Command += ' and Element = ' + "'" + element + "'" 
     

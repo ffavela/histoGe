@@ -384,11 +384,8 @@ def main(argv):
             del iEnerAux
 
         DBInfo = EnergyRange(conexion,iEner,fEner)
-        if len(DBInfo) == 0:
-            print('\nThe energy range consulted is %.2f keV to %.2f keV.\n' % (iEner,fEner))
-            print('No results were found.')
-        else:
-            print('\nThe energy range consulted is %.2f keV to %.2f keV.\n' % (iEner,fEner))
+        print('\nThe energy range consulted is %.2f keV to %.2f keV.\n' % (iEner,fEner))
+        if len(DBInfo) != 0:
             Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
             for Ele in DBInfo:
                 Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
@@ -404,6 +401,7 @@ def main(argv):
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
             print(df) #imprime la tabla
 
+        print("\n%d results were found" %(len(DBInfo)))
         CloseDatabase(conexion)
         return True
 
