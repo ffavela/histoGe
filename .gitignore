@@ -3,4 +3,5 @@ __pycache__
 *.SPE
 *.mca
 myDatabase/*
-sampleScripts/dens4Plotting.txt
+sampleScripts/*.txt
+sampleScripts/*.bak
