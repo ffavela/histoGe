@@ -5,3 +5,4 @@ __pycache__
 myDatabase/*
 sampleScripts/*.txt
 sampleScripts/*.bak
+sampleScripts/*.pdf
