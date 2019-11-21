@@ -97,6 +97,12 @@ def stripList(ListDB):
         ListDB[i] = Element
     return ListDB
 
+def getNormalizedEmissionList(IsoList):
+    IsoList = stripList(IsoList)
+
+
+    pass
+
 
 
 
