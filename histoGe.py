@@ -391,12 +391,8 @@ def main(argv,pidParent):
             del iEnerAux
 
         DBInfo = EnergyRange(conexion,iEner,fEner)
-        #DBInfo = stripList(DBInfo)
-        if len(DBInfo) == 0:
-            print('\nThe energy range consulted is %.2f keV to %.2f keV.\n' % (iEner,fEner))
-            print('No results were found.')
-        else:
-            print('\nThe energy range consulted is %.2f keV to %.2f keV.\n' % (iEner,fEner))
+        print('\nThe energy range consulted is %.2f keV to %.2f keV.\n' % (iEner,fEner))
+        if len(DBInfo) != 0:
             Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
             for Ele in DBInfo:
                 Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
@@ -421,6 +417,7 @@ def main(argv,pidParent):
             #     os.kill(pidParent,signal.SIGUSR1)
             #     print(str(pidParent))
 
+        print("\n%d results were found" %(len(DBInfo)))
         CloseDatabase(conexion)
         return True
 
