@@ -764,6 +764,7 @@ def main(argv,pidParent):
 
             else:
                 DBInfoL = []
+
                 for idxR in idxPairL:
                     start,end = idxR
                     iEner = energyArr[start]
@@ -774,6 +775,7 @@ def main(argv,pidParent):
                     start,end = idxR
                     iEner = energyArr[start]
                     fEner = energyArr[end]
+
                     print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
                     Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
                     for Ele in DBInfo:
@@ -799,14 +801,20 @@ def main(argv,pidParent):
                         #     print(str(pidParent))
 
             CloseDatabase(conexion)
-        # print("Histogram energy range is = ",tMinE,tMaxE)
+
         if '--noPlot' not in myOptDict:
+            fig, ax = plt.subplots()
+            for iPV in idxPairL:
+                start, end = iPV
+                ax.fill_between(myDataList[0][start:end], myDataList[1][start:end], facecolor='red')
             if '--log' in myOptDict:
                 plt.yscale('log')
             if '--noCal' not in myOptDict and mySpecialDict['calBoolean'] == True:
                 plt.xlabel('Energies [KeV]')
             else:
                 plt.xlabel('Channels')
+
+
 
             plt.plot(myDataList[0],myDataList[1],label="testing")
             plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
@@ -926,6 +934,3 @@ if __name__ == "__main__":
         pidParent = 0
         #print('Fork Failed')
         main(sys.argv,pidParent)
-    
-
-    
