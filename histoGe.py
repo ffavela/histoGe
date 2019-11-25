@@ -514,6 +514,7 @@ def main(argv,pidParent):
                 mySpecialDict = functionDict[myExtension](e)
 
             myDataList = mySpecialDict["theList"]
+            print(mySpecialDict)
             if '--rebin' in myOptDict:
                 rebInt=int(argv[myOptDict['--rebin'][0]])
                 if "theRebinedList" not in mySpecialDict:
@@ -569,7 +570,8 @@ def main(argv,pidParent):
 
     # there is an "Qt::AA_EnableHighDpiScaling" error here.
     if "--autoPeak" not in myOptDict:
-        plt.plot(myDataList[0],myDataList[1],label=myFilename)
+        nameSplited=myFilename.split('_')
+        plt.plot(myDataList[0],myDataList[1], label=nameSplited[0])
         #myPlotF(myDataList)
 
     if mySubsList: # != None
@@ -804,6 +806,7 @@ def main(argv,pidParent):
 
         if '--noPlot' not in myOptDict:
             fig, ax = plt.subplots()
+            plt.ylabel('Counts')
             for iPV in idxPairL:
                 start, end = iPV
                 ax.fill_between(myDataList[0][start:end], myDataList[1][start:end], facecolor='red')
@@ -814,9 +817,10 @@ def main(argv,pidParent):
             else:
                 plt.xlabel('Channels')
 
-
-
-            plt.plot(myDataList[0],myDataList[1],label="testing")
+            nameSplited=myFilename.split('_')
+            plt.title(myFilename + ', exposure time = ' + str(mySpecialDict["expoTime"]))
+            plt.plot(myDataList[0],myDataList[1], label = nameSplited[0])
+            plt.legend(loc='best')
             plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
             plt.show()
         return 0
@@ -896,8 +900,6 @@ def main(argv,pidParent):
             plt.xlabel('Energies [KeV]')
         else:
             plt.xlabel('Channels')
-
-
         plt.ylabel('Counts')
         plt.title(myFilename + ', exposure time = ' + str(mySpecialDict["expoTime"]))
         plt.show()
