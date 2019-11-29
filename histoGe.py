@@ -571,7 +571,8 @@ def main(argv,pidParent):
     # there is an "Qt::AA_EnableHighDpiScaling" error here.
     if "--autoPeak" not in myOptDict:
         nameSplited=myFilename.split('_')
-        plt.plot(myDataList[0],myDataList[1], label=nameSplited[0])
+        fig, ax = plt.subplots()
+        plt.plot(myDataList[0],myDataList[1], label=nameSplited[0]) #plot the main spectrum if --autopeak is not used
         #myPlotF(myDataList)
 
     if mySubsList: # != None
@@ -830,17 +831,16 @@ def main(argv,pidParent):
     fittingDict=doFittingStuff(infoDict,myDataList)
     gaussData4Print=[]
     for e in fittingDict:
-        #print("###################################################################################################################################################################################################")
+
         a,mean,sigma,c,minIdx,maxIdx,myFWHM=fittingDict[e]
         if a == None:
             print("Skipping failed fit")
             continue
         gaussData4Print.append([e,a,mean,sigma,c])
         #print("FWHM= ",myFWHM)
-        xVals=myDataList[0][minIdx:maxIdx]
-        plt.plot(xVals,gaus(xVals,a,mean,sigma,c),\
-                 'r:')
-        # plt.annotate(e, xy=[mean,a])
+        xVals=myDataList[0][minIdx:maxIdx+1]
+        ax.fill_between(xVals,gaus(xVals,a,mean,sigma,c), facecolor='red') #plot gaus fit
+        #plt.annotate(e, xy=[mean,a])
     myGaussRows=['#tags','a','mean','sigma','c']
     pd.set_option('display.max_rows', None)
     dfG = pd.DataFrame(gaussData4Print, columns = myGaussRows)
@@ -865,7 +865,7 @@ def main(argv,pidParent):
 
     for e in gilmoreDict:
         tag,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,max_index,max_value=gilmoreDict[e]
-        a,mean,sigma,c,minIdx,maxIdx,myFWHM=[str(val)\
+        a,mean,sigma,c,minIdx,maxIdx,myFWHM=[str(val)
                                              for val in\
                                              fittingDict[e]]
         floatMean=fittingDict[e][1]

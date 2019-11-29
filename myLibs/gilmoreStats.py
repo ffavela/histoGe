@@ -10,18 +10,20 @@ from math import sqrt, pi
 import numpy as np
 from myLibs.miscellaneus import *
 
-def gilmoreGrossIntegral(myDataList,lowXVal,uppXVal):
+def gilmoreGrossIntegral(myDataList,lowXVal,uppXVal):  #checked
     xVals,yVals=myDataList
     L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
-    G=sum(yVals[L:U+1])
-    return G
+    G=sum(yVals[L:U+1])  #incluye en la suma el bin L y U
+    return G             #para el caso del DppMCA, no incluye la suma de los bins L y U
+                         #asi lo calcula el DppMCA     G=sum(yVals[L+1:U])
 
 def gilmoreBackground(myDataList,lowXVal,uppXVal):
     xVals,yVals=myDataList
     L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
-    n=U-L
+    n=(U-L)+1                   #n is the number of channels within the peak region
     C=yVals
-    B=n*(C[L-1]+C[U+1])/2
+    B=n*(C[L-1]+C[U+1])/2       #
+                                #B=(n-1)*(C[L]+C[U])/2 asi lo hace DppMCA
     return B
 
 def gilmoreNetArea(myDataList,lowXVal,uppXVal):
