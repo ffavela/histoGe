@@ -827,7 +827,7 @@ def main(argv,pidParent):
         return 0
 
     print("")
-    print("Gilmore statistics")
+    print("Gilmore statistics\n[variables in counts]")
     fittingDict=doFittingStuff(infoDict,myDataList)
     gaussData4Print=[]
     for e in fittingDict:
@@ -852,7 +852,7 @@ def main(argv,pidParent):
         data4print.append(gL[0:6])
     realXVals=myDataList[0]
 
-    myHStr4=['#tags','NetArea[counts]','NetArea ExtBkgd','GrossInt','Background','Sigma_A']
+    myHStr4=['#tags','NetArea','Area+ExtBkgd','GrossInt','Background','Sigma_A']
     pd.set_option('display.max_rows', len(data4print))#imprime todas las filas
     df = pd.DataFrame([data for data in data4print], columns = myHStr4)
     print(df)

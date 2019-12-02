@@ -17,7 +17,7 @@ def gilmoreGrossIntegral(myDataList,lowXVal,uppXVal):  #checked
     return G             #para el caso del DppMCA, no incluye la suma de los bins L y U
                          #asi lo calcula el DppMCA     G=sum(yVals[L+1:U])
 
-def gilmoreBackground(myDataList,lowXVal,uppXVal):
+def gilmoreBackground(myDataList,lowXVal,uppXVal):     #checked
     xVals,yVals=myDataList
     L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
     n=(U-L)+1                   #n is the number of channels within the peak region
@@ -26,22 +26,22 @@ def gilmoreBackground(myDataList,lowXVal,uppXVal):
                                 #B=(n-1)*(C[L]+C[U])/2 asi lo hace DppMCA
     return B
 
-def gilmoreNetArea(myDataList,lowXVal,uppXVal):
+def gilmoreNetArea(myDataList,lowXVal,uppXVal):        #checked
     xVals,yVals=myDataList
     G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
     B=gilmoreBackground(myDataList,lowXVal,uppXVal)
     A=G-B
     return A
 
-def gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal,m=5):
-    """Takes into account the bins (5 by default) before and after the
-region of interest"""
+def gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal,m=1): #checked
+    """Takes into account the bins (1 by default) before and after the
+region of interest. Default m=1 NetArea=Area+ExtendedBKGD""" 
     xVals,yVals=myDataList
     L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
-    n=U-L
+    n=(U-L)+1                   #n is the number of channels within the peak region
     C=yVals
     G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
-    A=G-n*(sum(C[L-m:L-1])+sum(C[U+1:U+m+1]))/(2*m)
+    A=G-n*(sum(C[L-m:L])+sum(C[U+1:U+m+1]))/(2*m)
     return A
 
 def gilmoreSigma(myDataList,lowXVal,uppXVal):   
@@ -81,7 +81,7 @@ def doGilmoreStuff(infoDict,myDataList):
         netArea=gilmoreNetArea(myDataList,lowXVal,uppXVal)
         sigma_A=gilmoreSigma(myDataList,lowXVal,uppXVal)
 
-        m=5 #extended region
+        m=2 #extended region
         EBA=gilmoreExtendedBkgExtensionsInt(myDataList,\
                                            lowXVal,uppXVal,m)
         extSigma_A=gilmoreExtendedSigma(myDataList,\
