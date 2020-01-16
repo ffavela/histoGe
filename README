@@ -23,7 +23,7 @@ For update, simply:
 
 	1. Run:
 
-			sudo update.py
+			update.py
 
 	2. Or run:
 
