@@ -6,8 +6,7 @@ try:
 	os.system("mkdir -p ~/.myPrograms")
 	a = "cd ~/.myPrograms && ln -s "+ path + "   histoGe"
 	os.system(a)
-	os.system("echo 'export PATH=$PATH:~/.myPrograms' >> ~/.bashrc")
+	if (len(subprocess.getoutput("grep 'export PATH=$PATH:~/.myPrograms' ~/.bashrc")))==0:
+		os.system("echo 'export PATH=$PATH:~/.myPrograms' >> ~/.bashrc")
 except:
 	print('Error')
-
-

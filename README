@@ -5,6 +5,8 @@ probably change the repo location.
 The program accepts 3 different file formats, ("mca" the pocket
 version, "Txt" gamma view format, "SPE" Boulby format.)
 
+IT'S NECESARY PYTHON>=3.6
+
 For install, simply:
 
 	1. Run:
@@ -13,7 +15,7 @@ For install, simply:
 	
 	2. Or as 'su', run:
 
-			pip3 install -r requirements.txt
+			apt upgrade python3-pip && pip3 install -r requirements.txt
 
 	   and run out of root:
 		
@@ -23,7 +25,7 @@ For update, simply:
 
 	1. Run:
 
-			update.py
+			python3 update.py
 
 	2. Or run:
 
