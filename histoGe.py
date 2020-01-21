@@ -667,8 +667,9 @@ def main(argv,pidParent):
         #range
         memoLenDict={}
         idxPairL = peakRangeFinder(myDataList)
+        
         ind = getSimpleIdxAve(idxPairL,myDataList)
-        peakXVals=[myDataList[0][i] for i in ind]
+        peakXVals=[myDataList[0][i] for i in ind]  #Peak Vals in Energy/channel
         peakYVals=[myDataList[1][i] for i in ind]
 
         if '--noQuery' not in myOptDict:
@@ -723,11 +724,14 @@ def main(argv,pidParent):
                         isoL[2] = isoC/isoCountD[iso][1]
 
                     isoLL.sort(key = lambda x: x[2],reverse = True)
-
+                
+                Ranges = []
                 for idxR, isoPeakL, DBInfoD in zip(idxPairL,isoPeakLL,DBInfoDL):
                     start,end = idxR
                     iEner = energyArr[start]
                     fEner = energyArr[end]
+                    Ranges.append([iEner,fEner])
+
                     print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
                     Eg , Ig , Decay, Half , Parent, rank, rank2 = [],[],[],[],[],[],[]
                     for pInfo in isoPeakL:
@@ -802,6 +806,15 @@ def main(argv,pidParent):
                         # if pidParent > 0:
                         #     os.kill(pidParent,signal.SIGUSR1)
                         #     print(str(pidParent))
+
+            
+            lenght = len(Ranges)
+            myInfofile=open( myFilename+'.info','a')
+            pd.set_option('display.max_rows', len(Ranges))
+            df = pd.DataFrame(list(Ranges),columns=['start','end'])
+            myInfofile.write(df.head(10).to_string())
+            myInfofile.close()
+            
 
             CloseDatabase(conexion)
 
