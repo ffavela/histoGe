@@ -5,33 +5,43 @@ probably change the repo location.
 The program accepts 3 different file formats, ("mca" the pocket
 version, "Txt" gamma view format, "SPE" Boulby format.)
 
-Before you install, make sure you have:
-    Matplotlib package (python3-matplotlib)
-    Numpy package (python3-numpy)
-    Scipy package (python3-scipy)
-    Pandas Package (python3-pandas)
+IT'S NECESARY PYTHON>=3.6
 
-To install, simply do a:
+For install, simply:
 
-$ mkdir -p ~/.myPrograms
-$ cd ~/.myPrograms
-$ ln -s /path/to/histoGe/histoGe.py histoGe # replace with proper path
+	1. Run:
 
-Then open your shell rc file and put a line to export the new path, for
-example if you are using bash then do a:
+			sudo python3 install_sudo.py
+	
+	2. Or as 'su', run:
 
-$ nano ~/.bashrc
+			apt upgrade python3-pip && pip3 install -r requirements.txt
 
-Then put the following at the end of the file:
+	   and run out of root:
+		
+			python3 install_su.py
 
-export PATH=$PATH:~/.myPrograms
+For update, simply:
 
-Save and close the file (in nano do a Ctr+X, you will be asked to save
-the changes press Y for yes).
+	1. Run:
+
+			python3 update.py
+
+	2. Or run:
+
+			git pull
+
+	   and run as 'su':
+		
+			pip3 install -r requirements.txt
 
 Download the database from this link:
 
+<<<<<<< HEAD
 https://drive.google.com/file/d/17k55-6P8gTXFOQKdXblHMG2T0xc-dJ9p/view?usp=sharing
+=======
+
+>>>>>>> 9eabf94154874c513b8db479bae8cf46fef78758
 
 Save it under the "Path/to/histoGe/myDatabase/" folder.
 

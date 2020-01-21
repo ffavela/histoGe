@@ -514,6 +514,7 @@ def main(argv,pidParent):
                 mySpecialDict = functionDict[myExtension](e)
 
             myDataList = mySpecialDict["theList"]
+            print(mySpecialDict)
             if '--rebin' in myOptDict:
                 rebInt=int(argv[myOptDict['--rebin'][0]])
                 if "theRebinedList" not in mySpecialDict:
@@ -569,7 +570,9 @@ def main(argv,pidParent):
 
     # there is an "Qt::AA_EnableHighDpiScaling" error here.
     if "--autoPeak" not in myOptDict:
-        plt.plot(myDataList[0],myDataList[1],label=myFilename)
+        nameSplited=myFilename.split('_')
+        fig, ax = plt.subplots()
+        plt.plot(myDataList[0],myDataList[1], label=nameSplited[0]) #plot the main spectrum if --autopeak is not used
         #myPlotF(myDataList)
 
     if mySubsList: # != None
@@ -764,6 +767,7 @@ def main(argv,pidParent):
 
             else:
                 DBInfoL = []
+
                 for idxR in idxPairL:
                     start,end = idxR
                     iEner = energyArr[start]
@@ -774,6 +778,7 @@ def main(argv,pidParent):
                     start,end = idxR
                     iEner = energyArr[start]
                     fEner = energyArr[end]
+
                     print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
                     Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
                     for Ele in DBInfo:
@@ -799,8 +804,13 @@ def main(argv,pidParent):
                         #     print(str(pidParent))
 
             CloseDatabase(conexion)
-        # print("Histogram energy range is = ",tMinE,tMaxE)
+
         if '--noPlot' not in myOptDict:
+            fig, ax = plt.subplots()
+            plt.ylabel('Counts')
+            for iPV in idxPairL:
+                start, end = iPV
+                ax.fill_between(myDataList[0][start:end], myDataList[1][start:end], facecolor='red')
             if '--log' in myOptDict:
                 plt.yscale('log')
             if '--noCal' not in myOptDict and mySpecialDict['calBoolean'] == True:
@@ -808,27 +818,29 @@ def main(argv,pidParent):
             else:
                 plt.xlabel('Channels')
 
-            plt.plot(myDataList[0],myDataList[1],label="testing")
+            nameSplited=myFilename.split('_')
+            plt.title(myFilename + ', exposure time = ' + str(mySpecialDict["expoTime"]))
+            plt.plot(myDataList[0],myDataList[1], label = nameSplited[0])
+            plt.legend(loc='best')
             plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
             plt.show()
         return 0
 
     print("")
-    print("Gilmore statistics")
+    print("Gilmore statistics\n[variables in counts]")
     fittingDict=doFittingStuff(infoDict,myDataList)
     gaussData4Print=[]
     for e in fittingDict:
-        #print("###################################################################################################################################################################################################")
+
         a,mean,sigma,c,minIdx,maxIdx,myFWHM=fittingDict[e]
         if a == None:
             print("Skipping failed fit")
             continue
         gaussData4Print.append([e,a,mean,sigma,c])
         #print("FWHM= ",myFWHM)
-        xVals=myDataList[0][minIdx:maxIdx]
-        plt.plot(xVals,gaus(xVals,a,mean,sigma,c),\
-                 'r:')
-        # plt.annotate(e, xy=[mean,a])
+        xVals=myDataList[0][minIdx:maxIdx+1]
+        ax.fill_between(xVals,gaus(xVals,a,mean,sigma,c), facecolor='red') #plot gaus fit
+        #plt.annotate(e, xy=[mean,a])
     myGaussRows=['#tags','a','mean','sigma','c']
     pd.set_option('display.max_rows', None)
     dfG = pd.DataFrame(gaussData4Print, columns = myGaussRows)
@@ -840,7 +852,7 @@ def main(argv,pidParent):
         data4print.append(gL[0:6])
     realXVals=myDataList[0]
 
-    myHStr4=['#tags','NetArea[counts]','NetArea ExtBkgd','GrossInt','Background','Sigma_A']
+    myHStr4=['#tags','NetArea','Area+ExtBkgd','GrossInt','Background','Sigma_A']
     pd.set_option('display.max_rows', len(data4print))#imprime todas las filas
     df = pd.DataFrame([data for data in data4print], columns = myHStr4)
     print(df)
@@ -853,7 +865,7 @@ def main(argv,pidParent):
 
     for e in gilmoreDict:
         tag,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,max_index,max_value=gilmoreDict[e]
-        a,mean,sigma,c,minIdx,maxIdx,myFWHM=[str(val)\
+        a,mean,sigma,c,minIdx,maxIdx,myFWHM=[str(val)
                                              for val in\
                                              fittingDict[e]]
         floatMean=fittingDict[e][1]
@@ -888,8 +900,6 @@ def main(argv,pidParent):
             plt.xlabel('Energies [KeV]')
         else:
             plt.xlabel('Channels')
-
-
         plt.ylabel('Counts')
         plt.title(myFilename + ', exposure time = ' + str(mySpecialDict["expoTime"]))
         plt.show()
@@ -926,6 +936,3 @@ if __name__ == "__main__":
         pidParent = 0
         #print('Fork Failed')
         main(sys.argv,pidParent)
-    
-
-    
