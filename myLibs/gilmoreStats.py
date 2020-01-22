@@ -33,6 +33,17 @@ def gilmoreNetArea(myDataList,lowXVal,uppXVal):        #checked
     A=G-B
     return A
 
+def doOutputFile(myFilename,df,dfG):
+    myOutputfile=open(myFilename+'_out.put','w')
+    myOutputfile.write("Gilmore statistics\n[variables in counts]\n")
+    myOutputfile.write(df.to_string())
+    myOutputfile.close()
+    myOutputfile=open(myFilename+'_out.put','a')
+    myOutputfile.write("\nGauss Parameters\n")
+    myOutputfile.write(dfG.to_string())
+    myOutputfile.close()
+    return 0
+
 def gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal,m=1): #checked
     """Takes into account the bins (1 by default) before and after the
 region of interest. Default m=1 NetArea=Area+ExtendedBKGD""" 
@@ -66,8 +77,16 @@ def doGilmoreStuff(infoDict,myDataList):
         return gilmoreDict
     xVals,yVals=myDataList
     for e in infoDict:
+        # lowXVal,uppXVal=infoDict[e]
+        for i in infoDict[e]:               
+            if i == 'start':
+                lowXVal=infoDict[e][i]
+            elif i == 'end':
+                uppXVal=infoDict[e][i]
+        #print(lowXVal, uppXVal)
         #print(e)
-        lowXVal,uppXVal=infoDict[e]
+        
+        
 
         #print(getIdxRangeVals(myDataList,lowXVal,uppXVal))
         minX,maxX=getIdxRangeVals(myDataList,lowXVal,uppXVal)

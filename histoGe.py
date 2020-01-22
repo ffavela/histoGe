@@ -188,14 +188,17 @@ def parseCalData(calStringData):
 
 def getDictFromInfoFile(infoFileName):
     infoDict={}
-    for line in open(infoFileName):
-        if len(re.split('\n\s*\n',line)[0])<=1:
-            continue
-        if line[0] == "#":
-            continue
-        newList=line.split()
-        infoDict[newList[2]]=[float(val)\
-                              for val in newList[0:2]]
+    newTable=pd.read_table(infoFileName, delim_whitespace=True, index_col=0)
+    infoDict=newTable.to_dict('index')
+    # for line in open(infoFileName):
+    #    if len(re.split('\n\s*\n',line)[0])<=1:
+    #        continue
+    #    if line[0] == "#":
+    #        continue
+    #    newList=line.split()
+    #    infoDict[newList[2]]=[float(val)\
+    #                          for val in newList[0:2]]
+    
     return infoDict
 
 def doFittingStuff(infoDict,myDataList):
@@ -205,7 +208,14 @@ there"""
     if infoDict == {}: #minor optimization
         return fittingDict
     for e in infoDict:
-        xMin,xMax=infoDict[e]
+        #xMin,xMax=infoDict[e]
+        for i in infoDict[e]:               
+            if i == 'start':
+                xMin=infoDict[e][i]
+            elif i == 'end':
+                xMax=infoDict[e][i]
+        
+               
         mean=(xMin+xMax)*0.5
 
         # mean=1460.68
@@ -809,10 +819,10 @@ def main(argv,pidParent):
 
             
             lenght = len(Ranges)
-            myInfofile=open( myFilename+'.info','a')
+            myInfofile=open( myFilename+'.info','w')
             pd.set_option('display.max_rows', len(Ranges))
             df = pd.DataFrame(list(Ranges),columns=['start','end'])
-            myInfofile.write(df.head(10).to_string())
+            myInfofile.write(df.to_string())
             myInfofile.close()
             
 
@@ -875,6 +885,9 @@ def main(argv,pidParent):
 
     print('\nGauss Parameters')
     print(dfG)
+
+    doOutputFile(myFilename,df,dfG)
+    
 
     for e in gilmoreDict:
         tag,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,max_index,max_value=gilmoreDict[e]

@@ -26,6 +26,15 @@ def getTentParams(x4cal,y4cal):
     b=E1-a*C1
     return a,b
 
+def doInfoFile(Ranges, myFilename):
+    lenght = len(Ranges)
+    myInfofile=open( myFilename+'.info','w')
+    pd.set_option('display.max_rows', len(Ranges))
+    df = pd.DataFrame(list(Ranges),columns=['start','end'])
+    myInfofile.write(df.to_string())
+    myInfofile.close()
+    return 0
+
 ###Fitting fails often here... don't know why... see histoGe.py where
 ###it is really called ####
 
