@@ -202,8 +202,7 @@ def getDictFromInfoFile(infoFileName):
     return infoDict
 
 def doFittingStuff(infoDict,myDataList):
-    """Need 2 put this in fitting.py but for some reason fitting fails
-there"""
+    """Need 2 put this in fitting.py but for some reason fitting fails there"""
     fittingDict={}
     if infoDict == {}: #minor optimization
         return fittingDict
@@ -293,8 +292,7 @@ def checkIOption(myOptDict,argv):
 
 def checkRebinOpt(myOptDict,argv):
     if '--rebin' not in myOptDict:
-        print("error: this function should not have been called, this is a\
-programming error.")
+        print("error: this function should not have been called, this is a programming error.")
         return False
 
     if len(myOptDict['--rebin']) != 1:
@@ -555,6 +553,7 @@ def main(argv,pidParent):
     else:
         mySpecialDict = functionDict[myExtension](myFilename)
     myDataList = mySpecialDict["theList"]
+
     if '--rebin' in myOptDict:
         rebInt=int(argv[myOptDict['--rebin'][0]])
         if "theRebinedList" not in mySpecialDict:
@@ -735,12 +734,12 @@ def main(argv,pidParent):
 
                     isoLL.sort(key = lambda x: x[2],reverse = True)
                 
-                Ranges = []
+                Ranges = [] #Ranges of energy from autoPeak
                 for idxR, isoPeakL, DBInfoD in zip(idxPairL,isoPeakLL,DBInfoDL):
                     start,end = idxR
                     iEner = energyArr[start]
                     fEner = energyArr[end]
-                    Ranges.append([iEner,fEner])
+                    Ranges.append([iEner,fEner])#Ranges of energy from autoPeak
 
                     print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
                     Eg , Ig , Decay, Half , Parent, rank, rank2 = [],[],[],[],[],[],[]
@@ -818,13 +817,7 @@ def main(argv,pidParent):
                         #     print(str(pidParent))
 
             
-            lenght = len(Ranges)
-            myInfofile=open( myFilename+'.info','w')
-            pd.set_option('display.max_rows', len(Ranges))
-            df = pd.DataFrame(list(Ranges),columns=['start','end'])
-            myInfofile.write(df.to_string())
-            myInfofile.close()
-            
+            doInfoFile(Ranges, myFilename) #creates info file         
 
             CloseDatabase(conexion)
 
@@ -853,8 +846,8 @@ def main(argv,pidParent):
     print("Gilmore statistics\n[variables in counts]")
     fittingDict=doFittingStuff(infoDict,myDataList)
     gaussData4Print=[]
-    for e in fittingDict:
 
+    for e in fittingDict:
         a,mean,sigma,c,minIdx,maxIdx,myFWHM=fittingDict[e]
         if a == None:
             print("Skipping failed fit")
@@ -864,12 +857,13 @@ def main(argv,pidParent):
         xVals=myDataList[0][minIdx:maxIdx+1]
         ax.fill_between(xVals,gaus(xVals,a,mean,sigma,c), facecolor='red') #plot gaus fit
         #plt.annotate(e, xy=[mean,a])
+
     myGaussRows=['#tags','a','mean','sigma','c']
     pd.set_option('display.max_rows', None)
     dfG = pd.DataFrame(gaussData4Print, columns = myGaussRows)
-
     gilmoreDict=doGilmoreStuff(infoDict,myDataList)
     data4print=[]
+    
     for e in gilmoreDict:
         gL=gilmoreDict[e]
         data4print.append(gL[0:6])
