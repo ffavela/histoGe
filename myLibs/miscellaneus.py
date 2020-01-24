@@ -29,8 +29,8 @@ def is_float(n):
 
 def getIdxRangeVals(myDataList,xMin,xMax):
     xVals=myDataList[0]
-    xMinIdx=xVals[0]
-    xMaxIdx=xVals[-1]
+    xMinIdx=0
+    xMaxIdx=len(xVals)-1
     for i,x in enumerate(xVals):
         if xMin <= x:
             xMinIdx=i
