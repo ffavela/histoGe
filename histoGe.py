@@ -923,8 +923,8 @@ if __name__ == "__main__":
     try:
         pidParent = os.getgid()
         #signal.signal(signal.SIGUSR1,TerminateProcess)
-        #pid = os.fork()
-        pid = 0
+        pid = os.fork()
+        #pid = 0
         #pid, fd = os.forkpty()
         #print(fd)
         #print(pidParent)
