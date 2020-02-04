@@ -923,14 +923,14 @@ if __name__ == "__main__":
     try:
         pidParent = os.getgid()
         #signal.signal(signal.SIGUSR1,TerminateProcess)
-        pid = os.fork()
-        #pid = 0
+        #pid = os.fork()
+        pid = 0
         #pid, fd = os.forkpty()
         #print(fd)
         #print(pidParent)
         #print(type(pidParent))
         if pid == 0:
-            print('ATENCION: Proceso hijo')
+            #print('ATENCION: Proceso hijo')
             #print(os.getpid())
             #print(sys.argv)
             #print("Child Process")
