@@ -125,21 +125,21 @@ def autoPeakFun(Command):
         List.remove('--log')
     else:
         logFlag = False
-    if '--rebin' in List:
-        rebinFlag = True
-        List.remove('--rebin')
-        rebinNum = None
-        for Arg in List:
-            try:
-                rebinNum = int(Arg)
-                break
-            except:
-                continue
-        if rebinNum == None:
-            return 120
+    # if '--rebin' in List:
+    #     rebinFlag = True
+    #     List.remove('--rebin')
+    #     rebinNum = None
+    #     for Arg in List:
+    #         try:
+    #             rebinNum = int(Arg)
+    #             break
+    #         except:
+    #             continue
+    #     if rebinNum == None:
+    #         return 120
 
-    else:
-        rebinFlag = False
+    # else:
+    #     rebinFlag = False
 
 
     myFileDict=getMyFileDict(Commands)
@@ -189,17 +189,20 @@ def autoPeakFun(Command):
                 fEner = energyArr[end]
                 Ranges.append([iEner,fEner])
                       
-        myInfofile=open( myFilename+'.info','w')
+        
         pd.set_option('display.max_rows', len(Ranges))
         df = pd.DataFrame(list(Ranges),columns=['start','end'])
-        myInfofile.write(df.to_string())
-        myInfofile.close()
+        if wofFlag:
+            myInfofile=open( myFilename+'.info','w')
+            myInfofile.write(df.to_string())
+            myInfofile.close()
 
         print('\n'+myFilename+'.info was created\n')
 
         PlotTitle='Peaks in '+ myFilename.split('/')[-1]
 
-        simplePlot(myDataList,logFlag,noCalFlag,myFilename,True,PlotTitle)
+        if not noPlotFlag:
+            simplePlot(myDataList,logFlag,noCalFlag,myFilename,True,PlotTitle)
         
         # plt.plot(myDatalist[0],myDatalist[1]) #plot the spectrum
         # plt.show()
