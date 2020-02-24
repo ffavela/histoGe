@@ -2,6 +2,9 @@ import sqlite3
 import os
 
 def OpenDatabase(pathfile):
+    if pathfile[-1] == '/':
+        pathfile = pathfile[:-1]
+        
     dbpath = pathfile + '/myDatabase/RadioactiveIsotopes.db'
     conexion = sqlite3.connect(dbpath)
     return conexion

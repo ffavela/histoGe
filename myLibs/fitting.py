@@ -1,7 +1,9 @@
 """Curve fitting functions"""
-
+import pandas as pd
 import numpy as np
-from myLibs.miscellaneus import *
+from myLibs.miscellaneus import getIdxRangeVals,fwhm
+from math import sqrt, pi
+from scipy.optimize import curve_fit
 
 def gaus(x,a,x0,sigma,c=0):
     """A gaussian bell. I added temporarly an additive constant."""
@@ -29,11 +31,49 @@ def getTentParams(x4cal,y4cal):
 def doInfoFile(Ranges, myFilename):
     lenght = len(Ranges)
     myInfofile=open( myFilename+'.info','w')
-    pd.set_option('display.max_rows', len(Ranges))
+    pd.set_option('display.max_rows', lenght)
     df = pd.DataFrame(list(Ranges),columns=['start','end'])
     myInfofile.write(df.to_string())
     myInfofile.close()
     return 0
+
+def doFittingStuff(infoDict,myDataList):
+    """Need 2 put this in fitting.py but for some reason fitting fails there"""
+    fittingDict={}
+    if infoDict == {}: #minor optimization
+        return fittingDict
+    for e in infoDict:
+        #xMin,xMax=infoDict[e]
+        for i in infoDict[e]:               
+            if i == 'start':
+                xMin=infoDict[e][i]
+            elif i == 'end':
+                xMax=infoDict[e][i]
+        
+        mean=(xMin+xMax)*0.5
+        minIdx,maxIdx=getIdxRangeVals(myDataList,xMin,xMax)
+       
+        xVals=myDataList[0]
+        sigma=1.0 #need to automate this!!
+        # a=150
+        yVals=myDataList[1]
+        a=max(yVals[minIdx:maxIdx])
+        c=(yVals[minIdx]+yVals[maxIdx])/2
+        #need to handle cases where fit fails
+        try:
+            popt,_ = curve_fit(gaus,xVals,myDataList[1],p0=[a,mean,sigma,c])
+            #popt,pcov = curve_fit(gaus,xVals,myDataList[1],p0=[a,mean,sigma,c])
+        except:
+            print("Fit failed for %s" %(e))
+            fittingDict[e]=[None,None,None,None,None,None,None]
+            continue
+
+        a,mean,sigma,c=popt
+        myIntegral=a*sigma*sqrt(2*pi)
+        myFWHM=fwhm(sigma)
+        fittingDict[e]=[a,mean,sigma,c,minIdx,maxIdx,myFWHM]
+        # return fittingDict
+    return fittingDict
 
 ###Fitting fails often here... don't know why... see histoGe.py where
 ###it is really called ####

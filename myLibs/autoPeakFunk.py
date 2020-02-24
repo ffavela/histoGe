@@ -83,6 +83,8 @@ def getSimpleIdxAve(pairIdxL,theList):
         max_value = int(max(my_list[start:end]))
         my_sublist = my_list[start:end]
         result = np.where(my_sublist == max_value)
+        #result = my_sublist.index(max_value)
         max_index = start + result[0][0]
+        #max_index = start + result
         indList.append(max_index)
     return indList

@@ -5,10 +5,27 @@ internal values (it tries) including the spectrum and the exposition
 time.
 
 """
-
+import pandas as pd
 import numpy as np
 from scipy.optimize import curve_fit
-from myLibs.fitting import *
+from myLibs.fitting import myLine,getTentParams
+
+
+MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q','--query'],'test':['-t','--test'],\
+        'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e']}
+SubOptD = {'help':[],'autoPeak':['--rebin','--wif','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
+        'rank':['--wof'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal'],'energy':['--all','--wof']}
+    #NumArgD = {'help':[0],'autoPeak':[1],'query':[1],'test':[0],'isotope':[2],'sum':['--noCal','noPlot','wof'],\
+    #    'rank':['--noCal','noPlot','wof'],'sub':['--noCal','noPlot','wof'],'stats':[],'energy':[]}
+
+
+def isValidSpecFile(strVal):
+    if strVal.endswith('.Txt') or\
+       strVal.endswith('.SPE') or\
+       strVal.endswith('.mca') or\
+       strVal.endswith('.info'):
+        return True
+    return False
 
 def getDictFromSPE(speFile,calFlag=True):
     """Parses the .SPE file format that is used in Boulby"""
@@ -58,10 +75,7 @@ def getDictFromSPE(speFile,calFlag=True):
     return internDict
 
 def getDictFromMCA(mcaFilename,calFlag=True):
-    """Parses the .mca file format comming from either the micro mca or
-the px5.
-
-    """
+    """Parses the .mca file format comming from either the micro mca or the px5."""
     internDict={}
     mcaList=[]
     str2init = "<<DATA>>"
@@ -149,3 +163,49 @@ def getDictFromGammaVision(gvFilename, calFlag=True):
     if tStr in internDict:
         internDict["expoTime"]=float(internDict[tStr])
     return internDict
+
+def CommandParser(lista):
+    argvcp = lista.copy()
+    argvcp.pop(0)
+    FileList = []
+    InstList = []
+    NumList = []
+    NameList = []
+    if len(argvcp) != 0:
+        for MainOpt in MainOptD:
+            
+            for arg in argvcp:
+                if arg in MainOptD[MainOpt]:
+                    InstList.append([arg])
+                    for arg2 in argvcp:
+                        if arg2 in SubOptD[MainOpt]:
+                            InstList[-1].append(arg2)
+                        elif isValidSpecFile(arg2):
+                            FileList.append(arg2)
+                        else:
+                            try:
+                                float(arg)
+                                NumList.append(arg2)
+                            except ValueError:
+                                if arg2[0] != '-':
+                                    NameList.append(arg2)
+
+        if len(InstList) > 0:
+            InstList[-1].extend(FileList)
+            InstList[-1].extend(NumList)
+            InstList[-1].extend(NameList)
+        else:
+            InstList = [argvcp.copy()]
+    else:
+        return ['shorthelp'] 
+
+    return InstList
+
+def getDictFromInfoFile(infoFileName):
+    infoDict={}
+    newTable=pd.read_table(infoFileName, delim_whitespace=True, index_col=0)
+    infoDict=newTable.to_dict('index')
+    return infoDict
+
+
+functionDict = {"SPE": getDictFromSPE,"mca": getDictFromMCA,"Txt": getDictFromGammaVision,"info":getDictFromInfoFile}
