@@ -22,9 +22,6 @@ def gilmoreBackground(myDataList,lowXVal,uppXVal):     #checked
     L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
     n=(U-L)+1                   #n is the number of channels within the peak region
     C=yVals
-    if U == (len(xVals)-1):
-        U -= 1
-        
     B=n*(C[L-1]+C[U+1])/2       #
                                 #B=(n-1)*(C[L]+C[U])/2 asi lo hace DppMCA
     return B

@@ -59,7 +59,9 @@ def getDictFromSPE(speFile,calFlag=True):
 
 def getDictFromMCA(mcaFilename,calFlag=True):
     """Parses the .mca file format comming from either the micro mca or
-the px5."""
+the px5.
+
+    """
     internDict={}
     mcaList=[]
     str2init = "<<DATA>>"

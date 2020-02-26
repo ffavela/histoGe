@@ -12,7 +12,6 @@ from scipy import asarray as ar,exp
 from math import sqrt, pi
 import time
 import signal
-#import keyboard
 
 
 
@@ -26,11 +25,17 @@ from myLibs.plotting import *
 
 accOpts=['-h', '--help','-c',\
          '-r','--ROI','-n','--dump',\
-         '--noPlot','--netArea','--grossInt','--bkgd',\
-         '--extBkInt','--gSigma','--extSigma','--noCal',\
-         '--autoPeak','--log','--noBkgd','--rebin',\
-         '-q','--query','-i','--isotope','--testing',\
-         '--Rank','--noQuery', '--all','--energyRanges']
+         '--noPlot','--netArea',\
+         '--grossInt','--bkgd',\
+         '--extBkInt','--gSigma',\
+         '--extSigma','--noCal',\
+         '--autoPeak','--log',\
+         '--noBkgd','--rebin',\
+         '-q','--query',\
+         '-i','--isotope',\
+         '--testing',\
+         '--noRank',\
+         '--noQuery', '--all']
 
 def isValidSpecFile(strVal):
     if strVal.endswith('.Txt') or\
@@ -138,14 +143,10 @@ def printHelp(argv, functionDict, extBool=False):
         print("\t--rebin:\tNeeds a positive integer for")
         print("\t\tgrouping the contents of consecutive bins")
         print("\t\ttogether.\n")
-        print("\t--autoPeak:\tFind peaks in histogram and, with them,")
-        print("\t\t\tmake an .info file. It should be used with rebin option.\n")
+        print("\t--autoPeak:\tFind peaks in histogram and make a rank to help identify")
+        print("\t\t\tthe isotopes that generates that peak. It should be used with rebin option.\n")
         print("\t--query:\tQuery the database RadioactiveIsoptopes.db using a range of energies.\n")
-        print("\t--isotope:\tLook for that isotope in the database.")
-        print("\t--Rank: Make ranking of isotopes to obtain the most probables isotopes\n")
-        print("\t\t\tthat explains peaks. It needs and .info file.")
-        print("\t--energyRanges: Using the .info file, it displays the isotopes that\n")
-        print("\t\t\tthat can be found in the ranges of each peak.\n")
+        print("\t--isotope:\tLook for that isotope in the database.\n")
         print("Extra options:\n")
         print("\t--noCal:\tWill not use any calibration info.")
         print("\t\t\tMight mess with your ranges (used with -c).\n")
@@ -159,9 +160,9 @@ def printHelp(argv, functionDict, extBool=False):
         print("\t\t\tmethod.\n")
         print("\t--extSigma:\tSame as gSigma but using 5 bins")
         print("\t\t\tbefore and after region.\n")
-        print("\t--log:\t\tprint Y axis with Log scale.\n")
-        print("\t--all: --Rank and --energyRanges displays all the isotopes and")
-        print("\t\t\tnot only the first 10 entries.")
+        print("\t--log:\t\tprint Y axis with Log scale ")
+        print("\t--noRank: No rank in autoPeak option.\n")
+        print("\t--noQuery: autoPeak only shows figures with the identified peaks.\n")
         print("Valid extensions are:")
         for ext in functionDict:
             print("\t\t%s" %(ext))
@@ -213,9 +214,12 @@ def doFittingStuff(infoDict,myDataList):
             elif i == 'end':
                 xMax=infoDict[e][i]
         
+               
         mean=(xMin+xMax)*0.5
-        minIdx,maxIdx=getIdxRangeVals(myDataList,xMin,xMax)
-       
+
+        # mean=1460.68
+        minIdx,maxIdx=getIdxRangeVals(myDataList,\
+                                      xMin,xMax)
         xVals=myDataList[0]
         sigma=1.0 #need to automate this!!
         # a=150
@@ -224,7 +228,9 @@ def doFittingStuff(infoDict,myDataList):
         c=(yVals[minIdx]+yVals[maxIdx])/2
         #need to handle cases where fit fails
         try:
-            popt,pcov = curve_fit(gaus,myDataList[0],myDataList[1],p0=[a,mean,sigma,c])
+            popt,pcov = curve_fit(gaus,myDataList[0],\
+                                  myDataList[1],\
+                                  p0=[a,mean,sigma,c])
         except:
             print("Fit failed for %s" %(e))
             fittingDict[e]=[None,None,None,None,None,None,None]
@@ -361,6 +367,9 @@ def main(argv,pidParent):
             pd.set_option('display.max_rows', None)#imprime todas las filas
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
             print(df) #imprime la tabla
+            # if pidParent > 0:
+            #     os.kill(pidParent,signal.SIGUSR1)
+            #     print(str(pidParent))
 
         CloseDatabase(conexion)
 
@@ -412,6 +421,9 @@ def main(argv,pidParent):
 
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])#crea  la tabla
             print(df) #imprime la tabla
+            # if pidParent > 0:
+            #     os.kill(pidParent,signal.SIGUSR1)
+            #     print(str(pidParent))
 
         print("\n%d results were found" %(len(DBInfo)))
         CloseDatabase(conexion)
@@ -444,7 +456,6 @@ def main(argv,pidParent):
             print("error: %s needs a .info extension" % (infoFile))
             return False
         infoDict=getDictFromInfoFile(infoFile)
-
     elif '-r' in myOptDict:
         if len(myOptDict['-r']) == 0:
             print("error: -r option needs an argument")
@@ -524,7 +535,7 @@ def main(argv,pidParent):
                 specialX=myDataList[0]
             plt.plot(specialX,myDataList[1],label=e)
             plt.legend(loc='best')
-
+            #print(e)
         if '-n' not in myOptDict:
             if '--log' in myOptDict:
                plt.yscale('log')
@@ -542,6 +553,7 @@ def main(argv,pidParent):
     else:
         mySpecialDict = functionDict[myExtension](myFilename)
     myDataList = mySpecialDict["theList"]
+
     if '--rebin' in myOptDict:
         rebInt=int(argv[myOptDict['--rebin'][0]])
         if "theRebinedList" not in mySpecialDict:
@@ -651,180 +663,163 @@ def main(argv,pidParent):
         pd.set_option('display.max_rows', len(myStatsD))#imprime todas las filas
         df = pd.DataFrame([myStatsD[v] for v in myStatsD] , columns = myHStrL)
         print(df)
+        # if pidParent > 0:
+        #     os.kill(pidParent,signal.SIGUSR1)
+        #     print(str(pidParent))
         return 0
 
-    if ('--Rank' in myOptDict) != ('--energyRanges' in myOptDict):
-        print("#This might take a while, be patient.\n#Output will be comming shortly.")
-        print("#Terminal was liberated but process continues in the background.")
-        if '--Rank' in myOptDict:
-            Tag = '--Rank'
-        elif '--energyRanges' in myOptDict:
-            Tag = '--energyRanges'
-
-        if len(myOptDict[Tag]) == 0:
-            print("error: --Rank option needs an argument")
-            return False
-        infoFile=argv[myOptDict[Tag][0]]
-        if not os.path.isfile(infoFile):
-            print("error: %s does not exist, are you in the right path?" %(infoFile))
-            return False
-        if not infoFile.endswith('.info'):
-            print("error: %s needs a .info extension" % (infoFile))
-            return False
-        infoDict=getDictFromInfoFile(infoFile)
-        
-        idxPairL = []
-        for DictEle in infoDict.values():
-            idxPairL.append(getIdxRangeVals(myDataList,DictEle['start'],DictEle['end']))
+    if '--autoPeak' in myOptDict:
         #Energy range of the histogram
         tMinE,tMaxE=myDataList[0][0],myDataList[0][-1]
 
-        #For memoizing the database queries for the histogram energy range
+        #For memoizing the database queries for the histogram energy
+        #range
         memoLenDict={}
-        pathfile = os.path.realpath(__file__)
-        pathfile = pathfile.strip('histoGe.py')
-        conexion = OpenDatabase(pathfile)
-
-        ind = getSimpleIdxAve(idxPairL,myDataList)
-        peakXVals=[myDataList[0][i] for i in ind]  #Peak Vals in Energy/channel
-        peakYVals=[myDataList[1][i] for i in ind]
-        
-        if '--Rank' in myOptDict:
-            isoPeakLL = []
-            isoCountD = {}
-            DBInfoL = []
-            DBInfoDL = []
-            energyArr = myDataList[0]
-            for idxR in idxPairL:
-                start,end = idxR
-                iEner = energyArr[start]
-                fEner = energyArr[end]
-                DBInfoL.append(EnergyRange(conexion,iEner,fEner))
-                DBInfo = DBInfoL[-1]
-                DBInfoD = {}
-                for e in DBInfo:
-                    DBInfoD[e[-1]] = e
-                DBInfoDL.append(DBInfoD)
-                isoPeakL = []
-
-                for Ele in DBInfo:
-                    iso = Ele[-1]
-                    if [iso,1,0] not in isoPeakL:
-                        isoPeakL.append([iso,1,0])
-        #So that there is only one count of each isotope per peak
-                        if iso not in isoCountD:
-        #Considering the number of entries in the energy range of the histogram
-                            if iso not in memoLenDict:
-                                memoLenDict[iso]=len(EnergyRange(conexion,tMinE,tMaxE,iso))
-                            nInRange=memoLenDict[iso]
-                            isoCountD[iso] = [0,nInRange]
-                        isoCountD[iso][0] += 1
-                isoPeakLL.append(isoPeakL)
-
-            for isoLL in isoPeakLL:
-                for isoL in isoLL:
-                    iso = isoL[0]
-                    isoC = isoCountD[iso][0]
-                    isoL[1] = isoC
-                    isoL[2] = isoC/isoCountD[iso][1]
-
-                isoLL.sort(key = lambda x: x[2],reverse = True)
-            
-            Ranges = []
-            for idxR, isoPeakL, DBInfoD in zip(idxPairL,isoPeakLL,DBInfoDL):
-                start,end = idxR
-                iEner = energyArr[start]
-                fEner = energyArr[end]
-                Ranges.append([iEner,fEner])
-
-                print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
-                Eg , Ig , Decay, Half , Parent, rank, rank2 = [],[],[],[],[],[],[]
-                for pInfo in isoPeakL:
-                    iso = pInfo[0]
-                    Ele = DBInfoD[iso]
-                    Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
-                    Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
-                    Decay.append(Ele[5])
-                    #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
-                    x=halfLifeUnit(Ele)
-                    if x == 0:
-                        y = str(x)
-                    else:
-                        y = str('{0:.2e}'.format(x))
-                    Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
-                    Parent.append(Ele[10])
-                    rank.append(pInfo[1])
-                    rank2.append(pInfo[2])
-
-                if '--all' not in myOptDict:
-                    pd.set_option('display.max_rows', len(Ele))
-                else:
-                    pd.set_option('display.max_rows', None) #imprime todas las filas
-
-                df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2'])#crea  la tabla
-
-                if '--all' not in myOptDict:
-                    print(df.head(10)) #print('\nOnly the first 10')
-                else:
-                    print(df)
-                #keyboard.press_and_release('\n')
-
-        if '--energyRanges' in myOptDict:
-            isoPeakLL = []
-            isoCountD = {}
-            DBInfoL = []
-            DBInfoDL = []
-            energyArr = myDataList[0]
-            for idxR in idxPairL:
-                start,end = idxR
-                iEner = energyArr[start]
-                fEner = energyArr[end]
-                DBInfoL.append(EnergyRange(conexion,iEner,fEner))
-                DBInfo = DBInfoL[-1]
-                start,end = idxR
-                iEner = energyArr[start]
-                fEner = energyArr[end]
-
-                print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
-                Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
-                for Ele in DBInfo:
-                    Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
-                    Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
-                    Decay.append(Ele[5])
-                    Half.append(halfLifeUnit(Ele))
-                    Parent.append(Ele[10])
-
-                if '--all' not in myOptDict:
-                    pd.set_option('display.max_rows', len(Ele))
-                else:
-                    pd.set_option('display.max_rows', None)
-
-                df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])
-
-                if '--all' not in myOptDict:
-                    print(df.head(10))
-                else:
-                    print(df)
-        CloseDatabase(conexion)
-        #keyboard.press_and_release('\n')
-
-    if '--autoPeak' in myOptDict:
         idxPairL = peakRangeFinder(myDataList)
-        energyArr = myDataList[0]
-        Ranges=[]
-        for idxR in idxPairL:
-            start,end = idxR
-            iEner = energyArr[start]
-            fEner = energyArr[end]
-            Ranges.append([iEner,fEner])
+        
         ind = getSimpleIdxAve(idxPairL,myDataList)
         peakXVals=[myDataList[0][i] for i in ind]  #Peak Vals in Energy/channel
         peakYVals=[myDataList[1][i] for i in ind]
-        myInfofile=open(myFilename+'.info','w')
-        pd.set_option('display.max_rows', len(Ranges))
-        df = pd.DataFrame(list(Ranges),columns=['start','end'])
-        myInfofile.write(df.to_string())
-        myInfofile.close()
+
+        if '--noQuery' not in myOptDict:
+            if '--noRank' not in myOptDict:
+                print("#This might take a while, be patient.\n#Output will be comming shortly.")
+                print("#Terminal was liberated but process continues in the background.")
+            pathfile = os.path.realpath(__file__)
+            pathfile = pathfile.strip('histoGe.py')
+            conexion = OpenDatabase(pathfile)
+            energyArr = myDataList[0]
+            if '--noRank' not in myOptDict:
+                isoPeakLL = []
+                isoCountD = {}
+                DBInfoL = []
+                DBInfoDL = []
+                for idxR in idxPairL:
+                    start,end = idxR
+                    iEner = energyArr[start]
+                    fEner = energyArr[end]
+                    DBInfoL.append(EnergyRange(conexion,iEner,fEner))
+                    DBInfo = DBInfoL[-1]
+                    DBInfoD = {}
+                    for e in DBInfo:
+                        DBInfoD[e[-1]] = e
+                    DBInfoDL.append(DBInfoD)
+                    isoPeakL = []
+
+                    for Ele in DBInfo:
+                        iso = Ele[-1]
+                        if [iso,1,0] not in isoPeakL:
+                            isoPeakL.append([iso,1,0])
+                            #So that there is only one count of each isotope
+                            #per peak
+                            #if '--noRank' not in myOptDict:
+                            if iso not in isoCountD:
+                                #Considering the number of entries in the
+                                #energy range of the histogram
+                                if iso not in memoLenDict:
+                                    memoLenDict[iso]=\
+                                        len(EnergyRange(conexion,tMinE,tMaxE,iso))
+                                nInRange=memoLenDict[iso]
+                                isoCountD[iso] = [0,nInRange]
+                            isoCountD[iso][0] += 1
+                    isoPeakLL.append(isoPeakL)
+
+                #if '--noRank' not in myOptDict:
+                for isoLL in isoPeakLL:
+                    for isoL in isoLL:
+                        iso = isoL[0]
+                        isoC = isoCountD[iso][0]
+                        isoL[1] = isoC
+                        isoL[2] = isoC/isoCountD[iso][1]
+
+                    isoLL.sort(key = lambda x: x[2],reverse = True)
+                
+                Ranges = [] #Ranges of energy from autoPeak
+                for idxR, isoPeakL, DBInfoD in zip(idxPairL,isoPeakLL,DBInfoDL):
+                    start,end = idxR
+                    iEner = energyArr[start]
+                    fEner = energyArr[end]
+                    Ranges.append([iEner,fEner])#Ranges of energy from autoPeak
+
+                    print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
+                    Eg , Ig , Decay, Half , Parent, rank, rank2 = [],[],[],[],[],[],[]
+                    for pInfo in isoPeakL:
+                        iso = pInfo[0]
+                        Ele = DBInfoD[iso]
+                        Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
+                        Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
+                        Decay.append(Ele[5])
+                        #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
+                        x=halfLifeUnit(Ele)
+                        if x == 0:
+                            y = str(x)
+                        else:
+                            y = str('{0:.2e}'.format(x))
+                        Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
+                #
+                        Parent.append(Ele[10])
+                        rank.append(pInfo[1])
+                        rank2.append(pInfo[2])
+
+                    if '--all' not in myOptDict:
+                        pd.set_option('display.max_rows', len(Ele))
+                    else:
+                        pd.set_option('display.max_rows', None)#imprime todas las filas
+
+                    df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2'])#crea  la tabla
+
+                    if '--all' not in myOptDict:
+                        print(df.head(10)) #imprime la tabla
+                        #print('\nOnly the first 10')
+                    else:
+                        print(df)
+                        # if pidParent > 0:
+                        #     print('El proceso padre es: ',pidParent)
+                        #     os.kill(pidParent,signal.SIGUSR1)
+                        #     print(str(pidParent))
+
+            else:
+                DBInfoL = []
+
+                for idxR in idxPairL:
+                    start,end = idxR
+                    iEner = energyArr[start]
+                    fEner = energyArr[end]
+                    DBInfoL.append(EnergyRange(conexion,iEner,fEner))
+                    DBInfo = DBInfoL[-1]
+                #for idxR, isoPeakL, DBInfoD in zip(idxPairL,isoPeakLL,DBInfoDL):
+                    start,end = idxR
+                    iEner = energyArr[start]
+                    fEner = energyArr[end]
+
+                    print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
+                    Eg , Ig , Decay, Half , Parent = [],[],[],[],[]
+                    for Ele in DBInfo:
+                        Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
+                        Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
+                        Decay.append(Ele[5])
+                        Half.append(halfLifeUnit(Ele))
+                        Parent.append(Ele[10])
+
+                    if '--all' not in myOptDict:
+                        pd.set_option('display.max_rows', len(Ele))
+                    else:
+                        pd.set_option('display.max_rows', None)#imprime todas las filas
+
+                    df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent'])
+
+                    if '--all' not in myOptDict:
+                        print(df.head(10)) #imprime la tabla
+                    else:
+                        print(df)
+                        # if pidParent > 0:
+                        #     os.kill(pidParent,signal.SIGUSR1)
+                        #     print(str(pidParent))
+
+            
+            doInfoFile(Ranges, myFilename) #creates info file         
+
+            CloseDatabase(conexion)
 
         if '--noPlot' not in myOptDict:
             fig, ax = plt.subplots()
@@ -847,6 +842,73 @@ def main(argv,pidParent):
             plt.show()
         return 0
 
+    print("")
+    print("Gilmore statistics\n[variables in counts]")
+    fittingDict=doFittingStuff(infoDict,myDataList)
+    gaussData4Print=[]
+
+    for e in fittingDict:
+        a,mean,sigma,c,minIdx,maxIdx,myFWHM=fittingDict[e]
+        if a == None:
+            print("Skipping failed fit")
+            continue
+        gaussData4Print.append([e,a,mean,sigma,c])
+        #print("FWHM= ",myFWHM)
+        xVals=myDataList[0][minIdx:maxIdx+1]
+        ax.fill_between(xVals,gaus(xVals,a,mean,sigma,c), facecolor='red') #plot gaus fit
+        #plt.annotate(e, xy=[mean,a])
+
+    myGaussRows=['#tags','a','mean','sigma','c']
+    pd.set_option('display.max_rows', None)
+    dfG = pd.DataFrame(gaussData4Print, columns = myGaussRows)
+    gilmoreDict=doGilmoreStuff(infoDict,myDataList)
+    data4print=[]
+    
+    for e in gilmoreDict:
+        gL=gilmoreDict[e]
+        data4print.append(gL[0:6])
+    realXVals=myDataList[0]
+
+    myHStr4=['#tags','NetArea','Area+ExtBkgd','GrossInt','Background','Sigma_A']
+    pd.set_option('display.max_rows', len(data4print))#imprime todas las filas
+    df = pd.DataFrame([data for data in data4print], columns = myHStr4)
+    print(df)
+    # if pidParent > 0:
+    #     os.kill(pidParent,signal.SIGUSR1)
+    #     print(str(pidParent))
+
+    print('\nGauss Parameters')
+    print(dfG)
+
+    doOutputFile(myFilename,df,dfG)
+    
+
+    for e in gilmoreDict:
+        tag,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,max_index,max_value=gilmoreDict[e]
+        a,mean,sigma,c,minIdx,maxIdx,myFWHM=[str(val)
+                                             for val in\
+                                             fittingDict[e]]
+        floatMean=fittingDict[e][1]
+        if None != floatMean:
+                    plt.annotate("%s,%2.1f" %(e,floatMean),\
+                                 xy=[realXVals[max_index],max_value])
+        else:
+            plt.annotate(e, xy=[realXVals[max_index],max_value])
+
+        # print(a,mean,sigma,c,minIdx,maxIdx,myFWHM)
+
+        # print("%s\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f" %(e,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A))
+
+     #   print("%s\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%s\t%s\t%s\t%s\t%s" %(e,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,a,mean,sigma,c,myFWHM))
+
+        # print("%s\t%s\t%s\t%s\t%s" %(a,mean,sigma,c,myFWHM))
+    #erase this part?
+    # plt.hist(myArr, bins=16384)
+    # plt.bar(np.arange(len(li)),li)
+    # plt.yscale('log', nonposy='clip')
+    print("exposure time = ", mySpecialDict["expoTime"])
+    plt.legend(loc='best')
+
     if '--noPlot' in myOptDict:
         #this option and -n are equivalent.
         myOptDict['-n']=[]
@@ -861,60 +923,9 @@ def main(argv,pidParent):
         plt.ylabel('Counts')
         plt.title(myFilename + ', exposure time = ' + str(mySpecialDict["expoTime"]))
         plt.show()
-    
-    if '-c' in myOptDict:
-        print("")
-        print("Gilmore statistics\n[variables in counts]")
-        fittingDict=doFittingStuff(infoDict,myDataList)
-        gaussData4Print=[]
-        for e in fittingDict:
-            a,mean,sigma,c,minIdx,maxIdx,myFWHM=fittingDict[e]
-            if a == None:
-                print("Skipping failed fit")
-                continue
-            gaussData4Print.append([e,a,mean,sigma,c])
-            xVals=myDataList[0][minIdx:maxIdx+1]
-            ax.fill_between(xVals,gaus(xVals,a,mean,sigma,c), facecolor='red') #plot gaus fit
-            #plt.annotate(e, xy=[mean,a])
-        myGaussRows=['#tags','a','mean','sigma','c']
-        pd.set_option('display.max_rows', None)
-        dfG = pd.DataFrame(gaussData4Print, columns = myGaussRows)
-
-        gilmoreDict=doGilmoreStuff(infoDict,myDataList)
-        data4print=[]
-        for e in gilmoreDict:
-            gL=gilmoreDict[e]
-            data4print.append(gL[0:6])
-        realXVals=myDataList[0]
-
-        myHStr4=['#tags','NetArea','Area+ExtBkgd','GrossInt','Background','Sigma_A']
-        pd.set_option('display.max_rows', len(data4print))#imprime todas las filas
-        df = pd.DataFrame([data for data in data4print], columns = myHStr4)
-        print(df)
-        print('\nGauss Parameters')
-        print(dfG)
-        #keyboard.press_and_release('\n')
-        doOutputFile(myFilename,df,dfG)
-
-        
-        for e in gilmoreDict:
-            tag,netArea,G,B,sigma_A,EBA,extSigma_A,myFWHMSigma_A,myFWHMExtSigma_A,max_index,max_value=gilmoreDict[e]
-            a,mean,sigma,c,minIdx,maxIdx,myFWHM=[str(val)
-                                                for val in\
-                                                fittingDict[e]]
-            floatMean=fittingDict[e][1]
-            if None != floatMean:
-                        plt.annotate("%s,%2.1f" %(e,floatMean),\
-                                    xy=[realXVals[max_index],max_value])
-            else:
-                plt.annotate(e, xy=[realXVals[max_index],max_value])
-        #erase this part?
-        # plt.hist(myArr, bins=16384)
-        # plt.bar(np.arange(len(li)),li)
-        # plt.yscale('log', nonposy='clip')
-        print("exposure time = ", mySpecialDict["expoTime"])
-        plt.legend(loc='best')
-
+        # if pidParent > 0:
+        #     os.kill(pidParent,signal.SIGUSR1)
+        #     print('Bandera')
 
 def TerminateProcess():
     sys.exit()
@@ -924,13 +935,12 @@ if __name__ == "__main__":
         pidParent = os.getgid()
         #signal.signal(signal.SIGUSR1,TerminateProcess)
         pid = os.fork()
-        #pid = 0
+
         #pid, fd = os.forkpty()
         #print(fd)
         #print(pidParent)
         #print(type(pidParent))
         if pid == 0:
-            #print('ATENCION: Proceso hijo')
             #print(os.getpid())
             #print(sys.argv)
             #print("Child Process")
