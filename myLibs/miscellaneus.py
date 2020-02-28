@@ -1,4 +1,5 @@
 """Just a set of useful functions"""
+from os import fork
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
@@ -20,6 +21,13 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
 #################################################
+
+def TryFork():
+    try:
+        pid = fork()
+    except:
+        pid = 0
+    return pid
 
 def is_float(n):
     try:

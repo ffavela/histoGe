@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sys
+from os import fork
 #import os.path
 #from os.path import basename
 #import re
@@ -16,6 +17,7 @@ from matplotlib import pyplot as plt
 
 # mainPath=sys.path[0] # sources dir
 from myLibs.parsers import CommandParser,MainOptD
+from myLibs.miscellaneus import TryFork
 #from myLibs.gilmoreStats import *
 #from myLibs.fitting import *
 #from myLibs.autoPeakFunk import *
@@ -46,7 +48,11 @@ def main(argv):
         return exitcode
         
     elif Command[0] in MainOptD['autoPeak']:
-        exitcode = autoPeakFun(Command)
+        pid = TryFork()
+        if pid == 0:
+            exitcode = autoPeakFun(Command)
+        else:
+            exitcode = 0
         return exitcode
         
     elif Command[0] in MainOptD['query']:
@@ -54,7 +60,11 @@ def main(argv):
         return exitcode
         
     elif Command[0] in MainOptD['test']:
-        exitcode = TestFun()
+        pid = TryFork()
+        if pid == 0:
+            exitcode = TestFun()
+        else:
+            exitcode = 0
         return exitcode
         
     elif Command[0] in MainOptD['isotope']:
@@ -62,7 +72,11 @@ def main(argv):
         return exitcode
         
     elif Command[0] in MainOptD['sum']:
-        exitcode = SumFun(Command)
+        pid = TryFork()
+        if pid == 0:
+            exitcode = SumFun(Command)
+        else:
+            exitcode = 0
         return exitcode
         
     elif Command[0] in MainOptD['rank']:
@@ -70,18 +84,30 @@ def main(argv):
         return exitcode
         
     elif Command[0] in MainOptD['sub']:
-        exitcode = SubFun(Command)
+        pid = TryFork()
+        if pid == 0:
+            exitcode = SubFun(Command)
+        else:
+            exitcode = 0
         return exitcode
         
     elif Command[0] in MainOptD['stats']:
-        exitcode = statsFun(Command)
+        pid = TryFork()
+        if pid == 0:
+            exitcode = statsFun(Command)
+        else:
+            exitcode = 0
         return exitcode
         
     elif Command[0] in MainOptD['energy']:
         exitcode = energyFun(Command)
         return exitcode
     else:
-        exitcode = noOption(Command)
+        pid = TryFork()
+        if pid == 0:
+            exitcode = noOption(Command)
+        else:
+            exitcode = 0
         return exitcode
 
 if __name__ == "__main__":
