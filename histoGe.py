@@ -25,7 +25,7 @@ from myLibs.miscellaneus import TryFork
 #from myLibs.plotting import *
 from autoPeak import autoPeakFun
 from Help import helpFun
-from shortHelp import shortHelpFun
+#from shortHelp import shortHelpFun
 from query import QueryFun
 from test import TestFun
 from isotope import isotopeFun
