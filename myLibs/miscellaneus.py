@@ -1,7 +1,10 @@
 """Just a set of useful functions"""
+from os import fork
+import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
-
+#from myLibs.fitting import gaus
+#from myLibs.fitting import gaus
 ###### MATPLOTLIB CONF #########################
 SMALL_SIZE = 15
 MEDIUM_SIZE = 22
@@ -19,9 +22,16 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 #################################################
 
+def TryFork():
+    try:
+        pid = fork()
+    except:
+        pid = 0
+    return pid
+
 def is_float(n):
     try:
-        float_n = float(n)
+        float(n)
     except ValueError:
         return False
     else:
@@ -54,8 +64,7 @@ def getRescaledList(myDataList,tRatio):
 def getSubstractedList(myDataList,myRescaledList):
     dataYVals=myDataList[1]
     rescaledYVals=myRescaledList[1]
-    subsYVals=[datY-rescY for \
-               datY,rescY in zip(dataYVals,rescaledYVals)]
+    subsYVals=[datY-rescY for datY,rescY in zip(dataYVals,rescaledYVals)]
     return [myDataList[0],subsYVals]
 
 def getRebinedList(myDataList,rebInt):
@@ -70,6 +79,36 @@ def getRebinedList(myDataList,rebInt):
         newXVals=np.append(newXVals,[xVals[theIdx]])
     return [newXVals,newYVals]
 
+def closest(lst, K): 
+    value = lst[min(range(len(lst)), key = lambda i: abs(lst[i]-K))]
+    return value
+
+def WriteOutputFile(mySubsDict,myFilename,Title):
+    try:
+        X1 = mySubsDict['theList'][0]
+        Y1 = mySubsDict['theList'][1]
+    except TypeError:
+        X1 = mySubsDict[0]
+        Y1 = mySubsDict[1]
+    File = open(myFilename,'a+')
+    File.write('#-------------------------------------\n# This is the sum of spectra: ' + Title + '\n--------------------------------------------\n\n')
+    try:
+        if mySubsDict['calBoolean']:
+            DataDict = {'Energy (keV)':X1,'Counts':Y1}
+        else:
+            DataDict = {'Channels':X1,'Counts':Y1}
+    except TypeError:
+            DataDict = {'Channels':X1,'Counts':Y1}
+
+    df = pd.DataFrame(DataDict)
+    File.write(df.to_string())
+    File.close()
+
+def WriteOutputFileRR(myFilename,df,iEner,fEner):
+    File = open(myFilename,'a+')
+    File.write('#-------------------------------------\n# This is the results of searching energies between: ' + str(iEner) + 'keV and ' + str(fEner) +' keV.\n--------------------------------------------\n\n')
+    File.write(df.to_string()+'\n')
+    File.close()
 
 ####### Some basic database values taken from the isonav #######
 ####### Will probably use in the future the whole database #####
