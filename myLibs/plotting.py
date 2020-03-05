@@ -26,8 +26,15 @@ def simplePlot(mySubsList,logFlag,noCalFlag,Label=None,show=False,Title=None):
         plt.title(Title)
         plt.show()
 
-def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=False,noCalFlag=True,Label=None,Show=True,Title = None,Fill=True,showPeaks=True,FitCurve=True):
-    mySpecialList = mySpecialDict['theList']
+def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=False,noCalFlag=True,Label=None,Show=True,Title = None,Fill=True,showPeaks=True,FitCurve=True,rebinFlag=False):
+    
+    if rebinFlag:
+        mySpecialList = []
+        mySpecialList.append(list(mySpecialDict['theRebinedList'][0]))
+        mySpecialList.append(list(mySpecialDict['theRebinedList'][1]))
+    else:
+        mySpecialList = mySpecialDict['theList']
+
     if mySpecialDict['calBoolean']:
         idxPairLAux = []
         for idx in idxPairL:
@@ -47,13 +54,14 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
             else:
                 start, end = iPV
             
-            ax.fill_between(mySpecialList[0][start:end+1],mySpecialDict['theList'][1][start:end+1],facecolor='red')
+            ax.fill_between(mySpecialList[0][start:end+1],mySpecialList[1][start:end+1],facecolor='red')
     
     if Title == None:
         Title = ''
     else:
         Title += ', '
     
+    plt.gcf().canvas.set_window_title(Label.split('.')[0])
     plt.title(Title + 'Exposure time = ' + str(mySpecialDict["expoTime"]) + '/s')
     plt.plot(mySpecialList[0],mySpecialList[1],label=Label)
     plt.ylabel('Counts')
@@ -64,7 +72,13 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
     else:
         plt.xlabel('Channels')
     e = 1
-    for iPV,gd in zip(idxPairLAux,gausdata.values()):
+    #for iPV,gd in zip(idxPairLAux,gausdata.values()):
+    
+    for iPV in idxPairLAux:
+        if gausdata != None:
+
+            gd = gausdata[e-1]
+        
         if mySpecialDict['calBoolean']:
             start = mySpecialList[0].index(iPV[0])
             end = mySpecialList[0].index(iPV[1])
@@ -92,7 +106,7 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
         else:
             plt.annotate(e, xy=[peakXVals,peakYVals])
         e += 1
-    
+
     if Show:
         if Label != None:
             plt.legend(loc='best')

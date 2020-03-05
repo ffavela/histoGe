@@ -18,7 +18,7 @@ from myLibs.parsers import functionDict, getDictFromSPE, getDictFromMCA, getDict
 #from myLibs.fitting import *
 #from myLibs.autoPeakFunk import *
 #from myLibs.QueryDB import *
-from myLibs.plotting import simplePlot
+from myLibs.plotting import complexPlot
 from myLibs.miscellaneus import getRebinedList
 from scipy.signal import savgol_filter
 
@@ -125,21 +125,21 @@ def autoPeakFun(Command):
         List.remove('--log')
     else:
         logFlag = False
-    # if '--rebin' in List:
-    #     rebinFlag = True
-    #     List.remove('--rebin')
-    #     rebinNum = None
-    #     for Arg in List:
-    #         try:
-    #             rebinNum = int(Arg)
-    #             break
-    #         except:
-    #             continue
-    #     if rebinNum == None:
-    #         return 120
+    if '--rebin' in List:
+        rebinFlag = True
+        List.remove('--rebin')
+        rebinNum = None
+        for Arg in List:
+            try:
+                rebinNum = int(Arg)
+                break
+            except:
+                continue
+        # if rebinNum == None:
+        #     return 120
 
-    # else:
-    #     rebinFlag = False
+    else:
+        rebinFlag = False
 
 
     myFileDict=getMyFileDict(Commands)
@@ -170,11 +170,14 @@ def autoPeakFun(Command):
                 idxPairL = peakRangeFinder(myDataList)
                 energyArr = myDataList[0]
                 Ranges=[]
-                for idxR in idxPairL:
-                    start,end = idxR
-                    iEner = energyArr[start]
-                    fEner = energyArr[end]
-                    Ranges.append([iEner,fEner])
+                if noCalFlag == False:
+                    for idxR in idxPairL:
+                        start,end = idxR
+                        iEner = energyArr[start]
+                        fEner = energyArr[end]
+                        Ranges.append([iEner,fEner])
+                else:
+                    Ranges = idxPairL
                 
         else:
             print("There was no rebin option detected, the rebin option is --rebin")
@@ -188,21 +191,19 @@ def autoPeakFun(Command):
                 iEner = energyArr[start]
                 fEner = energyArr[end]
                 Ranges.append([iEner,fEner])
-                      
-        
-        pd.set_option('display.max_rows', len(Ranges))
-        df = pd.DataFrame(list(Ranges),columns=['start','end'])
-        if wofFlag:
+        if wofFlag:              
             myInfofile=open( myFilename+'.info','w')
+            pd.set_option('display.max_rows', len(Ranges))
+            df = pd.DataFrame(list(Ranges),columns=['start','end'])
             myInfofile.write(df.to_string())
             myInfofile.close()
 
-        print('\n'+myFilename+'.info was created\n')
+            print('\n'+myFilename+'.info was created\n')
 
-        PlotTitle='Peaks in '+ myFilename.split('/')[-1]
+        PlotTitle = 'Peaks in '+ myFilename.split('/')[-1]
+        PlotLabel = myFilename.split('/')[-1]
 
-        if not noPlotFlag:
-            simplePlot(myDataList,logFlag,noCalFlag,myFilename,True,PlotTitle)
+        complexPlot(mySpecialDict,Ranges,logFlag=logFlag,noCalFlag=noCalFlag,Label=PlotLabel,Title=PlotTitle,FitCurve=False,rebinFlag=rebinFlag)
         
         # plt.plot(myDatalist[0],myDatalist[1]) #plot the spectrum
         # plt.show()
