@@ -153,7 +153,7 @@ def autoPeakFun(Command):
     elif not myFilename.endswith('.info'):       
        
         myExtension = myFilename.split(".")[-1] #verifies the file extention
-        mySpecialDict = functionDict[myExtension](myFilename,True) #fill de dictionary
+        mySpecialDict = functionDict[myExtension](myFilename,noCalFlag) #fill de dictionary
                                                                    #from data file
         
         if '--rebin' in Commands:

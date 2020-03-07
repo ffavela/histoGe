@@ -74,7 +74,7 @@ def getDictFromSPE(speFile,calFlag=True):
 
     return internDict
 
-def getDictFromMCA(mcaFilename,calFlag=True):
+def getDictFromMCA(mcaFilename,noCalFlag=False):
     #"""Parses the .mca file format comming from either the micro mca or the px5."""
     internDict={}
     mcaList=[]
@@ -98,15 +98,27 @@ def getDictFromMCA(mcaFilename,calFlag=True):
             internDict["expoTime"]=float(tempList[1])
 
         if line.find(strCal) != -1:
-            calBool = True
+            if noCalFlag == True:
+                calBool = False
+            else:
+                calBool = True
             continue
-
+        
         if line.find(str2init) != -1:
-            appendBool = True
-            calBool = False
-            continue
+            if (calBool == False) & (noCalFlag == False):
+                
+                noCalFlag = True
+                appendBool = True
+                calBool = False
 
-        if calBool and calFlag:
+                print("\n\nThe {} file is not calibrated, all the results is in channels\n\n".format(mcaFilename))
+                continue
+            else:
+                appendBool = True
+                calBool = False
+                continue
+        
+        if calBool:
             if line.find(strIgn) != -1:
                 continue
 
@@ -114,7 +126,7 @@ def getDictFromMCA(mcaFilename,calFlag=True):
                 calBool = False
             x4cal.append(float(line.split()[0]))
             y4cal.append(float(line.split()[1]))
-
+        
         if line.find(str2end) != -1:
             appendBool = False
             break #stopping here for now
