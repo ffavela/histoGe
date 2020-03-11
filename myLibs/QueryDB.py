@@ -102,48 +102,28 @@ def getNormalizedEmissionList(IsoList):
     IsoList = stripList(IsoList)
 
 
-def GetIntensities(conexion,min,max,element = None,order = None):
-    #Command = 'SELECT * FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
-    #ID,Energy,ExEnergy,Intensity,ExIntensity,DecayMode,HalfLife,HalfLifeUnit,ExHalfLife,Address,Element
-    Command = 'SELECT ID,Energy,Intensity,IgA,IgR,Element FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
-    if element != None:
-        Command += ' and Element = ' + "'" + element + "'" 
-    
-    if order == None:
-        cursor = conexion.cursor()
-        cursor.execute(Command)
-        Isotopes = cursor.fetchall()
-        return Isotopes
 
-<<<<<<< HEAD
+
 def GetIntensities(conexion,min,max,element= None,order= None):
     #Command = 'SELECT * FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
     #ID,Energy,ExEnergy,Intensity,ExIntensity,DecayMode,HalfLife,HalfLifeUnit,ExHalfLife,Address,Element
-    Command = 'SELECT ID,Energy,Intensity,IgA,IgR,Element FROM Isotopes WHERE Energy >= '+ str(min) + ' and Energy < '+ str(max)
+    Command = 'SELECT ID,Energy,ExEnergy,IgA,ExIntensity,DecayMode,HalfLife,HalfLifeUnit,ExHalfLife,Address,IgR,Element FROM Isotopes WHERE Energy >= '+ str(min) + ' and Energy < '+ str(max)
     if  element != None:
         Command += ' and Element = '+ "'"+ element + "'"
 
-        if  order == None:
-            cursor = conexion.cursor()
-            cursor.execute(Command)
-            Isotopes = cursor.fetchall()
-            return Isotopes
-        elif order == 'ASC' or order == 'DESC':
-            cursor = conexion.cursor()
-            Command += ' ORDER BY Energy '+ order
-            cursor.execute(Command)
-            Isotopes = cursor.fetchall()
-
-    return  Isotopes
-=======
-    elif order == 'ASC' or order == 'DESC':
+    if  order == None:
         cursor = conexion.cursor()
-        Command += ' ORDER BY Energy ' + order
         cursor.execute(Command)
         Isotopes = cursor.fetchall()
         return Isotopes
+    elif order == 'ASC' or order == 'DESC':
+        cursor = conexion.cursor()
+        Command += ' ORDER BY Energy '+ order
+        cursor.execute(Command)
+        Isotopes = cursor.fetchall()
+
+        return  Isotopes
         
 
->>>>>>> 05bd7334c9cfd8aaa08dfb3d04daadf7480b3887
 
 

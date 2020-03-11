@@ -82,10 +82,11 @@ def rankFun(ListOpt):
         DBInfoL.append(GetIntensities(conexion,iEner,fEner))
         DBInfo = DBInfoL[-1]
         DBInfoD = {}
-        for e in DBInfo:
-            DBInfoD[e[-1]] = e
-        DBInfoDL.append(DBInfoD)
-        isoPeakL = [] 
+        for e in DBInfo: 
+            #Filling dict with isotope name each isotope has only one tupple
+            DBInfoD[e[-1]] = e      
+        DBInfoDL.append(DBInfoD)   
+        isoPeakL = []
         for Ele in DBInfo:
             iso = Ele[-1]
             if [iso,1,0,0] not in isoPeakL:
