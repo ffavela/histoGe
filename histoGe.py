@@ -53,8 +53,9 @@ def main(argv):
             exitcode = autoPeakFun(Command)
         else:
             exitcode = 0
-        return exitcode
         
+        return exitcode
+
     elif Command[0] in MainOptD['query']:
         exitcode = QueryFun(Command)
         return exitcode

@@ -74,7 +74,7 @@ def getDictFromSPE(speFile,calFlag=True):
 
     return internDict
 
-def getDictFromMCA(mcaFilename,calFlag=True):
+def getDictFromMCA(mcaFilename,noCalFlag=False):
     #"""Parses the .mca file format comming from either the micro mca or the px5."""
     internDict={}
     mcaList=[]
@@ -93,29 +93,33 @@ def getDictFromMCA(mcaFilename,calFlag=True):
 
     #Ignoring errors for now, however bins are not skipped
     for line in open(mcaFilename, errors='ignore'):
-        if line.find(strExpTime) != -1:
+        if line.find(strExpTime) != -1:  #"REAL_TIME"
             tempList = line.split("-")
             internDict["expoTime"]=float(tempList[1])
 
-        if line.find(strCal) != -1:
-            calBool = True
+        if line.find(strCal) != -1:  #"<<CALIBRATION>>"
+            if noCalFlag == True:
+                calBool = False
+            else:
+                calBool = True
             continue
+        
 
-        if line.find(str2init) != -1:
+        if line.find(str2init) != -1:  #"<<DATA>>"
             appendBool = True
             calBool = False
             continue
-
-        if calBool and calFlag:
-            if line.find(strIgn) != -1:
+        
+        if calBool:
+            if line.find(strIgn) != -1:  #"LABEL"
                 continue
 
-            if line.find(strCalEnd) != -1:
+            if line.find(strCalEnd) != -1:  #"<<"
                 calBool = False
             x4cal.append(float(line.split()[0]))
             y4cal.append(float(line.split()[1]))
-
-        if line.find(str2end) != -1:
+        
+        if line.find(str2end) != -1: #"<<END>>"
             appendBool = False
             break #stopping here for now
 
