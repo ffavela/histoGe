@@ -63,8 +63,8 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
         plt.xlabel('Energies [KeV]')
     else:
         plt.xlabel('Channels')
-    e = 1
-    for iPV,gd in zip(idxPairLAux,gausdata.values()):
+        
+    for iPV,gd,e in zip(idxPairLAux,gausdata.values(),gausdata.keys()):
         if mySpecialDict['calBoolean']:
             start = mySpecialList[0].index(iPV[0])
             end = mySpecialList[0].index(iPV[1])
@@ -82,7 +82,7 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
             peakYVals = max(yVals)
             peakXVals = xVals[yVals.index(peakYVals)]
         if gausdata != None:
-            floatMean = gausdata[e-1][1]
+            floatMean = gausdata[e][1]
         else:
             floatMean = peakXVals
         if showPeaks:

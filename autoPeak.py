@@ -125,21 +125,21 @@ def autoPeakFun(Command):
         List.remove('--log')
     else:
         logFlag = False
-    # if '--rebin' in List:
-    #     rebinFlag = True
-    #     List.remove('--rebin')
-    #     rebinNum = None
-    #     for Arg in List:
-    #         try:
-    #             rebinNum = int(Arg)
-    #             break
-    #         except:
-    #             continue
-    #     if rebinNum == None:
-    #         return 120
+    if '--rebin' in List:
+        rebinFlag = True
+        List.remove('--rebin')
+        rebinNum = None
+        for Arg in List:
+            try:
+                rebinNum = int(Arg)
+                break
+            except:
+                continue
+        if rebinNum == None:
+            return 120
 
-    # else:
-    #     rebinFlag = False
+    else:
+        rebinFlag = False
 
 
     myFileDict=getMyFileDict(Commands)
@@ -196,8 +196,7 @@ def autoPeakFun(Command):
             myInfofile=open( myFilename+'.info','w')
             myInfofile.write(df.to_string())
             myInfofile.close()
-
-        print('\n'+myFilename+'.info was created\n')
+            print('\n'+myFilename+'.info was created\n')
 
         PlotTitle='Peaks in '+ myFilename.split('/')[-1]
 
