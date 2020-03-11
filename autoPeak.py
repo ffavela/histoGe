@@ -134,9 +134,8 @@ def autoPeakFun(Command):
                 rebinNum = int(Arg)
                 break
             except:
-                continue
-        # if rebinNum == None:
-        #     return 120
+                if rebinNum == None:
+                    return 120
 
     else:
         rebinFlag = False
@@ -197,7 +196,6 @@ def autoPeakFun(Command):
             df = pd.DataFrame(list(Ranges),columns=['start','end'])
             myInfofile.write(df.to_string())
             myInfofile.close()
-
             print('\n'+myFilename+'.info was created\n')
 
         PlotTitle = 'Peaks in '+ myFilename.split('/')[-1]

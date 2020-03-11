@@ -19,7 +19,7 @@ from myLibs.miscellaneus import getIdxRangeVals
 #from myLibs.gilmoreStats import *
 #from myLibs.fitting import *
 #from myLibs.autoPeakFunk import *
-from myLibs.QueryDB import OpenDatabase, CloseDatabase, EnergyRange, halfLifeUnit
+from myLibs.QueryDB import OpenDatabase, CloseDatabase, EnergyRange, halfLifeUnit, GetIntensities
 #from myLibs.plotting import *
 
 def rankFun(ListOpt):
@@ -78,7 +78,8 @@ def rankFun(ListOpt):
     for idxR in idxPairL:
         iEner = idxR[0]
         fEner = idxR[1]
-        DBInfoL.append(EnergyRange(conexion,iEner,fEner))
+        #DBInfoL.append(EnergyRange(conexion,iEner,fEner))
+        DBInfoL.append(GetIntensities(conexion,iEner,fEner))
         DBInfo = DBInfoL[-1]
         DBInfoD = {}
         for e in DBInfo:
@@ -91,7 +92,8 @@ def rankFun(ListOpt):
                 isoPeakL.append([iso,1,0,0]) #So that there is only one count of each isotope per peak
                 if iso not in isoCountD: #Considering the number of entries in the energy range of the histogram
                     if iso not in memoLenDict:
-                        memoLenDict[iso]=len(EnergyRange(conexion,tMinE,tMaxE,iso))
+                        #memoLenDict[iso]=len(EnergyRange(conexion,tMinE,tMaxE,iso))
+                        memoLenDict[iso]=len(GetIntensities(conexion,tMinE,tMaxE,iso))
                     nInRange=memoLenDict[iso]
                     isoCountD[iso] = [0,nInRange]
                 isoCountD[iso][0] += 1

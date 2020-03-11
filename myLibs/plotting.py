@@ -71,8 +71,35 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
         plt.xlabel('Energies [KeV]')
     else:
         plt.xlabel('Channels')
-    e = 1
-    #for iPV,gd in zip(idxPairLAux,gausdata.values()):
+        
+    for iPV,gd,e in zip(idxPairLAux,gausdata.values(),gausdata.keys()):
+        if mySpecialDict['calBoolean']:
+            start = mySpecialList[0].index(iPV[0])
+            end = mySpecialList[0].index(iPV[1])
+        else:
+            start, end = iPV
+        xVals = mySpecialList[0][start:end+1]    
+        yVals = mySpecialList[1][start:end+1]    
+        if FitCurve and gausdata != None:
+            xNpArray = np.array(xVals)
+            GausFun = gaus(xNpArray,gd[0],gd[1],gd[2],gd[3])
+            plt.plot(xNpArray,GausFun,color='green')
+            peakYVals = max(GausFun)
+            peakXVals = xVals[list(GausFun).index(peakYVals)]
+        else:
+            peakYVals = max(yVals)
+            peakXVals = xVals[yVals.index(peakYVals)]
+        if gausdata != None:
+            floatMean = gausdata[e][1]
+        else:
+            floatMean = peakXVals
+        if showPeaks:
+            plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
+        if Anotation:
+            plt.annotate("%s,%2.1f" %(e,floatMean),xy=[peakXVals,peakYVals])
+        else:
+            plt.annotate(e, xy=[peakXVals,peakYVals])
+        e += 1
     
     try:
         for iPV in idxPairLAux:
