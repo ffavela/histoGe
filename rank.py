@@ -87,8 +87,8 @@ def rankFun(ListOpt):
         isoPeakL = [] 
         for Ele in DBInfo:
             iso = Ele[-1]
-            if [iso,1,0] not in isoPeakL:
-                isoPeakL.append([iso,1,0]) #So that there is only one count of each isotope per peak
+            if [iso,1,0,0] not in isoPeakL:
+                isoPeakL.append([iso,1,0,0]) #So that there is only one count of each isotope per peak
                 if iso not in isoCountD: #Considering the number of entries in the energy range of the histogram
                     if iso not in memoLenDict:
                         memoLenDict[iso]=len(EnergyRange(conexion,tMinE,tMaxE,iso))
@@ -118,7 +118,7 @@ def rankFun(ListOpt):
             iso = pInfo[0]
             Ele = DBInfoD[iso]
             Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
-            Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
+            Ig.append(round(Ele[3],2))#+' ('+str(Ele[4])+')')
             Decay.append(Ele[5])
             #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
             x=halfLifeUnit(Ele)
@@ -129,16 +129,19 @@ def rankFun(ListOpt):
             Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
             Parent.append(Ele[10])
             rank.append(pInfo[1])
-            rank2.append(pInfo[2])
+            rank2.append(round(pInfo[2],3))
 
         if allFlag:
             pd.set_option('display.max_rows', None) #imprime todas las filas
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2'])#crea  la tabla
-            print(df)
+            print(df.sort_values(by=['Rank2','Ig (%)'], ascending=False))
         else:
             pd.set_option('display.max_rows', len(Ele))
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2'])#crea  la tabla
-            print(df.head(10)) #print('\nOnly the first 10')
+            print('try to index\n')
+            print(df.head(10).sort_values(by=['Rank2','Ig (%)'], ascending=False)) #print('\nOnly the first 10')
+            
+            
 
         if wofFlag:
             try:
