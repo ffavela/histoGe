@@ -30,7 +30,7 @@ from query import QueryFun
 from test import TestFun
 from isotope import isotopeFun
 from Sum import SumFun
-from rank2 import rankFun
+from rank import rankFun
 from Sub import SubFun
 from energy import energyFun
 from stats import statsFun

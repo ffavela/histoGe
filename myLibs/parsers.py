@@ -12,8 +12,8 @@ from myLibs.fitting import myLine,getTentParams
 
 
 MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q','--query'],'test':['-t','--test'],\
-        'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e']}
-SubOptD = {'help':[],'autoPeak':['--rebin','--wif','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
+        'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e']}
+SubOptD = {'help':[],'autoPeak':['--rebin','--wof','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
         'rank':['--wof'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log'],'energy':['--all','--wof']}
     #NumArgD = {'help':[0],'autoPeak':[1],'query':[1],'test':[0],'isotope':[2],'sum':['--noCal','noPlot','wof'],\
     #    'rank':['--noCal','noPlot','wof'],'sub':['--noCal','noPlot','wof'],'stats':[],'energy':[]}
@@ -205,7 +205,7 @@ def CommandParser(lista):
 
     return InstList
 
-def getDictFromInfoFile(infoFileName):
+def getDictFromInfoFile(infoFileName,noCalFlag=None):
     infoDict={}
     newTable=pd.read_table(infoFileName, delim_whitespace=True, index_col=0)
     infoDict=newTable.to_dict('index')

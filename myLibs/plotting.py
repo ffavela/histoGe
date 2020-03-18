@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 from myLibs.miscellaneus import closest
-from myLibs.fitting import gaus
+from myLibs.fitting import gaus,emptyFittingDict
 
 def plotCos():
     t2 = np.arange(0.0, 5.0, 0.02)
@@ -60,8 +60,8 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
         Title = ''
     else:
         Title += ', '
-    
-    plt.gcf().canvas.set_window_title(Label.split('.')[0])
+    if Label != None:
+        plt.gcf().canvas.set_window_title(Label.split('.')[0])
     plt.title(Title + 'Exposure time = ' + str(mySpecialDict["expoTime"]) + '/s')
     plt.plot(mySpecialList[0],mySpecialList[1],label=Label)
     plt.ylabel('Counts')
@@ -71,42 +71,12 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
         plt.xlabel('Energies [KeV]')
     else:
         plt.xlabel('Channels')
-        
-    for iPV,gd,e in zip(idxPairLAux,gausdata.values(),gausdata.keys()):
-        if mySpecialDict['calBoolean']:
-            start = mySpecialList[0].index(iPV[0])
-            end = mySpecialList[0].index(iPV[1])
-        else:
-            start, end = iPV
-        xVals = mySpecialList[0][start:end+1]    
-        yVals = mySpecialList[1][start:end+1]    
-        if FitCurve and gausdata != None:
-            xNpArray = np.array(xVals)
-            GausFun = gaus(xNpArray,gd[0],gd[1],gd[2],gd[3])
-            plt.plot(xNpArray,GausFun,color='green')
-            peakYVals = max(GausFun)
-            peakXVals = xVals[list(GausFun).index(peakYVals)]
-        else:
-            peakYVals = max(yVals)
-            peakXVals = xVals[yVals.index(peakYVals)]
-        if gausdata != None:
-            floatMean = gausdata[e][1]
-        else:
-            floatMean = peakXVals
-        if showPeaks:
-            plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
-        if Anotation:
-            plt.annotate("%s,%2.1f" %(e,floatMean),xy=[peakXVals,peakYVals])
-        else:
-            plt.annotate(e, xy=[peakXVals,peakYVals])
-        e += 1
     
-    try:
-        for iPV in idxPairLAux:
-            if gausdata != None:
+    if gausdata == None:
+        gausdata = emptyFittingDict(len(idxPairLAux))
 
-                gd = gausdata[e-1]
-            
+    try:
+        for iPV,gd,e in zip(idxPairLAux,gausdata.values(),gausdata.keys()):
             if mySpecialDict['calBoolean']:
                 start = mySpecialList[0].index(iPV[0])
                 end = mySpecialList[0].index(iPV[1])
@@ -114,20 +84,18 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
                 start, end = iPV
             xVals = mySpecialList[0][start:end+1]    
             yVals = mySpecialList[1][start:end+1]    
-            if FitCurve and gausdata != None:
+            NoneFlag = all([ps != None for ps in gd])
+            if FitCurve == True and NoneFlag:
                 xNpArray = np.array(xVals)
                 GausFun = gaus(xNpArray,gd[0],gd[1],gd[2],gd[3])
                 plt.plot(xNpArray,GausFun,color='green')
                 peakYVals = max(GausFun)
                 peakXVals = xVals[list(GausFun).index(peakYVals)]
             else:
-                
                 peakYVals = max(yVals)
                 peakXVals = xVals[yVals.index(peakYVals)]
-                
-                    
-            if gausdata != None:
-                floatMean = gausdata[e-1][1]
+            if NoneFlag:
+                floatMean = gausdata[e][1]
             else:
                 floatMean = peakXVals
             if showPeaks:
@@ -136,9 +104,49 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
                 plt.annotate("%s,%2.1f" %(e,floatMean),xy=[peakXVals,peakYVals])
             else:
                 plt.annotate(e, xy=[peakXVals,peakYVals])
-            e += 1
     except:
-                print("\n\nThe {} file is not calibrated, please use --noCal option in line command\n\n".format(Label))
+        print('ERROR: Unexpected error during plotting. ')
+        return 300
+        #e += 1
+    
+    # try:
+    #     for iPV in idxPairLAux:
+    #         if gausdata != None:
+
+    #             gd = gausdata[e-1]
+            
+    #         if mySpecialDict['calBoolean']:
+    #             start = mySpecialList[0].index(iPV[0])
+    #             end = mySpecialList[0].index(iPV[1])
+    #         else:
+    #             start, end = iPV
+    #         xVals = mySpecialList[0][start:end+1]    
+    #         yVals = mySpecialList[1][start:end+1]    
+    #         if FitCurve and gausdata != None:
+    #             xNpArray = np.array(xVals)
+    #             GausFun = gaus(xNpArray,gd[0],gd[1],gd[2],gd[3])
+    #             plt.plot(xNpArray,GausFun,color='green')
+    #             peakYVals = max(GausFun)
+    #             peakXVals = xVals[list(GausFun).index(peakYVals)]
+    #         else:
+                
+    #             peakYVals = max(yVals)
+    #             peakXVals = xVals[yVals.index(peakYVals)]
+                
+                    
+    #         if gausdata != None:
+    #             floatMean = gausdata[e-1][1]
+    #         else:
+    #             floatMean = peakXVals
+    #         if showPeaks:
+    #             plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
+    #         if Anotation:
+    #             plt.annotate("%s,%2.1f" %(e,floatMean),xy=[peakXVals,peakYVals])
+    #         else:
+    #             plt.annotate(e, xy=[peakXVals,peakYVals])
+    #         e += 1
+    # except:
+    #             print("\n\nThe {} file is not calibrated, please use --noCal option in line command\n\n".format(Label))
 
     if Show:
         if Label != None:

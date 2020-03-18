@@ -41,15 +41,24 @@ def getIdxRangeVals(myDataList,xMin,xMax):
     xVals=myDataList[0]
     xMinIdx=xVals[0]
     xMaxIdx=xVals[-1]
+    MinFlag = True
+    MaxFlag = True
     for i,x in enumerate(xVals):
         if xMin <= x:
-            xMinIdx=i
+            xMinIdx = i
+            MinFlag = False
             break
     #This needs to be optimized!
     for i,x in enumerate(xVals):
         if xMax <= x:
-            xMaxIdx=i
+            xMaxIdx = i
+            MaxFlag = False
             break
+    if MinFlag:
+        xMinIdx = 0
+
+    if MaxFlag:
+        xMaxIdx = len(xVals) - 1
 
     return [xMinIdx,xMaxIdx]
 

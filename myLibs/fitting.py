@@ -69,11 +69,19 @@ def doFittingStuff(infoDict,myDataList):
             continue
 
         a,mean,sigma,c=popt
-        myIntegral=a*sigma*sqrt(2*pi)
+        #myIntegral=a*sigma*sqrt(2*pi)
         myFWHM=fwhm(sigma)
         fittingDict[e]=[a,mean,sigma,c,minIdx,maxIdx,myFWHM]
         # return fittingDict
     return fittingDict
+
+def emptyFittingDict(num):
+    fittingDict = {}
+    for e in range(0,num,1):
+        fittingDict[e]=[None,None,None,None,None,None,None]
+
+    return fittingDict
+
 
 ###Fitting fails often here... don't know why... see histoGe.py where
 ###it is really called ####

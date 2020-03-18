@@ -96,13 +96,11 @@ def peakRangeFinder(theList):
     return indRange
 
 def autoPeakFun(Command):
-    
-    #print('\n\n'+ str(Command) +'\n\n')
 
-    Commands=Command
     noCalFlag = False
     logFlag = False
-
+    noPlotFlag = False
+    rebinFlag = False
     List = Command.copy()
     List.pop(0)
     if '--noCal' in List:
@@ -132,16 +130,19 @@ def autoPeakFun(Command):
         for Arg in List:
             try:
                 rebinNum = int(Arg)
+                List.remove(Arg)
                 break
             except:
-                if rebinNum == None:
-                    return 120
+                continue
+
+        # if rebinNum == None and :
+        #     return 120
 
     else:
         rebinFlag = False
 
 
-    myFileDict=getMyFileDict(Commands)
+    myFileDict=getMyFileDict(List)
     
     myFilename=myFileDict['specFiles'][0]
               
@@ -149,13 +150,18 @@ def autoPeakFun(Command):
        
         print(' Error: to many files to do autopeak\n')
 
-    elif not myFilename.endswith('.info'):       
-       
+    #elif not myFilename.endswith('.info'):       
+    else:   
         myExtension = myFilename.split(".")[-1] #verifies the file extention
+        if myExtension == 'info':
+            print('The file cannot be an info file.')
+            return 120
+
+        
         mySpecialDict = functionDict[myExtension](myFilename,noCalFlag) #fill de dictionary
                                                                    #from data file
         
-        if '--rebin' in Commands:
+        if rebinFlag:
             
             if isinstance(rebinNum, int) == False:
                 rebinNum=5
@@ -197,11 +203,18 @@ def autoPeakFun(Command):
             myInfofile.write(df.to_string())
             myInfofile.close()
             print('\n'+myFilename+'.info was created\n')
+            print('\n-----------------------------------\nThe information of the .info file is the next:\n')
+            print(df.to_string())
+
+        else:
+            df = pd.DataFrame(list(Ranges),columns=['start','end'])
+            print(df.to_string())
 
         PlotTitle = 'Peaks in '+ myFilename.split('/')[-1]
         PlotLabel = myFilename.split('/')[-1]
 
-        complexPlot(mySpecialDict,Ranges,logFlag=logFlag,noCalFlag=noCalFlag,Label=PlotLabel,Title=PlotTitle,FitCurve=False,rebinFlag=rebinFlag)
+        if noPlotFlag == False: 
+            complexPlot(mySpecialDict,Ranges,logFlag=logFlag,noCalFlag=noCalFlag,Label=PlotLabel,Title=PlotTitle,FitCurve=False,rebinFlag=rebinFlag)
         
         # plt.plot(myDatalist[0],myDatalist[1]) #plot the spectrum
         # plt.show()
