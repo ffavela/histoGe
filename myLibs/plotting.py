@@ -107,46 +107,6 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
     except:
         print('ERROR: Unexpected error during plotting. ')
         return 300
-        #e += 1
-    
-    # try:
-    #     for iPV in idxPairLAux:
-    #         if gausdata != None:
-
-    #             gd = gausdata[e-1]
-            
-    #         if mySpecialDict['calBoolean']:
-    #             start = mySpecialList[0].index(iPV[0])
-    #             end = mySpecialList[0].index(iPV[1])
-    #         else:
-    #             start, end = iPV
-    #         xVals = mySpecialList[0][start:end+1]    
-    #         yVals = mySpecialList[1][start:end+1]    
-    #         if FitCurve and gausdata != None:
-    #             xNpArray = np.array(xVals)
-    #             GausFun = gaus(xNpArray,gd[0],gd[1],gd[2],gd[3])
-    #             plt.plot(xNpArray,GausFun,color='green')
-    #             peakYVals = max(GausFun)
-    #             peakXVals = xVals[list(GausFun).index(peakYVals)]
-    #         else:
-                
-    #             peakYVals = max(yVals)
-    #             peakXVals = xVals[yVals.index(peakYVals)]
-                
-                    
-    #         if gausdata != None:
-    #             floatMean = gausdata[e-1][1]
-    #         else:
-    #             floatMean = peakXVals
-    #         if showPeaks:
-    #             plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
-    #         if Anotation:
-    #             plt.annotate("%s,%2.1f" %(e,floatMean),xy=[peakXVals,peakYVals])
-    #         else:
-    #             plt.annotate(e, xy=[peakXVals,peakYVals])
-    #         e += 1
-    # except:
-    #             print("\n\nThe {} file is not calibrated, please use --noCal option in line command\n\n".format(Label))
 
     if Show:
         if Label != None:

@@ -8,10 +8,11 @@ addressed easely by the closest value on myDataList.
 
 from math import sqrt, pi
 import numpy as np
-from myLibs.miscellaneus import *
+from myLibs.miscellaneus import getIdxRangeVals,fwhm
 
 def gilmoreGrossIntegral(myDataList,lowXVal,uppXVal):  #checked
-    xVals,yVals=myDataList
+    #xVals,yVals=myDataList
+    _,yVals=myDataList
     L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
     G=sum(yVals[L:U+1])  #incluye en la suma el bin L y U
     return G             #para el caso del DppMCA, no incluye la suma de los bins L y U
@@ -30,7 +31,7 @@ def gilmoreBackground(myDataList,lowXVal,uppXVal):     #checked
     return B
 
 def gilmoreNetArea(myDataList,lowXVal,uppXVal):        #checked
-    xVals,yVals=myDataList
+    #xVals,yVals=myDataList
     G=gilmoreGrossIntegral(myDataList,lowXVal,uppXVal)
     B=gilmoreBackground(myDataList,lowXVal,uppXVal)
     A=G-B
@@ -50,7 +51,8 @@ def doOutputFile(myFilename,df,dfG):
 def gilmoreExtendedBkgExtensionsInt(myDataList,lowXVal,uppXVal,m=1): #checked
     """Takes into account the bins (1 by default) before and after the
 region of interest. Default m=1 NetArea=Area+ExtendedBKGD""" 
-    xVals,yVals=myDataList
+    #xVals,yVals=myDataList
+    _,yVals=myDataList
     L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
     n=(U-L)+1                   #n is the number of channels within the peak region
     C=yVals
@@ -59,14 +61,14 @@ region of interest. Default m=1 NetArea=Area+ExtendedBKGD"""
     return A
 
 def gilmoreSigma(myDataList,lowXVal,uppXVal):   
-    xVals,yVals=myDataList
+    #xVals,yVals=myDataList
     A=gilmoreNetArea(myDataList,lowXVal,uppXVal)
     B=gilmoreBackground(myDataList,lowXVal,uppXVal)
     sigma_A=np.sqrt(A+2*B)
     return sigma_A
 
 def gilmoreExtendedSigma(myDataList,lowXVal,uppXVal,m=5):
-    xVals,yVals=myDataList
+    #xVals,yVals=myDataList
     L,U=getIdxRangeVals(myDataList,lowXVal,uppXVal)
     n=U-L
     A=gilmoreNetArea(myDataList,lowXVal,uppXVal)
@@ -78,7 +80,8 @@ def doGilmoreStuff(infoDict,myDataList):
     gilmoreDict={}
     if infoDict == {}:
         return gilmoreDict
-    xVals,yVals=myDataList
+    #xVals,yVals=myDataList
+    _,yVals=myDataList
     for e in infoDict:
         # lowXVal,uppXVal=infoDict[e]
         for i in infoDict[e]:               
