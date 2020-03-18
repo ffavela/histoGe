@@ -78,22 +78,25 @@ def rankFun(ListOpt):
     for idxR in idxPairL:
         iEner = idxR[0]
         fEner = idxR[1]
-        DBInfoL.append(EnergyRange(conexion,iEner,fEner))
+        #DBInfoL.append(EnergyRange(conexion,iEner,fEner))
+        DBInfoL.append(GetIntensities(conexion,iEner,fEner))
         DBInfo = DBInfoL[-1]
         DBInfoD = {}
-        for e in DBInfo:
-            DBInfoD[e[-1]] = e
-        DBInfoDL.append(DBInfoD)
-        isoPeakL = [] 
+        for e in DBInfo: 
+            #Filling dict with isotope name each isotope has only one tupple
+            DBInfoD[e[-1]] = e      
+        DBInfoDL.append(DBInfoD)   
+        isoPeakL = []
         for Ele in DBInfo:
             iso = Ele[-1]
             if [iso,1,0,0] not in isoPeakL:
-                isoPeakL.append([iso,1,0,0]) #So that there is only one count of each isotope per peak
+                isoPeakL.append([iso,1,0,Ele[10]]) #So that there is only one count of each isotope per peak
                 if iso not in isoCountD: #Considering the number of entries in the energy range of the histogram
                     if iso not in memoLenDict:
-                        memoLenDict[iso]=len(EnergyRange(conexion,tMinE,tMaxE,iso))
+                        #memoLenDict[iso]=len(EnergyRange(conexion,tMinE,tMaxE,iso))
+                        memoLenDict[iso]=len(GetIntensities(conexion,tMinE,tMaxE,iso))
                     nInRange=memoLenDict[iso]
-                    isoCountD[iso] = [0,nInRange]
+                    isoCountD[iso] = [0,nInRange,0]
                 isoCountD[iso][0] += 1
         isoPeakLL.append(isoPeakL)
 
@@ -103,8 +106,9 @@ def rankFun(ListOpt):
             isoC = isoCountD[iso][0]
             isoL[1] = isoC
             isoL[2] = isoC/isoCountD[iso][1]
+            isoCountD[iso][2] += isoL[-1]
 
-        isoLL.sort(key = lambda x: x[2],reverse = True)
+        isoLL.sort(key = lambda x: x[3],reverse = True)
     
     Ranges = []
     for idxR, isoPeakL, DBInfoD in zip(idxPairL,isoPeakLL,DBInfoDL):
@@ -113,12 +117,12 @@ def rankFun(ListOpt):
         Ranges.append([iEner,fEner])
 
         print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
-        Eg , Ig , Decay, Half , Parent, rank, rank2 = [],[],[],[],[],[],[]
+        Eg , Ig , Decay, Half , Parent, rank, rank2,rank3 = [],[],[],[],[],[],[],[]
         for pInfo in isoPeakL:
             iso = pInfo[0]
             Ele = DBInfoD[iso]
             Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
-            Ig.append(str(Ele[3])+' ('+str(Ele[4])+')')
+            Ig.append(round(Ele[3],2))#+' ('+str(Ele[4])+')')
             Decay.append(Ele[5])
             #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
             x=halfLifeUnit(Ele)
@@ -127,18 +131,22 @@ def rankFun(ListOpt):
             else:
                 y = str('{0:.2e}'.format(x))
             Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
-            Parent.append(Ele[10])
+            Parent.append(Ele[-1])
             rank.append(pInfo[1])
-            rank2.append(pInfo[2])
+            rank2.append(round(pInfo[2],3))
+            rank3.append(round(pInfo[-1],3))
 
         if allFlag:
             pd.set_option('display.max_rows', None) #imprime todas las filas
-            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2'])#crea  la tabla
-            print(df)
+            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3)),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3'])#crea  la tabla
+            print(df.sort_values(by=['Rank2'], ascending=False))
         else:
             pd.set_option('display.max_rows', len(Ele))
-            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2'])#crea  la tabla
-            print(df.head(10)) #print('\nOnly the first 10')
+            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2','Rank3'])#crea  la tabla
+            print('try to index\n')
+            print(df.head(10).sort_values(by=['Rank2'], ascending=False)) #print('\nOnly the first 10')
+            
+            
 
         if wofFlag:
             try:

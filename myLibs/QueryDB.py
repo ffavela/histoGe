@@ -8,7 +8,7 @@ def OpenDatabase(pathfile):
 
 def EnergyRange(conexion,min,max,element = None,order = None):
     #Command = 'SELECT * FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
-    Command = 'SELECT ID,Energy,ExEnergy,Intensity,ExIntensity,DecayMode,HalfLife,HalfLifeUnit,ExHalfLife,Address,Element FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
+    Command = 'SELECT ID,Energy,ExEnergy,IgA,ExIntensity,DecayMode,HalfLife,HalfLifeUnit,ExHalfLife,Address,Element FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
     if element != None:
         Command += ' and Element = ' + "'" + element + "'" 
     
@@ -102,25 +102,27 @@ def getNormalizedEmissionList(IsoList):
     IsoList = stripList(IsoList)
 
 
-def GetIntensities(conexion,min,max,element = None,order = None):
+
+
+def GetIntensities(conexion,min,max,element= None,order= None):
     #Command = 'SELECT * FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
     #ID,Energy,ExEnergy,Intensity,ExIntensity,DecayMode,HalfLife,HalfLifeUnit,ExHalfLife,Address,Element
-    Command = 'SELECT ID,Energy,Intensity,IgA,IgR,Element FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
-    if element != None:
-        Command += ' and Element = ' + "'" + element + "'" 
-    
-    if order == None:
+    Command = 'SELECT ID,Energy,ExEnergy,IgA,ExIntensity,DecayMode,HalfLife,HalfLifeUnit,ExHalfLife,Address,IgR,Element FROM Isotopes WHERE Energy >= '+ str(min) + ' and Energy < '+ str(max)
+    if  element != None:
+        Command += ' and Element = '+ "'"+ element + "'"
+
+    if  order == None:
         cursor = conexion.cursor()
         cursor.execute(Command)
         Isotopes = cursor.fetchall()
         return Isotopes
-
     elif order == 'ASC' or order == 'DESC':
         cursor = conexion.cursor()
-        Command += ' ORDER BY Energy ' + order
+        Command += ' ORDER BY Energy '+ order
         cursor.execute(Command)
         Isotopes = cursor.fetchall()
-        return Isotopes
+
+        return  Isotopes
         
 
 
