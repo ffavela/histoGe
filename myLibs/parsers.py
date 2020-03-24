@@ -12,9 +12,10 @@ from myLibs.fitting import myLine,getTentParams
 
 
 MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q','--query'],'test':['-t','--test'],\
-        'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e']}
+        'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e'],\
+        'parent':['--parent','-p']}
 SubOptD = {'help':[],'autoPeak':['--rebin','--wif','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
-        'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log'],'energy':['--all','--wof']}
+        'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log'],'energy':['--all','--wof'],'parent':[]}
     #NumArgD = {'help':[0],'autoPeak':[1],'query':[1],'test':[0],'isotope':[2],'sum':['--noCal','noPlot','wof'],\
     #    'rank':['--noCal','noPlot','wof'],'sub':['--noCal','noPlot','wof'],'stats':[],'energy':[]}
 
@@ -30,15 +31,16 @@ def isValidSpecFile(strVal):
 def getDictFromSPE(speFile,calFlag=True):
     """Parses the .SPE file format that is used in Boulby"""
     internDict = {}
-    myCounter=0
-    aCoef,bCoef,cCoef=[0.0,0.0,0.0]
+    #myCounter=0
+    _,bCoef,_=[0.0,0.0,0.0]
+    #aCoef,bCoef,cCoef=[0.0,0.0,0.0]
     myXvals=[]
     myYvals=[]
-    calBool=False
+    #calBool=False
     internDict['calBoolean']=False
-    appendBool=False
+    #appendBool=False
 
-    str2init = "DATA"
+    #str2init = "DATA"
     for line in open(speFile):
         iFound = line.find("$")
         if iFound != -1: #iFound == 0
@@ -52,8 +54,8 @@ def getDictFromSPE(speFile,calFlag=True):
     myYvals=[float(yVal) for yVal in internDict["DATA"][1:]]
 
     if "ENER_FIT" in internDict and calFlag:
-        aCoef,bCoef,cCoef=[float(e) for e in\
-                           internDict['ENER_FIT'][0].split()]
+        _,bCoef,_=[float(e) for e in internDict['ENER_FIT'][0].split()]
+        #aCoef,bCoef,cCoef=[float(e) for e in internDict['ENER_FIT'][0].split()]
         #Assuming E=bCoef*bin+aCoef, as I understood aCoef is
         #always zero (I'm reading it anyway) and I don't know
         #what's cCoef for.
@@ -129,7 +131,8 @@ def getDictFromMCA(mcaFilename,noCalFlag=False):
 
     if len(x4cal) > 1:
         a,b=getTentParams(x4cal,y4cal)
-        popt,pcov = curve_fit(myLine,x4cal, y4cal, p0=[a,b])
+        popt,_ = curve_fit(myLine,x4cal, y4cal, p0=[a,b])
+        #popt,pcov = curve_fit(myLine,x4cal, y4cal, p0=[a,b])
         a,b=popt
         #Do the calibration etc
         xCalibrated = [a*ch+b for ch in range(len(mcaList))]

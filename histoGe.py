@@ -35,6 +35,7 @@ from Sub import SubFun
 from energy import energyFun
 from stats import statsFun
 from noOption import noOption
+from isoparent import Parent
 
 def main(argv): 
     Commands = CommandParser(argv)
@@ -103,6 +104,11 @@ def main(argv):
     elif Command[0] in MainOptD['energy']:
         exitcode = energyFun(Command)
         return exitcode
+
+    elif Command[0] in MainOptD['parent']:
+        exitcode = Parent(Command)
+        return exitcode
+ 
     else:
         pid = TryFork()
         if pid == 0:

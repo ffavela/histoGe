@@ -102,8 +102,6 @@ def getNormalizedEmissionList(IsoList):
     IsoList = stripList(IsoList)
 
 
-
-
 def GetIntensities(conexion,min,max,element= None,order= None):
     #Command = 'SELECT * FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
     #ID,Energy,ExEnergy,Intensity,ExIntensity,DecayMode,HalfLife,HalfLifeUnit,ExHalfLife,Address,Element
@@ -123,7 +121,24 @@ def GetIntensities(conexion,min,max,element= None,order= None):
         Isotopes = cursor.fetchall()
 
         return  Isotopes
-        
+
+def GetChainAndChild(conexion,Isotope):
+    Command = 'SELECT MainChain,ChildIsotopes FROM Isotopes WHERE Element = '+ "'"+ Isotope + "'"
+    cursor = conexion.cursor()
+    cursor.execute(Command)
+    Isotopes = cursor.fetchone()
+    return Isotopes
+
+def GetMainChain(conexion,MainChainIso):
+
+    Command = 'SELECT DecayChain FROM DecayChains WHERE Isotope = ' + "'"+ MainChainIso + "'"
+    cursor = conexion.cursor()
+    cursor.execute(Command)
+    MainChain = cursor.fetchone()
+    return MainChain
+
+
+
 
 
 
