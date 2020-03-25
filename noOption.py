@@ -56,13 +56,14 @@ def noOption(ListOpt):
                 else:
                     myFilename = arg
                     myExtension = myFilename.split(".")[-1]
-                    if noCalFlag:
-                        mySubsDict = functionDict[myExtension](myFilename,False)
+                    mySubsDict = functionDict[myExtension](myFilename)
+                    if not noCalFlag and mySubsDict['calBoolean']:
+                        mySubsDict = functionDict[myExtension](myFilename,noCalFlag=False)
                     else:
-                        mySubsDict = functionDict[myExtension](myFilename)
+                        mySubsDict = functionDict[myExtension](myFilename,noCalFlag=True)
                     mySubsList = mySubsDict["theList"]
                     plotFlag = True
-                    simplePlot(mySubsList,logFlag,noCalFlag,Label=None,show=False,Title=None)
+                    simplePlot(mySubsList,logFlag,mySubsDict['calBoolean'],Label=None,show=False,Title=None)
             else:
                 print('WARNING: The file ' + arg + ' is invalid. Nothing to do with it.')
                 return 90

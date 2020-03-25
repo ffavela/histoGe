@@ -17,7 +17,7 @@ def simplePlot(mySubsList,logFlag,noCalFlag,Label=None,show=False,Title=None):
     plt.plot(mySubsList[0],mySubsList[1],label=Label)
     if logFlag:
         plt.yscale('log')
-    if not noCalFlag:
+    if noCalFlag:
             plt.xlabel('Energies [KeV]')
     else:
             plt.xlabel('Channels')

@@ -14,7 +14,7 @@ from myLibs.fitting import myLine,getTentParams
 MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q','--query'],'test':['-t','--test'],\
         'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e'],\
         'parent':['--parent','-p']}
-SubOptD = {'help':[],'autoPeak':['--rebin','--wif','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
+SubOptD = {'help':[],'autoPeak':['--rebin','--wof','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
         'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log'],'energy':['--all','--wof'],'parent':[]}
     #NumArgD = {'help':[0],'autoPeak':[1],'query':[1],'test':[0],'isotope':[2],'sum':['--noCal','noPlot','wof'],\
     #    'rank':['--noCal','noPlot','wof'],'sub':['--noCal','noPlot','wof'],'stats':[],'energy':[]}
