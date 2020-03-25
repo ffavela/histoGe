@@ -89,6 +89,8 @@ def getDictFromMCA(mcaFilename,noCalFlag=False):
     appendBool = False
     internDict['calBoolean']=False
     calBool = False
+    Calibrated = False
+    internDict["noCalFlag"] = False
 
     x4cal=[]
     y4cal=[]
@@ -100,6 +102,7 @@ def getDictFromMCA(mcaFilename,noCalFlag=False):
             internDict["expoTime"]=float(tempList[1])
 
         if line.find(strCal) != -1:  #"<<CALIBRATION>>"
+            Calibrated = True
             if noCalFlag == True:
                 calBool = False
             else:
@@ -128,7 +131,7 @@ def getDictFromMCA(mcaFilename,noCalFlag=False):
 
         if appendBool :
             mcaList.append(float(line))
-
+    
     if len(x4cal) > 1:
         a,b=getTentParams(x4cal,y4cal)
         popt,_ = curve_fit(myLine,x4cal, y4cal, p0=[a,b])
@@ -142,6 +145,10 @@ def getDictFromMCA(mcaFilename,noCalFlag=False):
         totalList=[range(len(mcaList)),mcaList]
 
     internDict["theList"]=totalList
+    
+    if (noCalFlag == False) and (Calibrated == False):
+            internDict["noCalFlag"] = True
+
     return internDict
 
 def getDictFromGammaVision(gvFilename, calFlag=True):

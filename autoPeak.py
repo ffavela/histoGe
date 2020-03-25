@@ -107,17 +107,22 @@ def autoPeakFun(Command):
         noCalFlag = True
         List.remove('--noCal')
     else:
-        noCalFlag = False
+         noCalFlag = False
     if '--noPlot' in List:
         noPlotFlag = True
         List.remove('--noPlot')
     else:
         noPlotFlag = False
-    if '--wof' in List:
-        wofFlag = True
-        List.remove('--wof')
+    # if '--wof' in List:
+    #     wofFlag = True
+    #     List.remove('--wof')
+    # else:
+    #     wofFlag = False
+    if '--wif' in List:
+        wifFlag = True
+        List.remove('--wif')
     else:
-        wofFlag = False
+        wifFlag = False
     if '--log' in List:
         logFlag = True
         List.remove('--log')
@@ -161,6 +166,10 @@ def autoPeakFun(Command):
         mySpecialDict = functionDict[myExtension](myFilename,noCalFlag) #fill de dictionary
                                                                    #from data file
         
+        if (noCalFlag == False) and (mySpecialDict["noCalFlag"] == True):
+            noCalFlag = True
+            print("Note: the file " + myFilename + " is not calibrated, please don't forget use --noCal option")
+
         if rebinFlag:
             
             if isinstance(rebinNum, int) == False:
@@ -196,7 +205,7 @@ def autoPeakFun(Command):
                 iEner = energyArr[start]
                 fEner = energyArr[end]
                 Ranges.append([iEner,fEner])
-        if wofFlag:              
+        if wifFlag:              
             myInfofile=open( myFilename+'.info','w')
             pd.set_option('display.max_rows', len(Ranges))
             df = pd.DataFrame(list(Ranges),columns=['start','end'])
