@@ -137,7 +137,22 @@ def GetMainChain(conexion,MainChainIso):
     MainChain = cursor.fetchone()
     return MainChain
 
+def GetIntensities2(conexion,element,order= None):
+    #Command = 'SELECT * FROM Isotopes WHERE Energy >= ' + str(min) + ' and Energy < ' + str(max)
+    #ID,Energy,ExEnergy,Intensity,ExIntensity,DecayMode,HalfLife,HalfLifeUnit,ExHalfLife,Address,Element
+    Command = 'SELECT ID,Energy,ExEnergy,IgA,ExIntensity,IgR,Element FROM Isotopes WHERE Element = '+ "'"+ element + "'"
 
+    if  order == None:
+        cursor = conexion.cursor()
+        cursor.execute(Command)
+        Isotopes = cursor.fetchall()
+        return Isotopes
+    elif order == 'ASC' or order == 'DESC':
+        cursor = conexion.cursor()
+        Command += ' ORDER BY Energy '+ order
+        cursor.execute(Command)
+        Isotopes = cursor.fetchall()
+        return  Isotopes
 
 
 

@@ -13,9 +13,16 @@ from myLibs.fitting import myLine,getTentParams
 
 MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q','--query'],'test':['-t','--test'],\
         'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e'],\
+<<<<<<< HEAD
         'parent':['--parent','-p']}
 SubOptD = {'help':[],'autoPeak':['--rebin','--wif','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
         'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log','--rebin'],'energy':['--all','--wof'],'parent':[]}
+=======
+        'parent':['--parent','-p'],'normint':['--normInt','-n']}
+SubOptD = {'help':[],'autoPeak':['--rebin','--wof','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
+        'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log'],'energy':['--all','--wof'],'parent':[],\
+            'normint':[]}
+>>>>>>> 946d033c9cf48b6f0aad0697d13eff64778348c3
     #NumArgD = {'help':[0],'autoPeak':[1],'query':[1],'test':[0],'isotope':[2],'sum':['--noCal','noPlot','wof'],\
     #    'rank':['--noCal','noPlot','wof'],'sub':['--noCal','noPlot','wof'],'stats':[],'energy':[]}
 

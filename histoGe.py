@@ -36,6 +36,7 @@ from energy import energyFun
 from stats import statsFun
 from noOption import noOption
 from isoparent import Parent
+from normintensity import NormIntensity
 
 def main(argv): 
     Commands = CommandParser(argv)
@@ -49,11 +50,11 @@ def main(argv):
         return exitcode
         
     elif Command[0] in MainOptD['autoPeak']:
-        # pid = TryFork()
-        # if pid == 0:
-        exitcode = autoPeakFun(Command)
-        # else:
-        #     exitcode = 0
+        pid = TryFork()
+        if pid == 0:
+            exitcode = autoPeakFun(Command)
+        else:
+            exitcode = 0
         
         return exitcode
 
@@ -94,11 +95,11 @@ def main(argv):
         return exitcode
         
     elif Command[0] in MainOptD['stats']:
-        # pid = TryFork()
-        # if pid == 0:
-        exitcode = statsFun(Command)
-        # else:
-        #     exitcode = 0
+        pid = TryFork()
+        if pid == 0:
+            exitcode = statsFun(Command)
+        else:
+            exitcode = 0
         return exitcode
         
     elif Command[0] in MainOptD['energy']:
@@ -109,6 +110,10 @@ def main(argv):
         exitcode = Parent(Command)
         return exitcode
  
+    elif Command[0] in MainOptD['normint']:
+        exitcode = NormIntensity(Command)
+        return exitcode
+
     else:
         pid = TryFork()
         if pid == 0:
