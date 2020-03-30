@@ -54,5 +54,5 @@ def isotopeFun(ListOpt):
             print('\n')
 
     CloseDatabase(conexion)
-    return True
+    return 0
 

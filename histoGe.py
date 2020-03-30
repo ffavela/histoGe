@@ -36,6 +36,7 @@ from energy import energyFun
 from stats import statsFun
 from noOption import noOption
 from isoparent import Parent
+from normintensity import NormIntensity
 
 def main(argv): 
     Commands = CommandParser(argv)
@@ -109,6 +110,10 @@ def main(argv):
         exitcode = Parent(Command)
         return exitcode
  
+    elif Command[0] in MainOptD['normint']:
+        exitcode = NormIntensity(Command)
+        return exitcode
+
     else:
         pid = TryFork()
         if pid == 0:
