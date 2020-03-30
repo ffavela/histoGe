@@ -49,11 +49,11 @@ def main(argv):
         return exitcode
         
     elif Command[0] in MainOptD['autoPeak']:
-        pid = TryFork()
-        if pid == 0:
-            exitcode = autoPeakFun(Command)
-        else:
-            exitcode = 0
+        # pid = TryFork()
+        # if pid == 0:
+        exitcode = autoPeakFun(Command)
+        # else:
+        #     exitcode = 0
         
         return exitcode
 
@@ -94,11 +94,11 @@ def main(argv):
         return exitcode
         
     elif Command[0] in MainOptD['stats']:
-        pid = TryFork()
-        if pid == 0:
-            exitcode = statsFun(Command)
-        else:
-            exitcode = 0
+        # pid = TryFork()
+        # if pid == 0:
+        exitcode = statsFun(Command)
+        # else:
+        #     exitcode = 0
         return exitcode
         
     elif Command[0] in MainOptD['energy']:
