@@ -222,6 +222,70 @@ def CommandParser(lista):
 
     return InstList
 
+
+def MultiCommandParser(lista):
+    SeparatorChars = ['&',';','!']
+    argvcp = lista.copy()
+    argvcp.pop(0)
+    CommandL = []
+    CommandLL = []
+
+    for ps,argu in enumerate(argvcp):
+        if (argu in SeparatorChars):
+            CommandLL.append(CommandL)
+            CommandL = []
+        elif (argu[-1] in SeparatorChars):
+            CommandL.append(argu[:-1])
+            CommandLL.append(CommandL)
+            CommandL = []
+        
+        elif ps == len(argvcp) - 1:
+            if argu not in SeparatorChars:
+                CommandL.append(argu)
+                CommandLL.append(CommandL)
+                CommandL = []
+            else:
+                CommandLL.append(CommandL)
+
+        else:
+            CommandL.append(argu)
+
+    InstListL = []
+    for Command in CommandLL:
+        FileList = []
+        InstList = []
+        NumList = []
+        NameList = []
+        if len(Command) != 0:
+            for MainOpt in MainOptD:
+                for arg in Command:
+                    if arg in MainOptD[MainOpt]:
+                        InstList.append([arg])
+                        for arg2 in Command:
+                            if arg2 in SubOptD[MainOpt]:
+                                InstList[-1].append(arg2)
+                            elif isValidSpecFile(arg2):
+                                FileList.append(arg2)
+                            else:
+                                try:
+                                    float(arg)
+                                    NumList.append(arg2)
+                                except ValueError:
+                                    if arg2[0] != '-':
+                                        NameList.append(arg2)
+
+            if len(InstList) > 0:
+                InstList[-1].extend(FileList)
+                InstList[-1].extend(NumList)
+                InstList[-1].extend(NameList)
+            else:
+                InstList = [Command.copy()]
+            InstListL.append(InstList[-1]) 
+    if InstListL == []:   
+        return ['shorthelp'] 
+    else:
+        return InstListL
+
 def getDictFromInfoFile(infoFileName,noCalFlag=None):
     infoDict={}
     newTable=pd.read_table(infoFileName, delim_whitespace=True, index_col=0)
