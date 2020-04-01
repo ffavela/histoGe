@@ -113,6 +113,8 @@ def statsFun(ListOpt):
             if "theRebinedList" not in FileDict:
                 FileDict["theRebinedList"]=getRebinedList(FileDict["theList"],rebinNum)
                 myDataList = FileDict["theRebinedList"]
+                myDataList[0] = list(myDataList[0])
+                myDataList[1] = list(myDataList[1])
                                
     else:
         print("There was no rebin option detected, the rebin option is --rebin")
@@ -179,6 +181,6 @@ def statsFun(ListOpt):
     # plt.yscale('log', nonposy='clip')
     #print("exposure time = ", FileDict["expoTime"])
     
-    complexPlot(FileDict,idxPairL,fittingDict,AnnotateArg,logFlag=logFlag,noCalFlag=noCalFlag,Show=not(noPlotFlag),FitCurve=True)
+    complexPlot(FileDict,idxPairL,fittingDict,AnnotateArg,logFlag=logFlag,noCalFlag=noCalFlag,Show=not(noPlotFlag),FitCurve=True, rebinFlag=rebinFlag)
 
     return 0
