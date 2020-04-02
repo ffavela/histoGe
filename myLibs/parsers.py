@@ -14,8 +14,8 @@ from myLibs.fitting import myLine,getTentParams
 MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q','--query'],'test':['-t','--test'],\
         'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e'],\
         'parent':['--parent','-p'],'normint':['--normInt','-n']}
-SubOptD = {'help':[],'autoPeak':['--rebin','--wif','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
-        'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log', "--rebin"],'energy':['--all','--wof'],'parent':[],\
+SubOptD = {'help':[],'autoPeak':['--rebin','--wof','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
+        'rank':['--wof',"--op1",'--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log', "--rebin"],'energy':['--all','--wof'],'parent':[],\
             'normint':[]}
     #NumArgD = {'help':[0],'autoPeak':[1],'query':[1],'test':[0],'isotope':[2],'sum':['--noCal','noPlot','wof'],\
     #    'rank':['--noCal','noPlot','wof'],'sub':['--noCal','noPlot','wof'],'stats':[],'energy':[]}

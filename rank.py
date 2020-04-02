@@ -37,7 +37,13 @@ def rankFun(ListOpt):
         List.remove('--all')
     else:
         allFlag = False
-
+#####    
+    if '--op1' in List:
+        op1Flag = True
+        List.remove('--op1')
+    else:
+        op1Flag = False
+#####
     if len(List) == 0:
         print("error: --energyRanges option needs an argument")
         return 0
@@ -53,7 +59,16 @@ def rankFun(ListOpt):
     
     idxPairL = []
     for DictEle in infoDict.values():
-        idxPairL.append([DictEle['start'],DictEle['end']])
+        ####
+        if op1Flag:
+            deltaEle = (DictEle['end']-DictEle['start'])*.2 #peak +/- % of the infoFile range
+            meanEle = (DictEle['start']+DictEle['end'])/2
+            DictEle['start'] = meanEle - deltaEle
+            DictEle['end'] = meanEle + deltaEle
+            idxPairL.append([DictEle['start'],DictEle['end']])
+        else:
+            idxPairL.append([DictEle['start'],DictEle['end']])
+        ####
     #Energy range of the histogram
     
     DBInfoL = []

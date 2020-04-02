@@ -118,11 +118,11 @@ def autoPeakFun(Command):
     #     List.remove('--wof')
     # else:
     #     wofFlag = False
-    if '--wif' in List:
-        wifFlag = True
-        List.remove('--wif')
+    if '--wof' in List:
+        wofFlag = True
+        List.remove('--wof')
     else:
-        wifFlag = False
+        wofFlag = False
     if '--log' in List:
         logFlag = True
         List.remove('--log')
@@ -205,7 +205,7 @@ def autoPeakFun(Command):
                 iEner = energyArr[start]
                 fEner = energyArr[end]
                 Ranges.append([iEner,fEner])
-        if wifFlag:              
+        if wofFlag:              
             myInfofile=open( myFilename+'.info','w')
             pd.set_option('display.max_rows', len(Ranges))
             df = pd.DataFrame(list(Ranges),columns=['start','end'])
