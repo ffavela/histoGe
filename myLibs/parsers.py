@@ -15,10 +15,8 @@ MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q',
         'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e'],\
         'parent':['--parent','-p'],'normint':['--normInt','-n']}
 SubOptD = {'help':[],'autoPeak':['--rebin','--wof','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
-        'rank':['--wof',"--op1",'--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log', "--rebin"],'energy':['--all','--wof'],'parent':[],\
+        'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log'],'energy':['--all','--wof'],'parent':[],\
             'normint':[]}
-    #NumArgD = {'help':[0],'autoPeak':[1],'query':[1],'test':[0],'isotope':[2],'sum':['--noCal','noPlot','wof'],\
-    #    'rank':['--noCal','noPlot','wof'],'sub':['--noCal','noPlot','wof'],'stats':[],'energy':[]}
 
 
 def isValidSpecFile(strVal):
@@ -215,6 +213,70 @@ def CommandParser(lista):
         return ['shorthelp'] 
 
     return InstList
+
+
+def MultiCommandParser(lista):
+    SeparatorChars = ['&',';','!']
+    argvcp = lista.copy()
+    argvcp.pop(0)
+    CommandL = []
+    CommandLL = []
+
+    for ps,argu in enumerate(argvcp):
+        if (argu in SeparatorChars):
+            CommandLL.append(CommandL)
+            CommandL = []
+        elif (argu[-1] in SeparatorChars):
+            CommandL.append(argu[:-1])
+            CommandLL.append(CommandL)
+            CommandL = []
+        
+        elif ps == len(argvcp) - 1:
+            if argu not in SeparatorChars:
+                CommandL.append(argu)
+                CommandLL.append(CommandL)
+                CommandL = []
+            else:
+                CommandLL.append(CommandL)
+
+        else:
+            CommandL.append(argu)
+
+    InstListL = []
+    for Command in CommandLL:
+        FileList = []
+        InstList = []
+        NumList = []
+        NameList = []
+        if len(Command) != 0:
+            for MainOpt in MainOptD:
+                for arg in Command:
+                    if arg in MainOptD[MainOpt]:
+                        InstList.append([arg])
+                        for arg2 in Command:
+                            if arg2 in SubOptD[MainOpt]:
+                                InstList[-1].append(arg2)
+                            elif isValidSpecFile(arg2):
+                                FileList.append(arg2)
+                            else:
+                                try:
+                                    float(arg)
+                                    NumList.append(arg2)
+                                except ValueError:
+                                    if arg2[0] != '-':
+                                        NameList.append(arg2)
+
+            if len(InstList) > 0:
+                InstList[-1].extend(FileList)
+                InstList[-1].extend(NumList)
+                InstList[-1].extend(NameList)
+            else:
+                InstList = [Command.copy()]
+            InstListL.append(InstList[-1]) 
+    if InstListL == []:   
+        return ['shorthelp'] 
+    else:
+        return InstListL
 
 def getDictFromInfoFile(infoFileName,noCalFlag=None):
     infoDict={}
