@@ -61,7 +61,7 @@ def rankFun(ListOpt):
     for DictEle in infoDict.values():
         ####
         if op1Flag:
-            deltaEle = (DictEle['end']-DictEle['start'])*.2 #peak +/- % of the infoFile range
+            deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
             meanEle = (DictEle['start']+DictEle['end'])/2
             DictEle['start'] = meanEle - deltaEle
             DictEle['end'] = meanEle + deltaEle

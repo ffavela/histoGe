@@ -184,14 +184,20 @@ def autoPeakFun(Command):
                 idxPairL = peakRangeFinder(myDataList)
                 energyArr = myDataList[0]
                 Ranges=[]
-                if noCalFlag == False:
-                    for idxR in idxPairL:
-                        start,end = idxR
-                        iEner = energyArr[start]
-                        fEner = energyArr[end]
-                        Ranges.append([iEner,fEner])
-                else:
-                    Ranges = idxPairL
+                for idxR in idxPairL:
+                    start,end = idxR
+                    iEner = energyArr[start]
+                    fEner = energyArr[end]
+                    Ranges.append([iEner,fEner])
+                    
+                # if noCalFlag == False:
+                #     for idxR in idxPairL:
+                #         start,end = idxR
+                #         iEner = energyArr[start]
+                #         fEner = energyArr[end]
+                #         Ranges.append([iEner,fEner])
+                # else:
+                #     Ranges = idxPairL
                 
         else:
             print("There was no rebin option detected, the rebin option is --rebin")
