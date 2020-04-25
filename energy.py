@@ -49,7 +49,7 @@ def energyFun(ListOpt):
         print("error: %s needs a .info extension" % (infoFile))
         return False
     infoDict=getDictFromInfoFile(infoFile)
-    
+    del infoDict['Range']
     idxPairL = []
     for DictEle in infoDict.values():
         idxPairL.append([DictEle['start'],DictEle['end']])

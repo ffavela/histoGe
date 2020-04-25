@@ -19,7 +19,7 @@ from myLibs.parsers import functionDict, getDictFromSPE, getDictFromMCA, getDict
 #from myLibs.autoPeakFunk import *
 #from myLibs.QueryDB import *
 from myLibs.plotting import complexPlot
-from myLibs.miscellaneus import getRebinedList
+from myLibs.miscellaneus import getRebinedList,findminPos
 from scipy.signal import savgol_filter
 
 def isFloat(myStr):
@@ -118,11 +118,11 @@ def autoPeakFun(Command):
     #     List.remove('--wof')
     # else:
     #     wofFlag = False
-    if '--wif' in List:
-        wifFlag = True
-        List.remove('--wif')
+    if '--wof' in List:
+        wofFlag = True
+        List.remove('--wof')
     else:
-        wifFlag = False
+        wofFlag = False
     if '--log' in List:
         logFlag = True
         List.remove('--log')
@@ -205,15 +205,18 @@ def autoPeakFun(Command):
                 iEner = energyArr[start]
                 fEner = energyArr[end]
                 Ranges.append([iEner,fEner])
-        if wifFlag:              
-            myInfofile=open( myFilename+'.info','w')
+        if wofFlag:              
+            minX = findminPos(myDataList[0])
+            maxX = max(myDataList[0])
+            myInfofile=open(myFilename+'.info','w')
+            RangeStr = '#SPECRANGE: ' + str(minX) + ',' + str(maxX) + '\n' 
             pd.set_option('display.max_rows', len(Ranges))
             df = pd.DataFrame(list(Ranges),columns=['start','end'])
-            myInfofile.write(df.to_string())
+            myInfofile.write(RangeStr + df.to_string())
             myInfofile.close()
             print('\n'+myFilename+'.info was created\n')
             print('\n-----------------------------------\nThe information of the .info file is the next:\n')
-            print(df.to_string())
+            print(RangeStr + df.to_string())
 
         else:
             df = pd.DataFrame(list(Ranges),columns=['start','end'])

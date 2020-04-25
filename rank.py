@@ -50,7 +50,10 @@ def rankFun(ListOpt):
         print("error: %s needs a .info extension" % (infoFile))
         return 101
     infoDict=getDictFromInfoFile(infoFile)
-    
+    minRange = infoDict['Range']['start']
+    maxRange = infoDict['Range']['end']
+    del infoDict['Range']
+
     idxPairL = []
     for DictEle in infoDict.values():
         idxPairL.append([DictEle['start'],DictEle['end']])
@@ -69,12 +72,18 @@ def rankFun(ListOpt):
     #tMinE,tMaxE = infoDict['theList'][0],infoDict['theList'][-1]
     tMinEL = []
     tMaxEL = []
-    for infoPair in infoDict.values():
-        tMinEL.append(infoPair['start'])
-        tMaxEL.append(infoPair['end'])
-    tMinE = min(tMinEL)
-    tMaxE = max(tMaxEL)
     
+    if True:
+        for infoPair in infoDict.values():
+            tMinEL.append(infoPair['start'])
+            tMaxEL.append(infoPair['end'])
+        tMinE = min(tMinEL)
+        tMaxE = max(tMaxEL)
+    else:
+        tMinE = minRange
+        tMaxE = maxRange
+
+
     for idxR in idxPairL:
         iEner = idxR[0]
         fEner = idxR[1]
