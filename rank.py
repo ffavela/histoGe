@@ -37,7 +37,13 @@ def rankFun(ListOpt):
         List.remove('--all')
     else:
         allFlag = False
-
+#####    
+    if '--op1' in List:
+        op1Flag = True
+        List.remove('--op1')
+    else:
+        op1Flag = False
+#####
     if len(List) == 0:
         print("error: --energyRanges option needs an argument")
         return 0
@@ -56,7 +62,16 @@ def rankFun(ListOpt):
 
     idxPairL = []
     for DictEle in infoDict.values():
-        idxPairL.append([DictEle['start'],DictEle['end']])
+        ####
+        if op1Flag:
+            deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
+            meanEle = (DictEle['start']+DictEle['end'])/2
+            DictEle['start'] = meanEle - deltaEle
+            DictEle['end'] = meanEle + deltaEle
+            idxPairL.append([DictEle['start'],DictEle['end']])
+        else:
+            idxPairL.append([DictEle['start'],DictEle['end']])
+        ####
     #Energy range of the histogram
     
     DBInfoL = []
@@ -131,7 +146,7 @@ def rankFun(ListOpt):
             iso = pInfo[0]
             Ele = DBInfoD[iso]
             Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
-            Ig.append(round(Ele[3],2))#+' ('+str(Ele[4])+')')
+            Ig.append(round(Ele[3],2))#+' ('+str(Ele[4])+')') #Normalized Intensity
             Decay.append(Ele[5])
             #Half.append(str(Ele[6])+' '+Ele[7]+' ('+str(Ele[8])+')')
             x=halfLifeUnit(Ele)
@@ -148,12 +163,11 @@ def rankFun(ListOpt):
         if allFlag:
             pd.set_option('display.max_rows', None) #imprime todas las filas
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3)),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3'])#crea  la tabla
-            print(df.sort_values(by=['Rank2'], ascending=False))
+            print(df)#.sort_values(by=['Rank2'], ascending=False))
         else:
             pd.set_option('display.max_rows', len(Ele))
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2','Rank3'])#crea  la tabla
-            print('try to index\n')
-            print(df.head(10).sort_values(by=['Rank2'], ascending=False)) #print('\nOnly the first 10')
+            print(df.head(10))#.sort_values(by=['Rank2'], ascending=False)) #print('\nOnly the first 10')
             
             
 

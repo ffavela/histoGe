@@ -25,6 +25,7 @@ from myLibs.parsers import getDictFromInfoFile,getDictFromMCA,getDictFromSPE,get
 from myLibs.fitting import doFittingStuff,gaus
 from myLibs.gilmoreStats import doGilmoreStuff,doOutputFile
 from myLibs.plotting import complexPlot
+from myLibs.miscellaneus import getRebinedList
 
 def statsFun(ListOpt):
     List = ListOpt.copy()
@@ -52,6 +53,24 @@ def statsFun(ListOpt):
         List.remove('--log')
     else:
         logFlag = False
+
+    if '--rebin' in List:
+        rebinFlag = True
+        List.remove('--rebin')
+        rebinNum = None
+        for Arg in List:
+            try:
+                rebinNum = int(Arg)
+                List.remove(Arg)
+                break
+            except:
+                continue
+
+        # if rebinNum == None and :
+        #     return 120
+
+    else:
+        rebinFlag = False
 
     #infoFile=List[0]
     
@@ -82,8 +101,27 @@ def statsFun(ListOpt):
         FileDict = functionDict[FileExt](FileName,False)
     else:
         FileDict = functionDict[FileExt](FileName)
-        
-    myDataList = FileDict['theList']
+
+    #####
+    if rebinFlag:
+            
+            if isinstance(rebinNum, int) == False:
+                rebinNum=5
+                print("There was no rebin integer detected, the default rebin value used was 5")
+                
+
+            if "theRebinedList" not in FileDict:
+                FileDict["theRebinedList"]=getRebinedList(FileDict["theList"],rebinNum)
+                myDataList = FileDict["theRebinedList"]
+                myDataList[0] = list(myDataList[0])
+                myDataList[1] = list(myDataList[1])
+                               
+    else:
+        print("There was no rebin option detected, the rebin option is --rebin")
+        myDataList = FileDict['theList']
+    
+    #####
+    
 
     print("")
     print("Gilmore statistics\n[variables in counts]")
@@ -143,6 +181,6 @@ def statsFun(ListOpt):
     # plt.yscale('log', nonposy='clip')
     #print("exposure time = ", FileDict["expoTime"])
     
-    complexPlot(FileDict,idxPairL,fittingDict,AnnotateArg,logFlag=logFlag,noCalFlag=noCalFlag,Show=not(noPlotFlag),FitCurve=True)
+    complexPlot(FileDict,idxPairL,fittingDict,AnnotateArg,logFlag=logFlag,noCalFlag=noCalFlag,Show=not(noPlotFlag),FitCurve=True, rebinFlag=rebinFlag)
 
     return 0

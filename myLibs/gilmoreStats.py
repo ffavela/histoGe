@@ -92,8 +92,6 @@ def doGilmoreStuff(infoDict,myDataList):
         #print(lowXVal, uppXVal)
         #print(e)
         
-        
-
         #print(getIdxRangeVals(myDataList,lowXVal,uppXVal))
         minX,maxX=getIdxRangeVals(myDataList,lowXVal,uppXVal)
         max_value = max(yVals[minX:maxX])

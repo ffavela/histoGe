@@ -35,6 +35,9 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
     else:
         mySpecialList = mySpecialDict['theList']
 
+    if noCalFlag:
+        mySpecialDict['calBoolean'] = True
+
     if mySpecialDict['calBoolean']:
         idxPairLAux = []
         for idx in idxPairL:
@@ -81,7 +84,7 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
                 start = mySpecialList[0].index(iPV[0])
                 end = mySpecialList[0].index(iPV[1])
             else:
-                start, end = iPV
+                start, end = indexiPV
             xVals = mySpecialList[0][start:end+1]    
             yVals = mySpecialList[1][start:end+1]    
             NoneFlag = all([ps != None for ps in gd])
@@ -105,7 +108,9 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
             else:
                 plt.annotate(e, xy=[peakXVals,peakYVals])
     except:
-        print('ERROR: Unexpected error during plotting. ')
+        print('\n ERROR: Unexpected error during plotting. ')
+        if mySpecialDict['calBoolean'] == False:
+            print('\n The File is not calibrated, remember use --noCal options in non calibrated files')
         return 300
 
     if Show:
