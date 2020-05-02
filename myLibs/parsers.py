@@ -449,7 +449,7 @@ def getDictFromGammaVisionAdv(gvFilename, calFlag=True):
         internDict["expoTime"]=float(internDict[tStr])
     return internDict
 
-def getDictFromHGE(myFilename):
+def getDictFromHGE(myFilename,calFlag=True):
     try:
         FileObj = open(myFilename,'r')
     except:
@@ -457,25 +457,26 @@ def getDictFromHGE(myFilename):
     else:
         FileLines = FileObj.readlines()
         FileObj.close()
-        hgeDict = {'DATE':[],'EQUIPMENT':[],'EXPOSURETIME':[],'CALIBRATION':[],'CHANNELS':[],'GAIN':[],'CALIBRATIONPOINTS':[],'DATA':[],'REBINNEDDATA':[],'REBINFACTOR':[]}
+        hgeDict = {'DATE':[],'EQUIPMENT':[],'EXPOSURETIME':[],'CALIBRATION':[],'CHANNELS':[],'GAIN':[],'CALIBRATIONPOINTS':[],'DATA':[],'REBINEDDATA':[],'REBINFACTOR':[]}
         DATAflag = False
         RebinDATAflag = False
-        AuxListData = []
+        AuxListXData = []
+        AuxListYData = []
         for Line in FileLines:
             if Line[0] != '#':
                 if 'DATE' in Line:
                     Idx = Line.find(':')
                     Idx += 2
                     try:
-                        hgeDict['DATE'] = Line[Idx:]
+                        hgeDict['DATE'] = Line[Idx:-1]
                     except:
-                        hgeDict['DATE'] = 'Not Availabe'
+                        hgeDict['DATE'] = 'Not Available'
 
                 elif 'EQUIPMENT' in Line:
                     Idx = Line.find(':')
                     Idx += 2
                     try:
-                        hgeDict['EQUIPMENT'] = Line[Idx:]
+                        hgeDict['EQUIPMENT'] = Line[Idx:-1]
                     except:
                         hgeDict['EQUIPMENT'] = 'Not Availabe'
 
@@ -483,7 +484,7 @@ def getDictFromHGE(myFilename):
                     Idx = Line.find(':')
                     Idx += 2
                     try:
-                        hgeDict['EXPOSURETIME'] = Line[Idx:]
+                        hgeDict['EXPOSURETIME'] = float(Line[Idx:-1])
                     except:
                         hgeDict['EXPOSURETIME'] = 'Not Availabe'
 
@@ -491,7 +492,7 @@ def getDictFromHGE(myFilename):
                     Idx = Line.find(':')
                     Idx += 2
                     try:
-                        hgeDict['CALIBRATION'] = bool(Line[Idx:])
+                        hgeDict['CALIBRATION'] = bool(Line[Idx:-1])
                     except:
                         hgeDict['CALIBRATION'] = 'Not Availabe'
 
@@ -499,48 +500,63 @@ def getDictFromHGE(myFilename):
                     Idx = Line.find(':')
                     Idx += 2
                     try:
-                        hgeDict['EXPOSURETIME'] = Line[Idx:]
+                        hgeDict['CHANNELS'] = int(Line[Idx:-1])
                     except:
-                        hgeDict['EXPOSURETIME'] = 'Not Availabe'
+                        hgeDict['CHANNELS'] = 'Not Available'
+
                 elif 'GAIN' in Line:
                     Idx = Line.find(':')
                     Idx += 2
                     try:
-                        hgeDict['EXPOSURETIME'] = Line[Idx:]
+                        hgeDict['GAIN'] = float(Line[Idx:-1])
                     except:
-                        hgeDict['EXPOSURETIME'] = 'Not Availabe'
+                        hgeDict['GAIN'] = 'Not Available'
                 elif 'CALIBRATIONPOINTS' in Line:
                     Idx = Line.find(':')
                     Idx += 2
                     try:
-                        hgeDict['EXPOSURETIME'] = Line[Idx:]
+                        hgeDict['CALIBRATIONPOINTS'] = Line[Idx:-1]
                     except:
-                        hgeDict['EXPOSURETIME'] = 'Not Availabe'
-                elif 'DATA' in Line or DATAflag:
+                        hgeDict['CALIBRATIONPOINTS'] = 'Not Available'
+                elif (Line[:-1] == 'DATA' or DATAflag) and 'ENDDATA' not in Line:
                     if DATAflag == False:
                         DATAflag = True
                     elif DATAflag == True:
-                        List = Line.split(',')
-                        AuxListData.append(List[1:2])
-                    elif 'ENDDATA' in Line:
-                        DATAflag = False
-                        hgeDict['DATA'] = AuxListData
-                elif 'REBINNEDDATA' in Line or RebinDATAflag:
+                        ListStr = Line[:-1].split(',')
+                        List = [float(ele) for ele in ListStr]
+                        AuxListXData.append(List[1])
+                        AuxListYData.append(List[2])
+                elif 'ENDDATA' in Line:
+                    DATAflag = False
+                    hgeDict['DATA'] = [AuxListXData,AuxListYData]
+                    AuxListXData = []
+                    AuxListYData = []
+                    if not hgeDict['CHANNELS'] or hgeDict['CHANNELS'] == 'Not Available':
+                        hgeDict['CHANNELS'] = len(hgeDict['DATA'])
+                elif ('REBINEDDATA' in Line or RebinDATAflag) and 'ENDREBINEDDATA' not in Line:
                     if rebinDATAflag == False:
                         rebinDATAflag = True
                     elif rebinDATAflag == True:
-                        List = Line.split(',')
-                        AuxListData.append(List[1:2])
-                    elif 'ENDREBINEDDATA' in Line:
-                        DATAflag = False
-                        hgeDict['REBINEDDATA'] = AuxListData
+                        ListStr = Line[:-1].split(',')
+                        List = [float(ele) for ele in ListStr]
+                        AuxListXData.append(List[1])
+                        AuxListYData.append(List[2])
+                elif 'ENDREBINEDDATA' in Line:
+                    rebinDATAflag = False
+                    hgeDict['REBINEDDATA'] = [AuxListXData,AuxListYData]
                 elif 'REBINFACTOR' in Line:
                     try:
                         hgeDict['REBINFACTOR'] = int(Line.strip('REBINFACTOR: '))
                     except:
                         hgeDict['REBINFACTOR'] = 'Not Available'
-                          
-    return 0
+
+    hgeDict['theList'] = hgeDict['DATA']
+    if hgeDict['REBINEDDATA']:
+        hgeDict['theRebinedList'] = hgeDict['REBINEDDATA']
+    hgeDict['noCalFlag'] = not hgeDict['CALIBRATION']
+    hgeDict['calBoolean'] = hgeDict['CALIBRATION'] 
+    hgeDict["expoTime"] = hgeDict['EXPOSURETIME']
+    return hgeDict
 
 functionDict = {"SPE": getDictFromSPE,"mca": getDictFromMCA,"Txt": getDictFromGammaVision,"info":getDictFromInfoFile}
 

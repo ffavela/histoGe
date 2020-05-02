@@ -13,7 +13,7 @@ import math
 #import keyboard
 
 # mainPath=sys.path[0] # sources dir
-from myLibs.parsers import functionDict, getDictFromSPE, getDictFromMCA, getDictFromGammaVision,isValidSpecFile
+from myLibs.parsers import functionDictAdv, getDictFromSPE, getDictFromMCA, getDictFromGammaVision,isValidSpecFile
 #from myLibs.gilmoreStats import *
 #from myLibs.fitting import *
 #from myLibs.autoPeakFunk import *
@@ -163,7 +163,7 @@ def autoPeakFun(Command):
             return 120
 
         
-        mySpecialDict = functionDict[myExtension](myFilename,noCalFlag) #fill de dictionary
+        mySpecialDict = functionDictAdv[myExtension](myFilename,noCalFlag) #fill de dictionary
                                                                    #from data file
         
         if (noCalFlag == False) and (mySpecialDict["noCalFlag"] == True):
