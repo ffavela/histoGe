@@ -21,7 +21,7 @@ from matplotlib import pyplot as plt
 #from myLibs.QueryDB import *
 #from myLibs.plotting import *
 
-from myLibs.parsers import getDictFromInfoFile,getDictFromMCA,getDictFromSPE,getDictFromGammaVision,functionDict,isValidSpecFile
+from myLibs.parsers import getDictFromInfoFile,getDictFromMCA,getDictFromSPE,getDictFromGammaVision,functionDictAdv,isValidSpecFile
 from myLibs.fitting import doFittingStuff,gaus
 from myLibs.gilmoreStats import doGilmoreStuff,doOutputFile
 from myLibs.plotting import complexPlot
@@ -98,9 +98,9 @@ def statsFun(ListOpt):
     infoDict=getDictFromInfoFile(infoFile)
     del infoDict['Range']
     if noCalFlag:
-        FileDict = functionDict[FileExt](FileName,False)
+        FileDict = functionDictAdv[FileExt](FileName,False)
     else:
-        FileDict = functionDict[FileExt](FileName)
+        FileDict = functionDictAdv[FileExt](FileName)
 
     #####
     if rebinFlag:
