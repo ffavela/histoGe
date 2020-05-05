@@ -38,6 +38,7 @@ from noOption import noOption
 from isoparent import Parent
 from normintensity import NormIntensity
 from DataFile2hgeFile import DataFile2hgeFile
+from efficiency import efficencyFun
 
 def main(argv): 
 
@@ -144,6 +145,15 @@ def main(argv):
             if  ps == lenCommands:
                 return exitcode
 
+        elif Command[0] in MainOptD['efficiency']:
+            pid = TryFork()
+            if pid == 0:
+                exitcode = efficencyFun(Command)
+            else:
+                exitcode = 0
+            if  ps == lenCommands:
+                return exitcode
+        
         else:
             pid = TryFork()
             if pid == 0:
