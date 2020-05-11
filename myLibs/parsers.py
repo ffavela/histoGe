@@ -14,10 +14,10 @@ from myLibs.miscellaneus import List2str
 
 MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q','--query'],'test':['-t','--test'],\
         'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e'],\
-        'parent':['--parent','-p'],'normint':['--normInt','-n'],'2file':['--hge','-f'], 'efficiency':['--eff','-e']}
+        'parent':['--parent','-p'],'normint':['--normInt','-n'],'2file':['--hge','-f'], 'efficiency':['--eff','-e'],'rankAdv':['-RA','--RankAdv','--rankAdv']}
 SubOptD = {'help':[],'autoPeak':['--rebin','--wof','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
         'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log'],'energy':['--all','--wof'],'parent':[],\
-            'normint':[],'2file':[],'efficiency':['--Plot','--plot']}
+            'normint':[],'2file':[],'efficiency':['--Plot','--plot'],'rankAdv':['--wof','--all','--filter']}
 
 def isValidSpectrumFile(strVal):
     if strVal.endswith('.Txt') or strVal.endswith('.SPE') or strVal.endswith('.mca') or strVal.endswith('.hge'):
@@ -33,8 +33,9 @@ def isValidSpecFile(strVal):
         return True
     return False
 
-def getDictFromSPE(speFile,calFlag=True):
+def getDictFromSPE(speFile,nocalFlag=False):
     """Parses the .SPE file format that is used in Boulby"""
+    calFlag = not nocalFlag
     internDict = {}
     #myCounter=0
     _,bCoef,_=[0.0,0.0,0.0]
@@ -156,7 +157,7 @@ def getDictFromMCA(mcaFilename,noCalFlag=False):
 
     return internDict
 
-def getDictFromGammaVision(gvFilename, calFlag=True):
+def getDictFromGammaVision(gvFilename,nocalFlag=True):
     """Parses the .Txt files from gammaVision"""
     internDict = {}
     gvList=[]
@@ -298,8 +299,9 @@ def getDictFromInfoFile(infoFileName,noCalFlag=None):
     return infoDict
 
 
-def getDictFromSPEAdv(speFile,calFlag=True):
+def getDictFromSPEAdv(speFile, nocalFlag=False):
     """Parses the .SPE file format that is used in Boulby"""
+    calFlag = not nocalFlag
     internDict = {}
     #myCounter=0
     _,bCoef,_=[0.0,0.0,0.0]
@@ -557,6 +559,34 @@ def getDictFromHGE(myFilename,calFlag=True):
     hgeDict['calBoolean'] = hgeDict['CALIBRATION'] 
     hgeDict["expoTime"] = hgeDict['EXPOSURETIME']
     return hgeDict
+
+def getMyFileDictRankAdv(myArg):  #check if is a valid 
+    myFileDict={}
+    myFileDict['specFiles']=[]
+    for Arg in myArg:    
+        
+        if isValidSpecFile(Arg):
+            if not Arg.endswith('.info'):
+                myFileDict['specFiles'].append(Arg)
+       
+    return myFileDict
+
+def getMyFileDict(myArg):  #check if is a valid 
+    myFileDict={}
+    myFileDict['specFiles']=[]
+    
+    #tmpOpt=''
+    for i in range(len(myArg)):
+        e=myArg[i]
+        # if e.endswith('.Txt') or e.endswith('.SPE') or e.endswith('.mca'):
+        if isValidSpecFile(e):
+            myFileDict['specFiles'].append(e)
+
+        if e.endswith('.info'):
+            print("\n Error: The argument is an Info File. \n --autoPeak option needs an spectrum file to generates the ranges\n")
+       
+    return myFileDict
+
 
 functionDict = {"SPE": getDictFromSPE,"mca": getDictFromMCA,"Txt": getDictFromGammaVision,"info":getDictFromInfoFile}
 

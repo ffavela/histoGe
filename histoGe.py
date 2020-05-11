@@ -39,6 +39,7 @@ from isoparent import Parent
 from normintensity import NormIntensity
 from DataFile2hgeFile import DataFile2hgeFile
 from efficiency import efficencyFun
+from rankAdv import rankAdvFun
 
 def main(argv): 
 
@@ -154,6 +155,10 @@ def main(argv):
             if  ps == lenCommands:
                 return exitcode
         
+        elif Command[0] in MainOptD['rankAdv']:
+            exitcode = rankAdvFun(Command)
+            return exitcode
+
         else:
             pid = TryFork()
             if pid == 0:

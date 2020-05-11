@@ -13,7 +13,7 @@ import math
 #import keyboard
 
 # mainPath=sys.path[0] # sources dir
-from myLibs.parsers import functionDictAdv, getDictFromSPE, getDictFromMCA, getDictFromGammaVision,isValidSpecFile
+from myLibs.parsers import functionDictAdv, getDictFromSPE, getDictFromMCA, getDictFromGammaVision,isValidSpecFile, getMyFileDict
 #from myLibs.gilmoreStats import *
 #from myLibs.fitting import *
 #from myLibs.autoPeakFunk import *
@@ -29,21 +29,6 @@ def isFloat(myStr):
         return False
     return True
 
-def getMyFileDict(myArg):  #check if is a valid 
-    myFileDict={}
-    myFileDict['specFiles']=[]
-    
-    #tmpOpt=''
-    for i in range(len(myArg)):
-        e=myArg[i]
-        # if e.endswith('.Txt') or e.endswith('.SPE') or e.endswith('.mca'):
-        if isValidSpecFile(e):
-            myFileDict['specFiles'].append(e)
-
-        if e.endswith('.info'):
-            print("\n Error: The argument is an Info File. \n --autoPeak option needs an spectrum file to generates the ranges\n")
-       
-    return myFileDict
 
 def peakRangeFinder(theList):
     energy,counts=theList

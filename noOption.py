@@ -58,9 +58,9 @@ def noOption(ListOpt):
                     myExtension = myFilename.split(".")[-1]
                     mySubsDict = functionDictAdv[myExtension](myFilename)
                     if not noCalFlag and mySubsDict['calBoolean']:
-                        mySubsDict = functionDictAdv[myExtension](myFilename,calFlag=False)
+                        mySubsDict = functionDictAdv[myExtension](myFilename,noCalFlag=False)
                     else:
-                        mySubsDict = functionDictAdv[myExtension](myFilename,calFlag=True)
+                        mySubsDict = functionDictAdv[myExtension](myFilename,noCalFlag=True)
                     mySubsList = mySubsDict["theList"]
                     plotFlag = True
                     simplePlot(mySubsList,logFlag,mySubsDict['calBoolean'],Label=None,show=False,Title=None)

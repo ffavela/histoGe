@@ -123,6 +123,15 @@ def rankFun(ListOpt):
                     isoCountD[iso] = [0,nInRange,0]
                 isoCountD[iso][0] += 1
         isoPeakLL.append(isoPeakL)
+    
+    IgRDict = {}
+    for DBInfo in DBInfoL:
+        for Ele in DBInfo:
+            iso = Ele[-1]
+            if iso not in IgRDict:
+                IgRDict[iso] = Ele[10]
+            else:
+                IgRDict[iso] += Ele[10] 
 
     for isoLL in isoPeakLL:
         for isoL in isoLL:
@@ -131,6 +140,7 @@ def rankFun(ListOpt):
             isoL[1] = isoC
             isoL[2] = isoC/isoCountD[iso][1]
             isoCountD[iso][2] += isoL[-1]
+            isoL[3] = IgRDict[iso]
 
         isoLL.sort(key = lambda x: x[3],reverse = True)
     

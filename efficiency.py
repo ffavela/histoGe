@@ -40,7 +40,7 @@ def efficencyFun(Command):
             Fun1Coeff = curve_fit(Fun1,Effenernp,Effnp,absolute_sigma=True,bounds=([-np.inf,-np.inf,-np.inf,-np.inf],[np.inf,np.inf,np.inf,np.inf]))
             R2Fun1Coeff = R2Fun1(Effenernp,Effnp,Fun1Coeff[0])
             LinearCoeff = curve_fit(LinearFun,Effenernp,Effnp,absolute_sigma=True)
-            R2LinearCoeff = R2LinearFun(Effenernp,Effnp,LinearCoeff[0])
+            R2LinearCoeff = R2LinearFun(Effenernp,Effnp,LinearCoeff[0]) 
                 
     if PlotFlag:
         XPoly = np.linspace(min(Effenernp),max(Effenernp),num=len(Effenernp)*50)
@@ -61,11 +61,11 @@ def efficencyFun(Command):
         plt.title('Detector Efficiency')
         plt.legend(loc='upper right')
         if R2max == R2PolyCoeff:
-            textstr = f'Eight grade polynomial.\na1={str(PolyCoeff[0][0])},a2={str(PolyCoeff[0][0])}\na3={str(PolyCoeff[0][0])},a4={str(PolyCoeff[0][0])}\na5={str(PolyCoeff[0][0])},a6={str(PolyCoeff[0][0])}\na7={str(PolyCoeff[0][0])},a8={str(PolyCoeff[0][0])}\n'
+            textstr = f'Eight grade polynomial.\na1={str(PolyCoeff[0][0])},a2={str(PolyCoeff[0][1])}\na3={str(PolyCoeff[0][2])},a4={str(PolyCoeff[0][3])}\na5={str(PolyCoeff[0][4])},a6={str(PolyCoeff[0][5])}\na7={str(PolyCoeff[0][6])},a8={str(PolyCoeff[0][7])}\nR²={str(R2PolyCoeff)}'
         elif R2max == R2Fun1Coeff:
             textstr = f'f(x) = (ax+b)/(x²+cx+d)\na={str(Fun1Coeff[0][0])}\nb={str(Fun1Coeff[0][1])}\nc={str(Fun1Coeff[0][2])}\nd={str(Fun1Coeff[0][3])}\nR²={str(R2Fun1Coeff)}'
         elif R2max == R2LinearCoeff:
-            textstr = f'f(x) = ax+b)\na={str(LinearCoeff[0][0])}\nb={str(LinearCoeff[0][1])}\nR²={str(R2LinearCoeff)}'
+            textstr = f'f(x) = (ax+b)\na={str(LinearCoeff[0][0])}\nb={str(LinearCoeff[0][1])}\nR²={str(R2LinearCoeff)}'
         plt.annotate(textstr,xy=(0, 0.1), xytext=(12, -12),va='bottom',xycoords='axes fraction', textcoords='offset points',fontsize=10)
         plt.show()
         return 0
