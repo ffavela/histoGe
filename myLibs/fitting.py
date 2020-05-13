@@ -83,6 +83,56 @@ def emptyFittingDict(num):
     return fittingDict
 
 
+def Fun1(x,a,b,c,d):
+    #return (a*x + b)*np.tanh(c*x + d) + e
+    #return (-a*x)/(b+c*np.exp(-d*x)) + e
+    return (a*x+b)/(x**2+c*x+d)
+
+
+def R2Fun1(xdata,ydata,Parm):
+    a = Parm[0]
+    b = Parm[1]
+    c = Parm[2]
+    d = Parm[3]
+    residuals = ydata- Fun1(xdata,a,b,c,d)
+    ss_res = np.sum(residuals**2)
+    ss_tot = np.sum((ydata-np.mean(ydata))**2)
+    r_squared = 1 - (ss_res / ss_tot)
+    return r_squared
+
+
+def LinearFun(x,a,b):
+    return a*x+b
+
+def R2LinearFun(xdata,ydata,Parm):
+    a = Parm[0]
+    b = Parm[1]
+    residuals = ydata- LinearFun(xdata,a,b)
+    ss_res = np.sum(residuals**2)
+    ss_tot = np.sum((ydata-np.mean(ydata))**2)
+    r_squared = 1 - (ss_res / ss_tot)
+    return r_squared
+
+def PolyFun(x,a,b,c,d,e,f,g,h,i):
+    return a*x**8+b*x**7+c*x**6+d*x**5+e*x**4+f*x**3+g*x**2+h*x+i
+
+def R2PolyFun(xdata,ydata,Parm):
+    a = Parm[0]
+    b = Parm[1]
+    c = Parm[2]
+    d = Parm[3]
+    e = Parm[4]
+    f = Parm[5]
+    g = Parm[6]
+    h = Parm[7]
+    i = Parm[8]
+    residuals = ydata - PolyFun(xdata,a,b,c,d,e,f,g,h,i)
+    ss_res = np.sum(residuals**2)
+    ss_tot = np.sum((ydata-np.mean(ydata))**2)
+    r_squared = 1 - (ss_res / ss_tot)
+    return r_squared
+
+
 ###Fitting fails often here... don't know why... see histoGe.py where
 ###it is really called ####
 

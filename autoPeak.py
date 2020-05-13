@@ -13,13 +13,13 @@ import math
 #import keyboard
 
 # mainPath=sys.path[0] # sources dir
-from myLibs.parsers import functionDict, getDictFromSPE, getDictFromMCA, getDictFromGammaVision,isValidSpecFile
+from myLibs.parsers import functionDictAdv, getDictFromSPE, getDictFromMCA, getDictFromGammaVision,isValidSpecFile, getMyFileDict
 #from myLibs.gilmoreStats import *
 #from myLibs.fitting import *
 #from myLibs.autoPeakFunk import *
 #from myLibs.QueryDB import *
 from myLibs.plotting import complexPlot
-from myLibs.miscellaneus import getRebinedList
+from myLibs.miscellaneus import getRebinedList,findminPos
 from scipy.signal import savgol_filter
 
 def isFloat(myStr):
@@ -29,21 +29,6 @@ def isFloat(myStr):
         return False
     return True
 
-def getMyFileDict(myArg):  #check if is a valid 
-    myFileDict={}
-    myFileDict['specFiles']=[]
-    
-    #tmpOpt=''
-    for i in range(len(myArg)):
-        e=myArg[i]
-        # if e.endswith('.Txt') or e.endswith('.SPE') or e.endswith('.mca'):
-        if isValidSpecFile(e):
-            myFileDict['specFiles'].append(e)
-
-        if e.endswith('.info'):
-            print("\n Error: The argument is an Info File. \n --autoPeak option needs an spectrum file to generates the ranges\n")
-       
-    return myFileDict
 
 def peakRangeFinder(theList):
     energy,counts=theList
@@ -163,7 +148,7 @@ def autoPeakFun(Command):
             return 120
 
         
-        mySpecialDict = functionDict[myExtension](myFilename,noCalFlag) #fill de dictionary
+        mySpecialDict = functionDictAdv[myExtension](myFilename,noCalFlag) #fill de dictionary
                                                                    #from data file
         
         if (noCalFlag == False) and (mySpecialDict["noCalFlag"] == True):
@@ -212,14 +197,17 @@ def autoPeakFun(Command):
                 fEner = energyArr[end]
                 Ranges.append([iEner,fEner])
         if wofFlag:              
-            myInfofile=open( myFilename+'.info','w')
+            minX = findminPos(myDataList[0])
+            maxX = max(myDataList[0])
+            myInfofile=open(myFilename+'.info','w')
+            RangeStr = '#SPECRANGE: ' + str(minX) + ',' + str(maxX) + '\n' 
             pd.set_option('display.max_rows', len(Ranges))
             df = pd.DataFrame(list(Ranges),columns=['start','end'])
-            myInfofile.write(df.to_string())
+            myInfofile.write(RangeStr + df.to_string())
             myInfofile.close()
             print('\n'+myFilename+'.info was created\n')
             print('\n-----------------------------------\nThe information of the .info file is the next:\n')
-            print(df.to_string())
+            print(RangeStr + df.to_string())
 
         else:
             df = pd.DataFrame(list(Ranges),columns=['start','end'])

@@ -14,7 +14,7 @@ import numpy as np
 
 # mainPath=sys.path[0] # sources dir
 from myLibs.parsers import getDictFromSPE,getDictFromMCA,getDictFromGammaVision,isValidSpecFile,getDictFromInfoFile,functionDict
-from myLibs.miscellaneus import WriteOutputFile
+from myLibs.miscellaneus import WriteOutputFile, WritehgeFile
 from myLibs.plotting import simplePlot
 #from myLibs.gilmoreStats import *
 #from myLibs.fitting import *
@@ -132,14 +132,24 @@ def SumFun(ListOpt):
         if wofFlag:
             myOutFile = myFilename.strip(myFilename.split('/')[-1]) + Title + '.txt'
             try:
-                WriteOutputFile(mySubsDictOut,myOutFile,Title)
+                WritehgeFile(myOutFile,mySubsDictOut)
                 print('-----------------------------------------')
                 print('The file was saved as:')
                 print(myOutFile)
                 print('-----------------------------------------')
-            except IOError:
-                print('An unexpected error ocurred while saving the data to file.')
-                return 44
+            except:
+                try:
+                    WriteOutputFile(mySubsDictOut,myOutFile,Title)
+                    print('-----------------------------------------')
+                    print('The file was saved as:')
+                    print(myOutFile)
+                    print('-----------------------------------------') 
+                except IOError:
+                    print('An unexpected error ocurred while saving the data to file.')
+                    return 44
+                
+                
+                
     else:
         print('ERROR: Not a valid argument in "Sum" function.')
         return 40

@@ -119,6 +119,152 @@ def WriteOutputFileRR(myFilename,df,iEner,fEner):
     File.write(df.to_string()+'\n')
     File.close()
 
+def WritehgeFile(myFilename,myDict):
+    #CategoryList = ['DATE','EQUIPMENT','EXPOSURETIME','CALIBRATION','CHANNELS','GAIN','DATA']
+
+    #------------------------------------------------------------
+    #Write header of .hge file
+    #------------------------------------------------------------
+    FileStr = '#--------------------------------------------------------\n# .hge file format is the stantard type file to be used \n# with histoGe software.\n#--------------------------------------------------------\n'
+    myFilename = myFilename.split('.')[0]
+    #------------------------------------------------------------
+    #Write aquisition parameters of .hge file
+    #------------------------------------------------------------
+    try:
+        DataStr = 'DATE: ' + List2str(myDict['date']) + '\n'
+    except:
+        DataStr = 'DATE: Not Available\n' 
+    finally:
+        FileStr += DataStr
+    
+    try:
+        DataStr = 'EQUIPMENT: ' + List2str(myDict['equipment']) + '\n'   
+    except:
+        DataStr = 'EQUIPMENT: Not Available\n'
+    finally:
+        FileStr += DataStr
+
+    try:
+        DataStr = 'EXPOSURETIME: ' + List2str(myDict['expoTime']) + '\n'
+    except:
+        DataStr = 'EXPOSURETIME: Not Available\n' 
+    finally:        
+        FileStr += DataStr
+
+    try:
+        DataStr = 'CALIBRATION: ' + List2str(myDict['calBoolean']) + '\n'
+    except:
+        DataStr = 'CALIBRATION: Not Available\n' 
+    finally:
+        FileStr += DataStr
+
+    try:
+        DataStr = 'CHANNELS: ' + List2str(myDict['channel']) + '\n'
+    except:
+        DataStr = 'CHANNELS: Not Available\n'
+    finally:
+        FileStr += DataStr
+
+    try:
+        DataStr = 'GAIN: ' + List2str(myDict['gain']) + '\n'
+    except:
+        DataStr = 'GAIN: Not Available\n'
+    finally:
+        FileStr += DataStr
+
+    try:
+        DataStr = 'CALIBRATIONPOINTS: ' + List2str(myDict['calpoints']) + '\n'
+    except:
+        DataStr = 'CALIBRATIONPOINTS: Not Available\n'
+    else:
+        FileStr += DataStr
+
+    try:
+        Data = myDict['theList']
+    except:
+        print('ERROR while loading the data.')
+        FileStr += 'ERROR loading the DATA. This file was generated but it is useless.\nPlease check your original file.'
+        FileObj = open(myFilename + '.bad','w+')
+        FileObj.write(FileStr)
+        FileObj.close()
+        return 1001
+    else:
+        FileStr += 'DATA\n'
+        Count = 1
+        X = Data[0]
+        Y = Data[1]
+        for Xo, Yo in zip(X,Y):
+            DataStr = str(Count)+','+str(Xo)+','+str(Yo)+'\n'
+            FileStr += DataStr
+            Count += 1
+        FileStr += 'ENDDATA'
+    try:
+        Data = myDict['theRebinedList']
+        
+    except:
+        pass
+    else:
+        FileStr += 'REBINNEDDATA\n'
+        Count = 1
+        X = Data[0]
+        Y = Data[1]
+        for Xo, Yo in zip(X,Y):
+            DataStr = str(Count)+','+str(Xo)+','+str(Yo)+'\n'
+            FileStr += DataStr
+            Count += 1
+        FileStr += 'ENDREBINEDDATA'
+        try:
+            RebinFactor = myDict['REBINFACTOR']
+        except:
+            FileStr += 'REBINFACTOR: Not Available'
+        else:
+            try:
+                FileStr += 'REBINFACTOR: ' + int(RebinFactor) + '\n'
+            except:
+                FileStr += 'REBINFACTOR: Lost during saving'
+    #------------------------------------------------------------
+    #Write and close data to .hge file
+    #------------------------------------------------------------
+
+    FileObj = open(myFilename +'.hge','w+')
+    FileObj.write(FileStr)
+    FileObj.close()
+    return 0
+
+def List2str(List):
+    String = ''
+    for idx,ele in enumerate(List):
+        if idx == len(List)-1:
+            String += str(ele) + '\n'
+        else:
+            String += str(ele) + ', '
+    
+    return String
+
+def findminPos(List):
+    flag = False
+    for ele in List:
+        if ele >= 0:
+            flag = True
+            break        
+    if not flag:
+        ele = 0
+    return ele 
+
+def removeDuplicates(listofElements):
+    
+    # Create an empty list to store unique elements
+    uniqueList = []
+    
+    # Iterate over the original list and for each element
+    # add it to uniqueList, if its not already there.
+    for elem in listofElements:
+        if elem not in uniqueList:
+            uniqueList.append(elem)
+    
+    # Return the list of unique elements        
+    return uniqueList
+
 ####### Some basic database values taken from the isonav #######
 ####### Will probably use in the future the whole database #####
 

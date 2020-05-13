@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 
 # mainPath=sys.path[0] # sources dir
 from energy import energyFun
-from myLibs.parsers import isValidSpecFile, functionDict, getDictFromGammaVision,getDictFromMCA,getDictFromSPE
+from myLibs.parsers import isValidSpecFile, functionDictAdv, getDictFromGammaVision,getDictFromMCA,getDictFromSPE
 from myLibs.plotting import simplePlot
 #from myLibs.gilmoreStats import *
 #from myLibs.fitting import *
@@ -56,11 +56,11 @@ def noOption(ListOpt):
                 else:
                     myFilename = arg
                     myExtension = myFilename.split(".")[-1]
-                    mySubsDict = functionDict[myExtension](myFilename)
+                    mySubsDict = functionDictAdv[myExtension](myFilename)
                     if not noCalFlag and mySubsDict['calBoolean']:
-                        mySubsDict = functionDict[myExtension](myFilename,noCalFlag=False)
+                        mySubsDict = functionDictAdv[myExtension](myFilename,noCalFlag=False)
                     else:
-                        mySubsDict = functionDict[myExtension](myFilename,noCalFlag=True)
+                        mySubsDict = functionDictAdv[myExtension](myFilename,noCalFlag=True)
                     mySubsList = mySubsDict["theList"]
                     plotFlag = True
                     simplePlot(mySubsList,logFlag,mySubsDict['calBoolean'],Label=None,show=False,Title=None)

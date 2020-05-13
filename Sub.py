@@ -14,7 +14,7 @@ import os.path
 
 # mainPath=sys.path[0] # sources dir
 from myLibs.parsers import isValidSpecFile,functionDict,getDictFromMCA,getDictFromSPE,getDictFromGammaVision
-from myLibs.miscellaneus import WriteOutputFile
+from myLibs.miscellaneus import WriteOutputFile, WritehgeFile
 from myLibs.plotting import simplePlot
 #from myLibs.gilmoreStats import *
 #from myLibs.fitting import *
@@ -114,13 +114,20 @@ def SubFun(ListOpt):
         simplePlot(subsTractedL,logFlag,noCalFlag,Label=None,show=True,Title=Title)
     if wofFlag:
         try:
-            WriteOutputFile(subsTractedL,myOutFile,Title)
+            WritehgeFile(myOutFile,subsTractedL)
             print('-----------------------------------------')
             print('The file was saved as:')
             print(myOutFile)
             print('-----------------------------------------')
-        except IOError:
-            print('An unexpected error ocurred while saving the data to file.')
-            return 66
-
+        except:
+            try:
+                WriteOutputFile(subsTractedL,myOutFile,Title)
+                print('-----------------------------------------')
+                print('The file was saved as:')
+                print(myOutFile)
+                print('-----------------------------------------')
+            except IOError:
+                print('An unexpected error ocurred while saving the data to file.')
+                return 66
+               
     return 0
