@@ -251,6 +251,20 @@ def findminPos(List):
         ele = 0
     return ele 
 
+def removeDuplicates(listofElements):
+    
+    # Create an empty list to store unique elements
+    uniqueList = []
+    
+    # Iterate over the original list and for each element
+    # add it to uniqueList, if its not already there.
+    for elem in listofElements:
+        if elem not in uniqueList:
+            uniqueList.append(elem)
+    
+    # Return the list of unique elements        
+    return uniqueList
+
 ####### Some basic database values taken from the isonav #######
 ####### Will probably use in the future the whole database #####
 

@@ -16,7 +16,7 @@ from math import sqrt
 
 # mainPath=sys.path[0] # sources dir
 from myLibs.parsers import getDictFromInfoFile, getMyFileDictRankAdv, functionDictAdv
-from myLibs.miscellaneus import getIdxRangeVals
+from myLibs.miscellaneus import getIdxRangeVals, removeDuplicates
 #from myLibs.gilmoreStats import *
 #from myLibs.fitting import *
 #from myLibs.autoPeakFunk import *
@@ -144,7 +144,10 @@ def rankAdvFun(ListOpt):
         DBInfoD = {}
         for e in DBInfo: 
             #Filling dict with isotope name each isotope has only one tupple
-            DBInfoD[e[-1]] = e      
+            if e[-1] not in DBInfoD:
+                DBInfoD[e[-1]] = [e]
+            else:
+                DBInfoD[e[-1]].append(e)
         DBInfoDL.append(DBInfoD)   
     
         for Ele in DBInfo:
@@ -184,32 +187,42 @@ def rankAdvFun(ListOpt):
             del memoLenDict[Ele]
             del isoCountD[Ele]
     memoLenDictKeys = memoLenDict.keys()
-    DBInfoDLshort = []
-    for DBInfoD in DBInfoDL:
-        DBInfoDKeys = DBInfoD.copy().keys()
-        for KeyDB in DBInfoDKeys:
-            if KeyDB not in memoLenDictKeys:
-                del DBInfoD[KeyDB]
-        DBInfoDLshort.append(DBInfoD)
-    #DBInfoDLshortKeys = list(DBInfoDLshort.keys())
+    
+    if filterFlag:
+        DBInfoDLshort = []
+        for DBInfoD in DBInfoDL:
+            DBInfoDKeys = DBInfoD.copy().keys()
+            for KeyDB in DBInfoDKeys:
+                if KeyDB not in memoLenDictKeys:
+                    del DBInfoD[KeyDB]
+            DBInfoDLshort.append(DBInfoD)
+        #DBInfoDLshortKeys = list(DBInfoDLshort.keys())
+    else:
+        DBInfoDLshort = DBInfoDL.copy()
+    
     DevRankD = {}
 
     for Key in memoLenDictKeys:
         NetAreaTot = 0
         NormPeakIntensity = 0
-        for Peak in memoLenDict[Key][3]:    
+        for Peak in removeDuplicates(memoLenDict[Key][3]):    
             NetAreaTot += gilmoreDict[gilmoreDictKeys[Peak]][1]
-            NormPeakIntensity += DBInfoDL[Peak][Key][10]
+            for MultiPeak in DBInfoDLshort[Peak][Key]:
+                NormPeakIntensity += MultiPeak[10]
 
         ECM = 0
         
-        if len(memoLenDict[Key][3]) == 1:
+        if len(removeDuplicates(memoLenDict[Key][3])) == 1:
             DevRankD[Key] = (memoLenDict[Key][0]/memoLenDict[Key][1])
         else:
-            for Peak in memoLenDict[Key][3]:
-                ECM += ((DBInfoDLshort[Peak][Key][10]/NormPeakIntensity)-(gilmoreDict[gilmoreDictKeys[Peak]][1]/NetAreaTot))**2 
+
+            for Peak in removeDuplicates(memoLenDict[Key][3]):
+                MultiPeakIntensity = 0
+                for MultiPeak in DBInfoDLshort[Peak][Key]:
+                    MultiPeakIntensity += MultiPeak[10]
+                ECM += ((MultiPeakIntensity/NormPeakIntensity)-(gilmoreDict[gilmoreDictKeys[Peak]][1]/NetAreaTot))**2 
             DevRankD[Key] = (memoLenDict[Key][0]/memoLenDict[Key][1])*sqrt(ECM/len(memoLenDict[Key][3]))
-     
+
     Ranges = []
     for idxR, DBInfoD in zip(idxPairL,DBInfoDL):
         iEner = idxR[0]
@@ -217,18 +230,19 @@ def rankAdvFun(ListOpt):
         Ranges.append([iEner,fEner])
         Eg , Ig , Decay, Half , Parent, rank = [],[],[],[],[],[]
         for Key in DBInfoD:
-            Ele = DBInfoD[Key]
-            Eg.append(Ele[1])
-            Ig.append(round(Ele[3],2))
-            Decay.append(Ele[5])
-            x=halfLifeUnit(Ele)
-            if x == 0:
-                y = str(x)
-            else:
-                y = str('{0:.2e}'.format(x))
-            Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
-            Parent.append(Ele[-1])
-            rank.append(DevRankD[Key])
+            #Ele = DBInfoD[Key]
+            for Ele in DBInfoD[Key]:
+                Eg.append(Ele[1])
+                Ig.append(round(Ele[3],2))
+                Decay.append(Ele[5])
+                x=halfLifeUnit(Ele)
+                if x == 0:
+                    y = str(x)
+                else:
+                    y = str('{0:.2e}'.format(x))
+                Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
+                Parent.append(Ele[-1])
+                rank.append(DevRankD[Key])
 
 
         print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
