@@ -15,7 +15,7 @@ MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q',
         'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e'],\
         'parent':['--parent','-p'],'normint':['--normInt','-n']}
 SubOptD = {'help':[],'autoPeak':['--rebin','--wof','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
-        'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log'],'energy':['--all','--wof'],'parent':[],\
+        'rank':['--wof','--all','and'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log','--rebin'],'energy':['--all','--wof'],'parent':[],\
             'normint':[]}
 
 
