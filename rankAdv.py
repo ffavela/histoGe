@@ -220,7 +220,8 @@ def rankAdvFun(ListOpt):
                 MultiPeakIntensity = 0
                 for MultiPeak in DBInfoDLshort[Peak][Key]:
                     MultiPeakIntensity += MultiPeak[10]
-                ECM += ((MultiPeakIntensity/NormPeakIntensity)-(gilmoreDict[gilmoreDictKeys[Peak]][1]/NetAreaTot))**2 
+                ECM += ((MultiPeakIntensity/NormPeakIntensity)-(gilmoreDict[gilmoreDictKeys[Peak]][1]/NetAreaTot))**2
+                #ECM += ((NormPeakIntensity/MultiPeakIntensity)-(gilmoreDict[gilmoreDictKeys[Peak]][1]/NetAreaTot))**2 
             DevRankD[Key] = (memoLenDict[Key][0]/memoLenDict[Key][1])*sqrt(ECM/len(memoLenDict[Key][3]))
 
     Ranges = []
