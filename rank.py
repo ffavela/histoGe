@@ -25,6 +25,8 @@ from myLibs.QueryDB import OpenDatabase, CloseDatabase, EnergyRange, halfLifeUni
 def rankFun(ListOpt):
     List = ListOpt.copy()
     List.pop(0)  
+    i = 0 #for rank op
+    rankOp = []
     
     if '--wof' in List:
         wofFlag = True
@@ -37,13 +39,26 @@ def rankFun(ListOpt):
         List.remove('--all')
     else:
         allFlag = False
-#####    
-    if '--op1' in List:
-        op1Flag = True
-        List.remove('--op1')
+
+    if 'and' in List:
+        addFlag = True
+        List.remove('and')
     else:
-        op1Flag = False
-#####
+        addFlag = False
+ 
+    for Arg in List:
+        try:
+            rankOp.append(int(Arg))
+            if rankOp[i] > 0 and rankOp[i] < 4:
+                
+                if type(rankOp[i]) == int:
+                    i += 1
+            
+            #break
+        except:
+            rankOp.append(3)
+            continue   
+
     if len(List) == 0:
         print("error: --energyRanges option needs an argument")
         return 0
@@ -63,15 +78,45 @@ def rankFun(ListOpt):
     idxPairL = []
     for DictEle in infoDict.values():
         ####
-        if op1Flag:
-            deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
-            meanEle = (DictEle['start']+DictEle['end'])/2
-            DictEle['start'] = meanEle - deltaEle
-            DictEle['end'] = meanEle + deltaEle
-            idxPairL.append([DictEle['start'],DictEle['end']])
+        if addFlag :
+            if rankOp[2] == 1:
+                rankSort = 'Rank'
+                # deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
+                # meanEle = (DictEle['start']+DictEle['end'])/2
+                # DictEle['start'] = meanEle - deltaEle
+                # DictEle['end'] = meanEle + deltaEle
+                idxPairL.append([DictEle['start'],DictEle['end']])
+            
+            elif rankOp[2] == 2:
+                rankSort = 'Rank2'
+                # deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
+                # meanEle = (DictEle['start']+DictEle['end'])/2
+                # DictEle['start'] = meanEle - deltaEle
+                # DictEle['end'] = meanEle + deltaEle
+                idxPairL.append([DictEle['start'],DictEle['end']])
+                
+            
+            elif rankOp[2] == 3:
+                rankSort = 'Rank3'
+                # deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
+                # meanEle = (DictEle['start']+DictEle['end'])/2
+                # DictEle['start'] = meanEle - deltaEle
+                # DictEle['end'] = meanEle + deltaEle
+                idxPairL.append([DictEle['start'],DictEle['end']])
+            
+            else:
+                idxPairL.append([DictEle['start'],DictEle['end']])
+                print('theres no rank op {}, please try an option between 1 and 3'.format(rankOp))
+                break
         else:
+            rankSort = 'Rank3'
+            # deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
+            # meanEle = (DictEle['start']+DictEle['end'])/2
+            # DictEle['start'] = meanEle - deltaEle
+            # DictEle['end'] = meanEle + deltaEle
             idxPairL.append([DictEle['start'],DictEle['end']])
         ####
+        ##idxPairL.append([DictEle['start'],DictEle['end']])
     #Energy range of the histogram
     
     DBInfoL = []
@@ -123,15 +168,16 @@ def rankFun(ListOpt):
                     isoCountD[iso] = [0,nInRange,0]
                 isoCountD[iso][0] += 1
         isoPeakLL.append(isoPeakL)
-    
+
     IgRDict = {}
+
     for DBInfo in DBInfoL:
         for Ele in DBInfo:
             iso = Ele[-1]
             if iso not in IgRDict:
                 IgRDict[iso] = Ele[10]
             else:
-                IgRDict[iso] += Ele[10] 
+                IgRDict[iso] += Ele[10]
 
     for isoLL in isoPeakLL:
         for isoL in isoLL:
@@ -142,7 +188,13 @@ def rankFun(ListOpt):
             isoCountD[iso][2] += isoL[-1]
             isoL[3] = IgRDict[iso]
 
-        isoLL.sort(key = lambda x: x[3],reverse = True)
+        if addFlag:
+            isoLL.sort(key = lambda x: x[rankOp[1]],reverse = True) # Main Sort of RANK HGE
+        else:
+            if i:
+                isoLL.sort(key = lambda x: x[rankOp[1]],reverse = True) # Main Sort of RANK HGE
+            else:
+                isoLL.sort(key = lambda x: x[rankOp[0]],reverse = True) # Main Sort of RANK HGE
     
     Ranges = []
     for idxR, isoPeakL, DBInfoD in zip(idxPairL,isoPeakLL,DBInfoDL):
@@ -172,25 +224,47 @@ def rankFun(ListOpt):
 
         if allFlag:
             pd.set_option('display.max_rows', None) #imprime todas las filas
+            pd.options.display.float_format = '{:,.5f}'.format
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3)),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3'])#crea  la tabla
-            print(df)#.sort_values(by=['Rank2'], ascending=False))
+            if addFlag:
+                print(df.sort_values(by=[rankSort], ascending=False))
+            else:
+                print(df)#.sort_values(by=['Rank2'], ascending=False))
         else:
             pd.set_option('display.max_rows', len(Ele))
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2','Rank3'])#crea  la tabla
-            print(df.head(10))#.sort_values(by=['Rank2'], ascending=False)) #print('\nOnly the first 10')
+            if addFlag:
+                print(df.head(10).sort_values(by=[rankSort], ascending=False)) #print('\nOnly the first 10')
+            else:
+                print(df.head(10))#.sort_values(by=[rankSort], ascending=False)) #print('\nOnly the first 10')
             
             
 
         if wofFlag:
             try:
                 myfilename = infoFile.strip('.info') + '_energyRanges.txt'
-                WriteOutputFileRR(myfilename,df,iEner,fEner)
+                if allFlag:
+                    if addFlag:
+                        WriteOutputFileRR(myfilename,df.sort_values(by=[rankSort], ascending=False),iEner,fEner)
+                    else:
+                        WriteOutputFileRR(myfilename,df,iEner,fEner)
+                else:
+                    if addFlag:
+                        WriteOutputFileRR(myfilename,df.head(10).sort_values(by=[rankSort], ascending=False),iEner,fEner)
+                    else:
+                        WriteOutputFileRR(myfilename,df.head(10),iEner,fEner)
+                
                 print('-----------------------------------------')
                 print('The file was saved as:')
                 print(myfilename)
-                print('-----------------------------------------')
+                print('-----------------------------------------')        
+            
+
             except IOError:
                 print('ERROR: An unexpected error ocurrs. Data could not be saved.')
+                break
+    
+            
     
     return 0
     
