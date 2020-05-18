@@ -106,7 +106,7 @@ def rankFun(ListOpt):
             
             else:
                 idxPairL.append([DictEle['start'],DictEle['end']])
-                print('theres no rank op {}, please try an option between 1 and 3'.format(rankOp))
+                print('theres n|o rank op {}, please try an option between 1 and 3'.format(rankOp))
                 break
         else:
             rankSort = 'Rank3'
