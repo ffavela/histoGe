@@ -40,6 +40,7 @@ from normintensity import NormIntensity
 from DataFile2hgeFile import DataFile2hgeFile
 from efficiency import efficencyFun
 from rankAdv import rankAdvFun
+from fuzzyrank import fuzzyrankFun
 
 def main(argv): 
 
@@ -159,6 +160,10 @@ def main(argv):
             exitcode = rankAdvFun(Command)
             return exitcode
 
+        elif Command[0] in MainOptD['fuzzy']:
+            exitcode = fuzzyrankFun(Command)
+            return exitcode
+        
         else:
             pid = TryFork()
             if pid == 0:
