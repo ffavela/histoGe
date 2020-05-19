@@ -71,7 +71,7 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
     if logFlag:
         plt.yscale('log')
     if not noCalFlag and mySpecialDict['calBoolean'] == True:
-        plt.xlabel('Energies [KeV]')
+        plt.xlabel('Energies [keV]')
     else:
         plt.xlabel('Channels')
     

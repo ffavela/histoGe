@@ -250,12 +250,13 @@ def rankAdvFun(ListOpt):
         
         if allFlag:
             pd.set_option('display.max_rows', None) #imprime todas las filas
-            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank)),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Adj MSE'])#crea  la tabla
-            print(df.sort_values(by=['Adj MSE'], ascending=True))
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank)), key=lambda x:x[5] ),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Adj MSE'])#crea  la tabla
+            print(df)#.sort_values(by=['Adj MSE'], ascending=True))
         else:
             pd.set_option('display.max_rows', 10)
-            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Adj MSE'])#crea  la tabla
-            print(df.sort_values(by=['Adj MSE'], ascending=True).head(10)) #print('\nOnly the first 10')
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank)), key=lambda x:x[5] ),index = None ,columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Adj MSE'])#crea  la tabla
+            print(df.head(10))
+            #print(df.sort_values(by=['Adj MSE'], ascending=True).head(10)) #print('\nOnly the first 10')
             
         if wofFlag:
             try:
