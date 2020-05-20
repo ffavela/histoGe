@@ -79,6 +79,24 @@ def fuzzyMin(List):
 
 
 def fuzzyinference(PeakRatio,IgR,ECM,numPoints=1e3):
+#-------------------------------------------------------------
+#The input values are limited to a certain range 
+#-------------------------------------------------------------    
+
+    if PeakRatio > 1:
+        PeakRatio = 1
+    elif PeakRatio < 0:
+        PeakRatio = 0
+
+    if IgR > 1:
+        IgR = 1
+    elif IgR < 0:
+        IgR = 0
+    
+    if ECM > 10:
+        ECM = 10
+    elif ECM < 0:
+        ECM = 0
 
 #-------------------------------------------------------------
 #Conjuntos difusos de entrada

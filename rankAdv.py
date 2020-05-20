@@ -186,6 +186,12 @@ def rankAdvFun(ListOpt):
         if memoLenDict[Ele][0] == 0 or memoLenDict[Ele][2] == 0:
             del memoLenDict[Ele]
             del isoCountD[Ele]
+            for DBInfoD in DBInfoDL:
+                try:
+                    del DBInfoD[Ele]
+                except KeyError:
+                    continue
+
     memoLenDictKeys = memoLenDict.keys()
     
     if filterFlag:
