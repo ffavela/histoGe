@@ -23,9 +23,11 @@ from myLibs.miscellaneus import getIdxRangeVals, removeDuplicates
 from myLibs.QueryDB import OpenDatabase, CloseDatabase, EnergyRange, halfLifeUnit, GetIntensities
 from myLibs.fitting import doFittingStuff
 from myLibs.gilmoreStats import doGilmoreStuff
+from myLibs.fuzzylib import fuzzyinference
 #from myLibs.plotting import *
 
-def rankAdvFun(ListOpt):
+
+def fuzzyrankFun(ListOpt):
     List = ListOpt.copy()
     List.pop(0)  
     
@@ -57,7 +59,7 @@ def rankAdvFun(ListOpt):
         op1Flag = False
 
     if len(List) == 0:
-        print("error: --energyRanges option needs an argument")
+        print("error: --fuzzyRank option needs an argument")
         return 0
 
     infoFile=List[0]
@@ -111,7 +113,7 @@ def rankAdvFun(ListOpt):
     
     DBInfoL = []
     pathfile = os.path.realpath(__file__)
-    pathfile = pathfile.rstrip('rankAdv.py')
+    pathfile = pathfile.rstrip('fuzzyrank.py')
     conexion = OpenDatabase(pathfile)
 
     memoLenDict={}
@@ -205,9 +207,9 @@ def rankAdvFun(ListOpt):
         #DBInfoDLshortKeys = list(DBInfoDLshort.keys())
     else:
         DBInfoDLshort = DBInfoDL.copy()
-    
+    fuzzyMax = fuzzyinference(1,1,0)
     DevRankD = {}
-
+    fuzzyRank = {}
     for Key in memoLenDictKeys:
         NetAreaTot = 0
         NormPeakIntensity = 0
@@ -220,6 +222,7 @@ def rankAdvFun(ListOpt):
         
         if len(removeDuplicates(memoLenDict[Key][3])) == 1:
             DevRankD[Key] = (memoLenDict[Key][0]/memoLenDict[Key][1])
+            fuzzyRank[Key] = fuzzyinference(memoLenDict[Key][1]/memoLenDict[Key][0],memoLenDict[Key][2],DevRankD[Key])
         else:
 
             for Peak in removeDuplicates(memoLenDict[Key][3]):
@@ -229,13 +232,14 @@ def rankAdvFun(ListOpt):
                 ECM += ((MultiPeakIntensity/NormPeakIntensity)-(gilmoreDict[gilmoreDictKeys[Peak]][1]/NetAreaTot))**2
                 #ECM += ((NormPeakIntensity/MultiPeakIntensity)-(gilmoreDict[gilmoreDictKeys[Peak]][1]/NetAreaTot))**2 
             DevRankD[Key] = (memoLenDict[Key][0]/memoLenDict[Key][1])*sqrt(ECM/len(memoLenDict[Key][3]))
+            fuzzyRank[Key] = fuzzyinference(memoLenDict[Key][1]/memoLenDict[Key][0],memoLenDict[Key][2],DevRankD[Key])/fuzzyMax
 
     Ranges = []
     for idxR, DBInfoD in zip(idxPairL,DBInfoDL):
         iEner = idxR[0]
         fEner = idxR[1]
         Ranges.append([iEner,fEner])
-        Eg , Ig , Decay, Half , Parent, rank = [],[],[],[],[],[]
+        Eg , Ig , Decay, Half , Parent, rank, rank2 = [],[],[],[],[],[],[]
         for Key in DBInfoD:
             #Ele = DBInfoD[Key]
             for Ele in DBInfoD[Key]:
@@ -250,19 +254,20 @@ def rankAdvFun(ListOpt):
                 Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
                 Parent.append(Ele[-1])
                 rank.append(DevRankD[Key])
-
+                rank2.append(fuzzyRank[Key])
 
         print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
         
         if allFlag:
             pd.set_option('display.max_rows', None) #imprime todas las filas
-            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank)), key=lambda x:x[5] ),index = None,columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Adj MSE'])#crea  la tabla
-            print(df)#.sort_values(by=['Adj MSE'], ascending=True))
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),key=lambda x: (x[6],-x[5]),reverse=True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Adj MSE','Membership'])#crea  la tabla
+            print(df)
+            #print(df.sort_values(by=['Membership'], ascending=False))
         else:
             pd.set_option('display.max_rows', 10)
-            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank)), key=lambda x:x[5] ),index = None ,columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Adj MSE'])#crea  la tabla
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2)),key=lambda x: (x[6],-x[5]),reverse=True),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Adj MSE','Membership'])#crea  la tabla
             print(df.head(10))
-            #print(df.sort_values(by=['Adj MSE'], ascending=True).head(10)) #print('\nOnly the first 10')
+            #print(df.sort_values(by=['Membership'], ascending=False).head(10)) #print('\nOnly the first 10')
             
         if wofFlag:
             try:
