@@ -250,7 +250,7 @@ def rankAdvFun(ListOpt):
         
         if allFlag:
             pd.set_option('display.max_rows', None) #imprime todas las filas
-            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank)), key=lambda x:x[5] ),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Adj MSE'])#crea  la tabla
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank)), key=lambda x:x[5] ),index = None,columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Adj MSE'])#crea  la tabla
             print(df)#.sort_values(by=['Adj MSE'], ascending=True))
         else:
             pd.set_option('display.max_rows', 10)
