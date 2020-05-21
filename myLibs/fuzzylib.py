@@ -106,13 +106,13 @@ def fuzzyinference(PeakRatio,IgR,ECM,numPoints=1e3):
     PeakRatioMed = GaussianSet(PeakRatio,0.7,0.125)
     PeakRatioHigh = SigmoidalSet(PeakRatio,50.0,0.85)
 
-    IgRLow = SigmoidalSet(PeakRatio,-50.0,0.35)
-    IgrMed = GaussianSet(PeakRatio,0.5,0.125)
-    IgrHigh = SigmoidalSet(PeakRatio,50.0,0.65)
+    IgRLow = SigmoidalSet(IgR,-50.0,0.35)
+    IgrMed = GaussianSet(IgR,0.5,0.125)
+    IgrHigh = SigmoidalSet(IgR,50.0,0.65)
 
-    ECMLow = SigmoidalSet(PeakRatio,-100.0,0.1)
-    ECMMed = GaussianSet(PeakRatio,0.2,0.08)
-    ECMHigh = SigmoidalSet(PeakRatio,100.0,0.3)
+    ECMLow = SigmoidalSet(ECM,-100.0,0.1)
+    ECMMed = GaussianSet(ECM,0.2,0.08)
+    ECMHigh = SigmoidalSet(ECM,100.0,0.3)
 
 #-------------------------------------------------------------
 #Conjuntos difusos de salida
