@@ -120,7 +120,7 @@ def fuzzyinference(PeakRatio,IgR,ECM,numPoints=1e3):
     minval = 0
     maxval = 1
     
-    Range = np.linspace(minval,maxval,num=numPoints)
+    Range = np.linspace(minval,maxval,num=int(numPoints))
     ProbVLow = SigmoidalSet(Range,-100.0,0.2)
     ProbLow = GaussianSet(Range,0.3,0.085)
     ProbMed = GaussianSet(Range,0.5,0.085)
