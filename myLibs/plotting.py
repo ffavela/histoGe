@@ -18,12 +18,12 @@ def simplePlot(mySubsList,logFlag,noCalFlag,Label=None,show=False,Title=None):
     if logFlag:
         plt.yscale('log')
     if noCalFlag:
-            plt.xlabel('Energies [KeV]')
+            plt.xlabel('Energies [KeV]', fontsize='large')
     else:
-            plt.xlabel('Channels')
-    plt.ylabel('Counts')
+            plt.xlabel('Channels', fontsize='large')
+    plt.ylabel('Counts', fontsize='large')
     if show == True:
-        plt.title(Title)
+        plt.title(Title, fontsize='large')
         plt.show()
 
 def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=False,noCalFlag=True,Label=None,Show=True,Title = None,Fill=True,showPeaks=True,FitCurve=True,rebinFlag=False):
@@ -64,16 +64,17 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
     else:
         Title += ', '
     if Label != None:
-        plt.gcf().canvas.set_window_title(Label.split('.')[0])
-    plt.title(Title + 'Exposure time = ' + str(mySpecialDict["expoTime"]) + '/s')
+        plt.gcf().canvas.set_window_title(Label.split('.')[0], fontsize='large')
+    plt.title(Title + 'Exposure time = ' + str(mySpecialDict["expoTime"]) + '/s', fontsize='large')
     plt.plot(mySpecialList[0],mySpecialList[1],label=Label)
-    plt.ylabel('Counts')
+    plt.ylabel('Counts', fontsize='large')
+
     if logFlag:
         plt.yscale('log')
     if not noCalFlag and mySpecialDict['calBoolean'] == True:
-        plt.xlabel('Energies [keV]')
+        plt.xlabel('Energies [keV]', fontsize='large')
     else:
-        plt.xlabel('Channels')
+        plt.xlabel('Channels', fontsize='large')
     
     if gausdata == None:
         gausdata = emptyFittingDict(len(idxPairLAux))
@@ -104,9 +105,9 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
             if showPeaks:
                 plt.plot(peakXVals, peakYVals, 'ro', markersize=8)
             if Anotation:
-                plt.annotate("%s,%2.1f" %(e,floatMean),xy=[peakXVals,peakYVals])
+                plt.annotate("%s,%2.1f" %(e,floatMean),xy=[peakXVals,peakYVals], fontsize='large', rotation=0)
             else:
-                plt.annotate(e, xy=[peakXVals,peakYVals])
+                plt.annotate(e, xy=[peakXVals,peakYVals], fontsize='large', rotation=0)
     except:
         print('\n ERROR: Unexpected error during plotting. ')
         if mySpecialDict['calBoolean'] == False:

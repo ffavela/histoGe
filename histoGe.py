@@ -41,6 +41,7 @@ from DataFile2hgeFile import DataFile2hgeFile
 from efficiency import efficencyFun
 from rankAdv import rankAdvFun
 from fuzzyrank import fuzzyrankFun
+from halfSort import halfSortFun
 
 def main(argv): 
 
@@ -162,6 +163,10 @@ def main(argv):
 
         elif Command[0] in MainOptD['fuzzy']:
             exitcode = fuzzyrankFun(Command)
+            return exitcode
+
+        elif Command[0] in MainOptD['halfSort']:
+            exitcode = halfSortFun(Command)
             return exitcode
         
         else:

@@ -77,31 +77,22 @@ def rankFun(ListOpt):
 
     idxPairL = []
     for DictEle in infoDict.values():
-        ####
+
         if addFlag :
             if rankOp[2] == 1:
                 rankSort = 'Rank'
-                # deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
-                # meanEle = (DictEle['start']+DictEle['end'])/2
-                # DictEle['start'] = meanEle - deltaEle
-                # DictEle['end'] = meanEle + deltaEle
+                
                 idxPairL.append([DictEle['start'],DictEle['end']])
             
             elif rankOp[2] == 2:
                 rankSort = 'Rank2'
-                # deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
-                # meanEle = (DictEle['start']+DictEle['end'])/2
-                # DictEle['start'] = meanEle - deltaEle
-                # DictEle['end'] = meanEle + deltaEle
+                
                 idxPairL.append([DictEle['start'],DictEle['end']])
                 
             
             elif rankOp[2] == 3:
                 rankSort = 'Rank3'
-                # deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
-                # meanEle = (DictEle['start']+DictEle['end'])/2
-                # DictEle['start'] = meanEle - deltaEle
-                # DictEle['end'] = meanEle + deltaEle
+                
                 idxPairL.append([DictEle['start'],DictEle['end']])
             
             else:
@@ -110,14 +101,9 @@ def rankFun(ListOpt):
                 break
         else:
             rankSort = 'Rank3'
-            # deltaEle = (DictEle['end']-DictEle['start'])*.1 #peak +/- % of the infoFile range
-            # meanEle = (DictEle['start']+DictEle['end'])/2
-            # DictEle['start'] = meanEle - deltaEle
-            # DictEle['end'] = meanEle + deltaEle
+            
             idxPairL.append([DictEle['start'],DictEle['end']])
-        ####
-        ##idxPairL.append([DictEle['start'],DictEle['end']])
-    #Energy range of the histogram
+        
     
     DBInfoL = []
     pathfile = os.path.realpath(__file__)
