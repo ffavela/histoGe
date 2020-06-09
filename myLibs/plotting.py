@@ -64,7 +64,7 @@ def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=Fals
     else:
         Title += ', '
     if Label != None:
-        plt.gcf().canvas.set_window_title(Label.split('.')[0], fontsize='large')
+        plt.gcf().canvas.set_window_title(Label.split('.')[0])
     plt.title(Title + 'Exposure time = ' + str(mySpecialDict["expoTime"]) + '/s', fontsize='large')
     plt.plot(mySpecialList[0],mySpecialList[1],label=Label)
     plt.ylabel('Counts', fontsize='large')
