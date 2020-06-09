@@ -15,11 +15,13 @@ from myLibs.miscellaneus import List2str
 MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q','--query'],'test':['-t','--test'],\
         'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e'],\
         'parent':['--parent','-p'],'normint':['--normInt','-n'],'2file':['--hge','-f'], 'efficiency':['--eff','-e'],'rankAdv':['-RA','--RankAdv','--rankAdv'],\
-            'fuzzy':['--fuzzy','--fuzzyRank','--fuzzyrank','-f'],'halfSort':['--halfSort','--halfRank','--halfrank']}
+            'fuzzy':['--fuzzy','--fuzzyRank','--fuzzyrank','-f'],'halfSort':['--halfSort','--halfRank','--halfrank'],\
+            'chainRank':['--chainRank','--ChainRank','-x']}
 
 SubOptD = {'help':[],'autoPeak':['--rebin','--wof','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
         'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log'],'energy':['--all','--wof'],'parent':[],\
-            'normint':[],'2file':[],'efficiency':['--Plot','--plot'],'rankAdv':['--wof','--all','--filter'],'fuzzy':['--wof','--all','--filter'],'halfSort':['--all','--wof']}
+            'normint':[],'2file':[],'efficiency':['--Plot','--plot'],'rankAdv':['--wof','--all','--filter'],'fuzzy':['--wof','--all','--filter'],'halfSort':['--all','--wof'],\
+            'chainRank':['--wof','--all']}
 
 def isValidSpectrumFile(strVal):
     if strVal.endswith('.Txt') or strVal.endswith('.SPE') or strVal.endswith('.mca') or strVal.endswith('.hge'):

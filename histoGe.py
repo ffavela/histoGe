@@ -42,6 +42,7 @@ from efficiency import efficencyFun
 from rankAdv import rankAdvFun
 from fuzzyrank import fuzzyrankFun
 from halfSort import halfSortFun
+from chainRank import ChainRankFun
 
 def main(argv): 
 
@@ -169,6 +170,10 @@ def main(argv):
             exitcode = halfSortFun(Command)
             return exitcode
         
+        elif Command[0] in MainOptD['chainRank']:
+            exitcode = ChainRankFun(Command)
+            return exitcode
+
         else:
             pid = TryFork()
             if pid == 0:
