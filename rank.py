@@ -60,7 +60,7 @@ def rankFun(ListOpt):
             continue   
 
     if len(List) == 0:
-        print("error: --energyRanges option needs an argument")
+        print("error: --Rank option needs an argument")
         return 0
 
     infoFile=List[0]

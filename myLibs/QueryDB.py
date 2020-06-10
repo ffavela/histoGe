@@ -127,6 +127,8 @@ def GetChainAndChild(conexion,Isotope):
     cursor = conexion.cursor()
     cursor.execute(Command)
     Isotopes = cursor.fetchone()
+    if Isotopes == None:
+        Isotopes = [Isotope,Isotope]
     return Isotopes
 
 def GetMainChain(conexion,MainChainIso):
@@ -135,6 +137,8 @@ def GetMainChain(conexion,MainChainIso):
     cursor = conexion.cursor()
     cursor.execute(Command)
     MainChain = cursor.fetchone()
+    if MainChain == None:
+        MainChain = MainChainIso
     return MainChain
 
 def GetIntensities2(conexion,element,order= None):
@@ -154,6 +158,21 @@ def GetIntensities2(conexion,element,order= None):
         Isotopes = cursor.fetchall()
         return  Isotopes
 
-
+def chaintoList(ChainStr):
+    writeFlag = True
+    ChainList = []
+    AuxStr = ''
+    for Char in ChainStr:
+        if Char == '#':
+            ChainList.append(AuxStr)
+            AuxStr = ''
+            writeFlag = False
+        elif Char == '&':
+            if writeFlag == False:
+                writeFlag = True
+        else:
+            if writeFlag == True:
+                AuxStr += Char
+    return ChainList
 
 
