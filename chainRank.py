@@ -210,15 +210,34 @@ def ChainRankFun(ListOpt):
         #         isoLL.sort(key = lambda x: x[rankOp[0]],reverse = True) # Main Sort of RANK HGE
 
     Ranges = []
+    chainRankIso = {}
+
+    for ChainAnsestor in ChainDict:
+        ChainList = ChainDict[ChainAnsestor]
+        for ChainMember in ChainList[0]:
+            if ChainMember not in chainRankIso: 
+                chainRankIso[ChainMember] = ChainList[1]
+
+
+ 
     for idxR, isoPeakL, DBInfoD in zip(idxPairL,isoPeakLL,DBInfoDL):
         iEner = idxR[0]
         fEner = idxR[1]
         Ranges.append([iEner,fEner])
 
-        #print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
-        Eg , Ig , Decay, Half , Parent, rank, rank2,rank3 = [],[],[],[],[],[],[],[]
+        print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
+        Eg , Ig , Decay, Half , Parent, rank, rank2,rank3, CR2, CR3 = [],[],[],[],[],[],[],[],[],[]
         for pInfo in isoPeakL:
             iso = pInfo[0]
+            if iso not in chainRankIso:
+                cr2, cr3 = [0,0]
+            else:
+                cr2,cr3 = chainRankIso[iso]
+
+            CR2.append(cr2)
+            CR3.append(cr3)
+
+            
             Ele = DBInfoD[iso]
             Eg.append(str(Ele[1])+' ('+str(Ele[2])+')')
             Ig.append(round(Ele[3],2))#+' ('+str(Ele[4])+')') #Normalized Intensity
@@ -237,8 +256,9 @@ def ChainRankFun(ListOpt):
 
             pd.set_option('display.max_rows', None) #imprime todas las filas
             pd.options.display.float_format = '{:,.5f}'.format
-            df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3)),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3'])#crea  la tabla
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3,CR2,CR3)), key=lambda x:x[-1], reverse= True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3','CR2','CR3'])#crea  la tabla
         
+        print(df.head(10))
         
     return 0
         
