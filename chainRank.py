@@ -256,9 +256,30 @@ def ChainRankFun(ListOpt):
 
             pd.set_option('display.max_rows', None) #imprime todas las filas
             pd.options.display.float_format = '{:,.5f}'.format
-            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3,CR2,CR3)), key=lambda x:x[-3], reverse= True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3','CR2','CR3'])#crea  la tabla
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3,CR2,CR3)), key=lambda x:x[-1], reverse= True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3','CR2','CR3'])#crea  la tabla
         
-        print(df.head(10))
+        if allFlag:
+            print(df)
+        else:
+            print(df.head(10))
+
+        if wofFlag:
+            try:
+                myfilename = infoFile.strip('.info') + '_chainRank.txt'
+                if allFlag:
+                    WriteOutputFileRR(myfilename,df,iEner,fEner)
+                else:
+                    WriteOutputFileRR(myfilename,df.head(10),iEner,fEner)
+                
+                print('-----------------------------------------')
+                print('The file was saved as:')
+                print(myfilename)
+                print('-----------------------------------------')        
+            
+
+            except IOError:
+                print('ERROR: An unexpected error ocurrs. Data could not be saved.')
+                break
         
     return 0
         
