@@ -228,7 +228,7 @@ def rankFun(ListOpt):
 
         if wofFlag:
             try:
-                myfilename = infoFile.strip('.info') + '_energyRanges.txt'
+                myfilename = infoFile.strip('.info') + '_rank'+ str(rankOp[1])+'.txt'
                 if allFlag:
                     if addFlag:
                         WriteOutputFileRR(myfilename,df.sort_values(by=[rankSort], ascending=False),iEner,fEner)

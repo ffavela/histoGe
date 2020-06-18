@@ -266,7 +266,11 @@ def rankAdvFun(ListOpt):
             
         if wofFlag:
             try:
-                myfilename = infoFile.strip('.info') + '_AdvRank.txt'
+                if filterFlag:
+                    myfilename = infoFile.strip('.info') + '_RankAdv_filter.txt'
+                else:
+                    myfilename = infoFile.strip('.info') + '_RankAdv.txt'
+
                 WriteOutputFileRR(myfilename,df,iEner,fEner)
                 print('-----------------------------------------')
                 print('The file was saved as:')

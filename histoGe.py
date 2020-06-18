@@ -76,9 +76,9 @@ def main(argv):
             if pid == 0:
                 exitcode = autoPeakFun(Command)
             else:
-                exitcode = 0
+            exitcode = 0
             if  ps == lenCommands:
-                return exitcode
+            return exitcode
 
         elif Command[0] in MainOptD['query']:
             exitcode = QueryFun(Command)

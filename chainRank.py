@@ -256,7 +256,7 @@ def ChainRankFun(ListOpt):
 
             pd.set_option('display.max_rows', None) #imprime todas las filas
             pd.options.display.float_format = '{:,.5f}'.format
-            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3,CR2,CR3)), key=lambda x:x[-1], reverse= True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3','CR2','CR3'])#crea  la tabla
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3,CR2,CR3)), key=lambda x:x[-3], reverse= True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3','CR2','CR3'])#crea  la tabla
         
         print(df.head(10))
         
