@@ -151,7 +151,7 @@ def autoPeakFun(Command):
         mySpecialDict = functionDictAdv[myExtension](myFilename,noCalFlag) #fill de dictionary
                                                                    #from data file
         
-        if (noCalFlag == False) and (mySpecialDict["calBoolean"] == True):
+        if (noCalFlag == False) and (mySpecialDict["calBoolean"] == False):
             noCalFlag = True
             print("Note: the file " + myFilename + " is not calibrated, please don't forget use --noCal option")
 

@@ -228,7 +228,18 @@ def rankFun(ListOpt):
 
         if wofFlag:
             try:
-                myfilename = infoFile.strip('.info') + '_rank'+ str(rankOp[1])+'.txt'
+                if rankOp[1] == 1:
+                    myfilename = infoFile.strip('.info') + '_rank_B.txt'
+                
+                elif rankOp[1] == 2:
+                    myfilename = infoFile.strip('.info') + '_rank_C.txt'
+                
+                elif rankOp[1] == 3:
+                    myfilename = infoFile.strip('.info') + '_rank_D.txt'
+
+                else:
+                    myfilename = infoFile.strip('.info') + '_rank_D.txt'
+
                 if allFlag:
                     if addFlag:
                         WriteOutputFileRR(myfilename,df.sort_values(by=[rankSort], ascending=False),iEner,fEner)

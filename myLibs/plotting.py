@@ -26,7 +26,7 @@ def simplePlot(mySubsList,logFlag,noCalFlag,Label=None,show=False,Title=None):
         plt.title(Title, fontsize='large')
         plt.show()
 
-def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=False,noCalFlag=True,Label=None,Show=True,Title = None,Fill=True,showPeaks=True,FitCurve=True,rebinFlag=False):
+def complexPlot(mySpecialDict,idxPairL,gausdata=None,Anotation=True,logFlag=False,noCalFlag=False,Label=None,Show=True,Title = None,Fill=True,showPeaks=True,FitCurve=True,rebinFlag=False):
     
     if rebinFlag:
         mySpecialList = []
