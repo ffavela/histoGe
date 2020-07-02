@@ -29,7 +29,7 @@ def ChainRankFun(ListOpt):
     List = ListOpt.copy()
     List.pop(0)  
     i = 0 #for rank op
-    rankOp = []
+    #rankOp = []
     
     if '--wof' in List:
         wofFlag = True
@@ -45,22 +45,24 @@ def ChainRankFun(ListOpt):
 
     if '--peak' in List:
         addFlag = True
-        List.remove('--1')
+        List.remove('--peak')
+        xId = -2
     else:
         addFlag = False
- 
-    for Arg in List:
-        try:
-            rankOp.append(int(Arg))
-            if rankOp[i] > 0 and rankOp[i] < 4:
+        xId = -1
+
+    # for Arg in List:
+    #     try:
+    #         rankOp.append(int(Arg))
+    #         if rankOp[i] > 0 and rankOp[i] < 4:
                 
-                if type(rankOp[i]) == int:
-                    i += 1
+    #             if type(rankOp[i]) == int:
+    #                 i += 1
             
-            #break
-        except:
-            rankOp.append(3)
-            continue   
+    #         #break
+    #     except:
+    #         rankOp.append(3)
+    #         continue   
 
     if len(List) == 0:
         print("error: --Rank option needs an argument")
@@ -79,7 +81,7 @@ def ChainRankFun(ListOpt):
     del infoDict['Range']
 
     idxPairL = []
-    #for DictEle in infoDict.values():
+    for DictEle in infoDict.values():
 
         # if addFlag :
         #     if rankOp[2] == 1:
@@ -105,7 +107,7 @@ def ChainRankFun(ListOpt):
         # else:
         #     rankSort = 'Rank3'
             
-        #     idxPairL.append([DictEle['start'],DictEle['end']])
+        idxPairL.append([DictEle['start'],DictEle['end']])
         
     
     DBInfoL = []
@@ -256,10 +258,6 @@ def ChainRankFun(ListOpt):
 
             pd.set_option('display.max_rows', None) #imprime todas las filas
             pd.options.display.float_format = '{:,.5f}'.format
-            if addFlag:
-                xId = -2
-            else:
-                xId = -1
             df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3,CR2,CR3)), key=lambda x:x[xId], reverse= True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3','CR2','CR3'])#crea  la tabla
         
         if allFlag:

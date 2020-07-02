@@ -465,7 +465,7 @@ def getDictFromHGE(myFilename,calFlag=True):
         FileObj.close()
         hgeDict = {'DATE':[],'EQUIPMENT':[],'EXPOSURETIME':[],'CALIBRATION':[],'CHANNELS':[],'GAIN':[],'CALIBRATIONPOINTS':[],'DATA':[],'REBINEDDATA':[],'REBINFACTOR':[]}
         DATAflag = False
-        RebinDATAflag = False
+        rebinDATAflag = False
         AuxListXData = []
         AuxListYData = []
         for Line in FileLines:
@@ -539,7 +539,7 @@ def getDictFromHGE(myFilename,calFlag=True):
                     AuxListYData = []
                     if not hgeDict['CHANNELS'] or hgeDict['CHANNELS'] == 'Not Available':
                         hgeDict['CHANNELS'] = len(hgeDict['DATA'])
-                elif ('REBINEDDATA' in Line or RebinDATAflag) and 'ENDREBINEDDATA' not in Line:
+                elif ('REBINEDDATA' in Line or rebinDATAflag) and 'ENDREBINEDDATA' not in Line:
                     if rebinDATAflag == False:
                         rebinDATAflag = True
                     elif rebinDATAflag == True:
