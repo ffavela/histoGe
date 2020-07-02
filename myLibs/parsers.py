@@ -21,7 +21,7 @@ MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q',
 SubOptD = {'help':[],'autoPeak':['--rebin','--wof','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
         'rank':['--wof','--all'],'sub':['--noCal','--log','--noPlot','--wof','--rebin'],'stats':['--wof','--noPlot','--noCal','--log'],'energy':['--all','--wof'],'parent':[],\
             'normint':[],'2file':[],'efficiency':['--Plot','--plot'],'rankAdv':['--wof','--all','--filter'],'fuzzy':['--wof','--all','--filter'],'halfSort':['--all','--wof'],\
-            'chainRank':['--wof','--all']}
+            'chainRank':['--wof','--all','--peak']}
 
 def isValidSpectrumFile(strVal):
     if strVal.endswith('.Txt') or strVal.endswith('.SPE') or strVal.endswith('.mca') or strVal.endswith('.hge'):

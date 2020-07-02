@@ -43,9 +43,9 @@ def ChainRankFun(ListOpt):
     else:
         allFlag = False
 
-    if 'and' in List:
+    if '--peak' in List:
         addFlag = True
-        List.remove('and')
+        List.remove('--1')
     else:
         addFlag = False
  
@@ -79,33 +79,33 @@ def ChainRankFun(ListOpt):
     del infoDict['Range']
 
     idxPairL = []
-    for DictEle in infoDict.values():
+    #for DictEle in infoDict.values():
 
-        if addFlag :
-            if rankOp[2] == 1:
-                rankSort = 'Rank'
+        # if addFlag :
+        #     if rankOp[2] == 1:
+        #         rankSort = 'Rank'
                 
-                idxPairL.append([DictEle['start'],DictEle['end']])
+        #         idxPairL.append([DictEle['start'],DictEle['end']])
             
-            elif rankOp[2] == 2:
-                rankSort = 'Rank2'
+        #     elif rankOp[2] == 2:
+        #         rankSort = 'Rank2'
                 
-                idxPairL.append([DictEle['start'],DictEle['end']])
+        #         idxPairL.append([DictEle['start'],DictEle['end']])
                 
             
-            elif rankOp[2] == 3:
-                rankSort = 'Rank3'
+        #     elif rankOp[2] == 3:
+        #         rankSort = 'Rank3'
                 
-                idxPairL.append([DictEle['start'],DictEle['end']])
+        #         idxPairL.append([DictEle['start'],DictEle['end']])
             
-            else:
-                idxPairL.append([DictEle['start'],DictEle['end']])
-                print('theres n|o rank op {}, please try an option between 1 and 3'.format(rankOp))
-                break
-        else:
-            rankSort = 'Rank3'
+        #     else:
+        #         idxPairL.append([DictEle['start'],DictEle['end']])
+        #         print('theres n|o rank op {}, please try an option between 1 and 3'.format(rankOp))
+        #         break
+        # else:
+        #     rankSort = 'Rank3'
             
-            idxPairL.append([DictEle['start'],DictEle['end']])
+        #     idxPairL.append([DictEle['start'],DictEle['end']])
         
     
     DBInfoL = []
@@ -256,7 +256,11 @@ def ChainRankFun(ListOpt):
 
             pd.set_option('display.max_rows', None) #imprime todas las filas
             pd.options.display.float_format = '{:,.5f}'.format
-            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3,CR2,CR3)), key=lambda x:x[-1], reverse= True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3','CR2','CR3'])#crea  la tabla
+            if addFlag:
+                xId = -2
+            else:
+                xId = -1
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3,CR2,CR3)), key=lambda x:x[xId], reverse= True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3','CR2','CR3'])#crea  la tabla
         
         if allFlag:
             print(df)
