@@ -15,7 +15,7 @@ from myLibs.miscellaneus import List2str
 MainOptD = {'help':['-h','--help'],'autoPeak':['-P','--autoPeak'],'query':['-q','--query'],'test':['-t','--test'],\
         'isotope':['-i','--isotope'],'sum':['-s','--sum'],'rank':['-R','--Rank','--rank'],'sub':['-r','--sub'],'stats':['-c','--stats'],'energy':['--energyRanges','-e'],\
         'parent':['--parent','-p'],'normint':['--normInt','-n'],'2file':['--hge','-f'], 'efficiency':['--eff','-e'],'rankAdv':['-RA','--RankAdv','--rankAdv'],\
-            'fuzzy':['--fuzzy','--fuzzyRank','--fuzzyrank','-f'],'halfSort':['--halfSort','--halfRank','--halfrank'],\
+            'fuzzy':['--fuzzy','--fuzzyRank','--fuzzyrank','-z'],'halfSort':['--halfSort','--halfRank','--halfrank'],\
             'chainRank':['--chainRank','--ChainRank','-x']}
 
 SubOptD = {'help':[],'autoPeak':['--rebin','--wof','--noPlot','--log','--noCal'],'query':['--all'],'test':[],'isotope':[],'sum':['--noCal','--log','--noPlot','--wof'],\
@@ -591,6 +591,16 @@ def getMyFileDict(myArg):  #check if is a valid
        
     return myFileDict
 
+
+def findRangeInfoDict(infoDict):
+    minVal = float('inf')
+    maxVal = -float('inf')
+    for Values in infoDict.values():
+        if Values['start'] < minVal:
+            minVal =  Values['start']
+        if Values['end'] > maxVal:
+            maxVal = Values['end']
+    return minVal, maxVal
 
 functionDict = {"SPE": getDictFromSPE,"mca": getDictFromMCA,"Txt": getDictFromGammaVision,"info":getDictFromInfoFile}
 

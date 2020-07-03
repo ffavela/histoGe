@@ -15,7 +15,7 @@ from math import sqrt
 #import keyboard
 
 # mainPath=sys.path[0] # sources dir
-from myLibs.parsers import getDictFromInfoFile, getMyFileDictRankAdv, functionDictAdv
+from myLibs.parsers import getDictFromInfoFile, getMyFileDictRankAdv, functionDictAdv, findRangeInfoDict
 from myLibs.miscellaneus import getIdxRangeVals, removeDuplicates
 #from myLibs.gilmoreStats import *
 #from myLibs.fitting import *
@@ -68,9 +68,13 @@ def rankAdvFun(ListOpt):
         print("error: %s needs a .info extension" % (infoFile))
         return 10001
     infoDict=getDictFromInfoFile(infoFile)
-    minRange = infoDict['Range']['start']
-    maxRange = infoDict['Range']['end']
-    del infoDict['Range']
+    try:
+        minRange = infoDict['Range']['start']
+        maxRange = infoDict['Range']['end']
+        del infoDict['Range']
+    except:
+        minRange, maxRange = findRangeInfoDict(infoDict)
+    
 
     myFileDict=getMyFileDictRankAdv(List)
     

@@ -96,7 +96,12 @@ def statsFun(ListOpt):
         return 112   
     
     infoDict=getDictFromInfoFile(infoFile)
-    del infoDict['Range']
+    try:
+         del infoDict['Range']
+    except:
+        pass
+   
+    
     if noCalFlag:
         FileDict = functionDictAdv[FileExt](FileName,False)
     else:

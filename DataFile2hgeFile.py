@@ -15,7 +15,7 @@ def DataFile2hgeFile(ListOpt):
         for File in ValidFileList:
             myExtension = File.split('.')[-1]
             mySpecialDict = functionDictAdv[myExtension](File)
-            hgeFilename = File.split('.')[0] + '.hge' 
+            hgeFilename = File.split('.')[0] + '_factor.hge' 
             exitcode = WritehgeFile(hgeFilename,mySpecialDict)
     else:
         print('There is not a valid file to be converted to .hge file.')
