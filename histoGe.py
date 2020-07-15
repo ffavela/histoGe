@@ -43,7 +43,7 @@ from rankAdv import rankAdvFun
 from fuzzyrank import fuzzyrankFun
 from halfSort import halfSortFun
 from chainRank import ChainRankFun
-
+from rank_imp import rankImp
 
 def main(argv): 
 
@@ -109,7 +109,8 @@ def main(argv):
                 return exitcode
             
         elif Command[0] in MainOptD['rank']:
-            exitcode = rankFun(Command)
+            #exitcode = rankFun(Command)
+            exitcode = rankImp(Command)
             return exitcode
             
         elif Command[0] in MainOptD['sub']:

@@ -83,7 +83,7 @@ def helpFun(argv, functionDict, extBool=False):
         "t of micro-mca or px5 hardware.\n\n\t.info files: File used to store the ranges of peaks. Usually,\n\t\t\t"
         "is generated with --autoPeak main option.\n\t\t\t\t\n\nDOWNLOADABLE FILES\n\n\tA tutorial file can be"
         " consulted in:\n\n\t\thttps://bit.ly/2QL8FYj\n\n\tSome .mca files to try histoGe can be downloaded fr"
-        "om:\n\n\t\thttps://bit.ly/2WNS36h\n\n\tDatabase can be downloaded from:\n\n\t\thttps://bit.ly/2YbVYKm"
+        "om:\n\n\t\thttps://bit.ly/2WNS36h\n\n\tDatabase can be downloaded from:\n\n\t\thttps://bit.ly/2VOzuO1"
         "\n\n*Database is encrypted. To obtain password sent a message to developers.\n\n")
         print(StrHelp)
 
