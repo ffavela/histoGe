@@ -23,6 +23,7 @@ from myLibs.miscellaneus import getIdxRangeVals, removeDuplicates
 from myLibs.QueryDB import OpenDatabase, CloseDatabase, EnergyRange, halfLifeUnit, GetIntensities
 from myLibs.fitting import doFittingStuff
 from myLibs.gilmoreStats import doGilmoreStuff
+from operator import itemgetter
 #from myLibs.plotting import *
 
 def rankImp(ListOpt):
@@ -30,7 +31,7 @@ def rankImp(ListOpt):
     List.pop(0)  
     i = 0 #for rank op
     rankOp = []
-
+    rankOp2 = [None,None,None]
     if '--wof' in List:
         wofFlag = True
         List.remove('--wof')
@@ -42,27 +43,32 @@ def rankImp(ListOpt):
         List.remove('--all')
     else:
         allFlag = False
-    
-    if 'and' in List:
-        addFlag = True
-        List.remove('and')
-    else:
-        addFlag = False
- 
+
     for Arg in List:
         try:
-            rankOp.append(int(Arg))
-            if rankOp[i] > 0 and rankOp[i] < 4:
-                
-                if type(rankOp[i]) == int:
-                    i += 1
-            
-            #break
+            if int(Arg) > 0 and int(Arg) < 4:
+                rankOp.append(int(Arg))
+            else:
+                continue
         except:
-            rankOp.append(3)
+            if len(List) <= 1:
+                rankOp.append(3)
             continue
+    
+    if len(rankOp) == 0:
+        rankOp.append(3)
+        rankOp.append(2) 
+    elif len(rankOp) == 1:
+        if rankOp[0] == 3:
+            rankOp.append(2)
+        else:
+            rankOp.append(3)
+
+    rankOp = removeDuplicates(rankOp)    
+    rankOp2 = [x-4 for x in rankOp]
+
     if len(List) == 0:
-        print("error: --energyRanges option needs an argument")
+        print("error: --rank option needs an argument")
         return 0
 
     infoFile=List[0]
@@ -73,6 +79,7 @@ def rankImp(ListOpt):
         print("error: %s needs a .info extension" % (infoFile))
         return 10001
     infoDict=getDictFromInfoFile(infoFile)
+    
     try:
         minRange = infoDict['Range']['start']
         maxRange = infoDict['Range']['end']
@@ -82,33 +89,7 @@ def rankImp(ListOpt):
     
     idxPairL = []
     for DictEle in infoDict.values():
-
-        if addFlag :
-            if rankOp[2] == 1:
-                rankSort = 'Rank'
-                
-                idxPairL.append([DictEle['start'],DictEle['end']])
-            
-            elif rankOp[2] == 2:
-                rankSort = 'Rank2'
-                
-                idxPairL.append([DictEle['start'],DictEle['end']])
-                
-            
-            elif rankOp[2] == 3:
-                rankSort = 'Rank3'
-                
-                idxPairL.append([DictEle['start'],DictEle['end']])
-            
-            else:
-                idxPairL.append([DictEle['start'],DictEle['end']])
-                print('theres n|o rank op {}, please try an option between 1 and 3'.format(rankOp))
-                break
-        else:
-            rankSort = 'Rank3'
-            
-            idxPairL.append([DictEle['start'],DictEle['end']])
-
+        idxPairL.append([DictEle['start'],DictEle['end']])
 
     DBInfoL = []
     pathfile = os.path.realpath(__file__)
@@ -120,7 +101,6 @@ def rankImp(ListOpt):
     isoCountD = {}
     DBInfoL = []
     DBInfoDL = []
-    #tMinE,tMaxE = infoDict['theList'][0],infoDict['theList'][-1]
     tMinEL = []
     tMaxEL = []
     
@@ -139,12 +119,10 @@ def rankImp(ListOpt):
         PeakNum += 1
         iEner = idxR[0]
         fEner = idxR[1]
-        #DBInfoL.append(EnergyRange(conexion,iEner,fEner))
         DBInfoL.append(GetIntensities(conexion,iEner,fEner))
         DBInfo = DBInfoL[-1]
         DBInfoD = {}
         for e in DBInfo: 
-            #Filling dict with isotope name each isotope has only one tupple
             if e[-1] not in DBInfoD:
                 DBInfoD[e[-1]] = [e]
             else:
@@ -175,13 +153,26 @@ def rankImp(ListOpt):
                     continue
 
     memoLenDictKeys = memoLenDict.keys()
-    
 
-    #DBInfoDLshort = DBInfoDL.copy()
-    
     Ranges = []
     rankList = []
-    for idxR, DBInfoD in zip(idxPairL,DBInfoDL):
+
+    try:
+        if rankOp[0] == 1:
+            myfilename = infoFile.strip('.info') + '_rank_B.txt'
+        
+        elif rankOp[0] == 2:
+            myfilename = infoFile.strip('.info') + '_rank_C.txt'
+        
+        elif rankOp[0] == 3:
+            myfilename = infoFile.strip('.info') + '_rank_D.txt'
+
+        else:
+            myfilename = infoFile.strip('.info') + '_rank_D.txt'
+    except:
+        myfilename = 'FileNameCouldNotBeRecovered.txt'
+
+    for idxR,DBInfoD in zip(idxPairL,DBInfoDL):
         iEner = idxR[0]
         fEner = idxR[1]
         Ranges.append([iEner,fEner])
@@ -197,54 +188,13 @@ def rankImp(ListOpt):
                     y = str(x)
                 else:
                     y = str('{0:.2e}'.format(x))
-                Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
+                Half.append(y+ ' [s] ')
                 Parent.append(Ele[-1])
-                rank.append(memoLenDict[Ele[-1]][0])
-                rank2.append(round(memoLenDict[Ele[-1]][1],3))
+                rank.append(memoLenDict[Ele[-1]][1])
+                rank2.append(round(memoLenDict[Ele[-1]][1]/memoLenDict[Ele[-1]][0],3))
                 rank3.append(round(memoLenDict[Ele[-1]][2],3))
-#list1, list2 = (list(t) for t in zip(*sorted(zip(list1, list2))))
-        # if addFlag:
-        #     isoLL.sort(key = lambda x: x[rankOp[1]],reverse = True) # Main Sort of RANK HGE
-        # else:
-        #     if i:
-        #         isoLL.sort(key = lambda x: x[rankOp[1]],reverse = True) # Main Sort of RANK HGE
-        #     else:
-        #         isoLL.sort(key = lambda x: x[rankOp[0]],reverse = True) # Main Sort of RANK HGE
-        
-
-
-        
-        if addFlag:
-            if rankOp[1] == 1:
-                rankList = rank.copy()
-                        
-            elif rankOp[1] == 2:
-                rankList = rank2.copy()
                 
-            elif rankOp[1] == 3:
-                rankList = rank3.copy()
-                
-        else:
-            if i:
-                if rankOp[1] == 1:
-                    rankList = rank.copy()
-                            
-                elif rankOp[1] == 2:
-                    rankList = rank2.copy()
-                    
-                elif rankOp[1] == 3:
-                    rankList = rank3.copy()
-            else:
-                if rankOp[1] == 1:
-                    rankList = rank.copy()
-                            
-                elif rankOp[1] == 2:
-                    rankList = rank2.copy()
-                    
-                elif rankOp[1] == 3:
-                    rankList = rank3.copy()
-        
-        rankList,Eg,Ig,Decay,Half,Parent,rank,rank2,rank3 = (list(t) for t in zip(*sorted(zip(rankList,Eg,Ig,Decay,Half,Parent,rank,rank2,rank3),reverse=True)))
+        Eg,Ig,Decay,Half,Parent,rank,rank2,rank3 = (list(t) for t in zip(*sorted(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3),key=itemgetter(*rankOp2) ,reverse=True)))
 
         print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
         
@@ -252,53 +202,30 @@ def rankImp(ListOpt):
             pd.set_option('display.max_rows', None) #imprime todas las filas
             pd.options.display.float_format = '{:,.5f}'.format
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3)),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank','Rank2','Rank3'])#crea  la tabla
-            if addFlag:
-                print(df.sort_values(by=[rankSort], ascending=False))
-            else:
-                print(df)#.sort_values(by=['Rank2'], ascending=False))
+            print(df)
+            
         else:
             pd.set_option('display.max_rows', len(Ele))
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank,rank2,rank3)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank','Rank2','Rank3'])#crea  la tabla
-            if addFlag:
-                print(df.head(10).sort_values(by=[rankSort], ascending=False)) #print('\nOnly the first 10')
-            else:
-                print(df.head(10))#.sort_values(by=[rankSort], ascending=False)) #print('\nOnly the first 10')
+            print(df)
             
-
         if wofFlag:
             try:
-                if rankOp[1] == 1:
-                    myfilename = infoFile.strip('.info') + '_rank_B.txt'
-                
-                elif rankOp[1] == 2:
-                    myfilename = infoFile.strip('.info') + '_rank_C.txt'
-                
-                elif rankOp[1] == 3:
-                    myfilename = infoFile.strip('.info') + '_rank_D.txt'
-
-                else:
-                    myfilename = infoFile.strip('.info') + '_rank_D.txt'
-
                 if allFlag:
-                    if addFlag:
-                        WriteOutputFileRR(myfilename,df.sort_values(by=[rankSort], ascending=False),iEner,fEner)
-                    else:
-                        WriteOutputFileRR(myfilename,df,iEner,fEner)
+                    WriteOutputFileRR(myfilename,df,iEner,fEner)
+                    
                 else:
-                    if addFlag:
-                        WriteOutputFileRR(myfilename,df.head(10).sort_values(by=[rankSort], ascending=False),iEner,fEner)
-                    else:
-                        WriteOutputFileRR(myfilename,df.head(10),iEner,fEner)
-                
-                print('-----------------------------------------')
-                print('The file was saved as:')
-                print(myfilename)
-                print('-----------------------------------------')        
+                    WriteOutputFileRR(myfilename,df.head(10),iEner,fEner)    
             
-
             except IOError:
                 print('ERROR: An unexpected error ocurrs. Data could not be saved.')
                 break
     
+    if wofFlag:
+        print('-----------------------------------------')
+        print('The file was saved as:')
+        print(myfilename)
+        print('-----------------------------------------')  
+
     return 0
     
