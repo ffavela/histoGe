@@ -2,6 +2,7 @@ __pycache__
 *.Txt
 *.SPE
 *.mca
+*.bak
 myDatabase/*
 sampleScripts/*.txt
 sampleScripts/*.bak
