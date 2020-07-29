@@ -81,11 +81,11 @@ def halfSortFun(ListOpt):
         if allFlag:
             pd.set_option('display.max_rows', None) #imprime todas las filas
             pd.options.display.float_format = '{:,.5f}'.format
-            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent)), key = lambda x: x[3], reverse=True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent'])#crea  la tabla
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent)), key = lambda x: float(x[3][:-4]), reverse=True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent'])#crea  la tabla
             print(df)
         else:
             pd.set_option('display.max_rows', None)
-            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent)), key = lambda x: x[3], reverse=True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent'])#crea  la tabla
+            df = pd.DataFrame(sorted(list(zip(Eg,Ig,Decay,Half,Parent)), key = lambda x: float(x[3][-4]), reverse=True),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent'])#crea  la tabla
             print(df.head(10))
             
             
