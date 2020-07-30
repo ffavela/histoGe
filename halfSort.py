@@ -71,10 +71,12 @@ def halfSortFun(ListOpt):
             x=halfLifeUnit(DBInfoD[Element])
             if x == 0:
                 y = str(x)
+
             else:
                 y = str('{0:.2e}'.format(x))
-                Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
-                Parent.append(DBInfoD[Element][-1])
+            
+            Half.append(y+ ' [s] ')# + str(Ele[6]) +' ' +str(Ele[7]) + ' ('+str(Ele[8])+')')
+            Parent.append(DBInfoD[Element][-1])
         
         print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
         
