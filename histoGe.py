@@ -44,6 +44,8 @@ from fuzzyrank import fuzzyrankFun
 from halfSort import halfSortFun
 from chainRank import ChainRankFun
 from rank_imp import rankImp
+from rank_dist import rankDist
+from rank_prob import rankProb
 
 def main(argv): 
 
@@ -175,6 +177,14 @@ def main(argv):
         elif Command[0] in MainOptD['chainRank']:
             exitcode = ChainRankFun(Command)
             return exitcode
+
+        elif Command[0] in MainOptD['distance']:
+            exitcode = rankDist(Command)
+            return exitcode
+        elif Command[0] in MainOptD['probability']:
+            exitcode = rankProb(Command)
+            return exitcode
+
 
         else:
             pid = TryFork()

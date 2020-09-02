@@ -4,6 +4,7 @@ import numpy as np
 from myLibs.miscellaneus import getIdxRangeVals,fwhm
 from math import sqrt, pi
 from scipy.optimize import curve_fit
+from scipy.stats import norm
 
 def gaus(x,a,x0,sigma,c=0):
     """A gaussian bell. I added temporarly an additive constant."""
@@ -131,6 +132,20 @@ def R2PolyFun(xdata,ydata,Parm):
     ss_tot = np.sum((ydata-np.mean(ydata))**2)
     r_squared = 1 - (ss_res / ss_tot)
     return r_squared
+
+
+def MeanDistance(DBInfo,FittingVector):
+    Diff = []
+    Prob = []
+    for Iso in DBInfo:
+        diffVal = Iso[1]-FittingVector[1]
+        Diff.append([Iso[-1],diffVal])
+        if diffVal > 0:
+            diffVal *= -1
+        Prob.append([Iso[-1],2*norm.cdf(diffVal,scale=FittingVector[2])])    
+    
+    return Diff,Prob
+
 
 
 ###Fitting fails often here... don't know why... see histoGe.py where
