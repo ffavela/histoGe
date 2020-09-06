@@ -176,6 +176,7 @@ def rankDist(ListOpt):
     #print(df)
     #print('\nGauss Parameters')
     #print(dfG)
+    fittingDictKeys = list(fittingDict.keys())
 
 
     PeakNum = -1
@@ -185,7 +186,7 @@ def rankDist(ListOpt):
         fEner = idxR[1]
         DBInfoL.append(GetIntensities(conexion,iEner,fEner))
         DBInfo = DBInfoL[-1]
-        DiffL, ProbL = MeanDistance(DBInfo,fittingDict[(PeakNum+1)])
+        DiffL, ProbL = MeanDistance(DBInfo,fittingDict[fittingDictKeys[PeakNum]])
         DiffLL.append(DiffL)
         ProbLL.append(ProbL)
         DBInfoD = {}
@@ -235,10 +236,10 @@ def rankDist(ListOpt):
             myfilename = infoFile.strip('.info') + '_rank_C.txt'
         
         elif rankOp[0] == 3:
-            myfilename = infoFile.strip('.info') + '_rank_D.txt'
+            myfilename = infoFile.strip('.info') + '_rank_Dist.txt'
 
         else:
-            myfilename = infoFile.strip('.info') + '_rank_D.txt'
+            myfilename = infoFile.strip('.info') + '_rank_Dist.txt'
     except:
         myfilename = 'FileNameCouldNotBeRecovered.txt'
 
@@ -266,7 +267,7 @@ def rankDist(ListOpt):
                 ProbRank.append(ProbEle[1])
                 DiffRank.append(DiffEle[1])
 
-        Eg,Ig,Decay,Half,Parent,rank3,ProbRank,DiffRank = (list(t) for t in zip(*sorted(zip(Eg,Ig,Decay,Half,Parent,rank3,ProbRank,DiffRank),key=itemgetter(*rankOp2) ,reverse=True)))
+        Eg,Ig,Decay,Half,Parent,rank3,ProbRank,DiffRank = (list(t) for t in zip(*sorted(zip(Eg,Ig,Decay,Half,Parent,rank3,ProbRank,DiffRank),key=itemgetter(*rankOp2) ,reverse=True))) #verificar que ordene correctamente
 
         print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
         

@@ -176,7 +176,7 @@ def rankProb(ListOpt):
     #print(df)
     #print('\nGauss Parameters')
     #print(dfG)
-
+    fittingDictKeys = list(fittingDict.keys())
 
     PeakNum = -1
     for idxR in idxPairL:
@@ -185,7 +185,7 @@ def rankProb(ListOpt):
         fEner = idxR[1]
         DBInfoL.append(GetIntensities(conexion,iEner,fEner))
         DBInfo = DBInfoL[-1]
-        DiffL, ProbL = MeanDistance(DBInfo,fittingDict[(PeakNum+1)])
+        DiffL, ProbL = MeanDistance(DBInfo,fittingDict[fittingDictKeys[PeakNum]])
         DiffLL.append(DiffL)
         ProbLL.append(ProbL)
         DBInfoD = {}
@@ -235,10 +235,10 @@ def rankProb(ListOpt):
             myfilename = infoFile.strip('.info') + '_rank_C.txt'
         
         elif rankOp[0] == 3:
-            myfilename = infoFile.strip('.info') + '_rank_D.txt'
+            myfilename = infoFile.strip('.info') + '_rank_Prob.txt'
 
         else:
-            myfilename = infoFile.strip('.info') + '_rank_D.txt'
+            myfilename = infoFile.strip('.info') + '_rank_Prob.txt'
     except:
         myfilename = 'FileNameCouldNotBeRecovered.txt'
 
