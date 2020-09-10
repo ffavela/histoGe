@@ -179,38 +179,47 @@ def rankProb(ListOpt):
     fittingDictKeys = list(fittingDict.keys())
 
     PeakNum = -1
+    IdxRemove=[]
+    #idxPairL_copy=idxPairL.copy()
     for idxR in idxPairL:
         PeakNum += 1
         iEner = idxR[0]
         fEner = idxR[1]
-        DBInfoL.append(GetIntensities(conexion,iEner,fEner))
-        DBInfo = DBInfoL[-1]
+        # DBInfoL.append(GetIntensities(conexion,iEner,fEner))
+        # DBInfo = DBInfoL[-1]
+        DBInfo = GetIntensities(conexion,iEner,fEner)
         DiffL, ProbL = MeanDistance(DBInfo,fittingDict[fittingDictKeys[PeakNum]])
-        DiffLL.append(DiffL)
-        ProbLL.append(ProbL)
-        DBInfoD = {}
-        for e,fs,gs in zip(DBInfo,DiffL,ProbL): 
-            if e[-1] not in DBInfoD:
-                DBInfoD[e[-1]] = [e]
-                ProbDL[gs[0]] = [gs]
-                DiffDL[fs[0]] = [fs]
-            else:
-                DBInfoD[e[-1]].append(e)
-                ProbDL[gs[0]].append(gs)
-                DiffDL[fs[0]].append(fs)
-        DBInfoDL.append(DBInfoD)   
+        if DiffL == None or ProbL == None:
+            continue
+        else:
+            IdxRemove.append(PeakNum)
+            DBInfoL.append(DBInfo)
+            DiffLL.append(DiffL)
+            ProbLL.append(ProbL)
+            DBInfoD = {}
+            for e,fs,gs in zip(DBInfo,DiffL,ProbL): 
+                if e[-1] not in DBInfoD:
+                    DBInfoD[e[-1]] = [e]
+                    ProbDL[gs[0]] = [gs]
+                    DiffDL[fs[0]] = [fs]
+                else:
+                    DBInfoD[e[-1]].append(e)
+                    ProbDL[gs[0]].append(gs)
+                    DiffDL[fs[0]].append(fs)
+            DBInfoDL.append(DBInfoD)   
         
-        for Ele in DBInfo:
-            iso = Ele[-1]
-            if iso not in memoLenDict:
-                memoLenDict[iso]=[len(GetIntensities(conexion,tMinE,tMaxE,iso)),1,Ele[10],[PeakNum]]
-                isoCountD[iso] = [Ele]
-            else:
-                memoLenDict[iso][1] += 1 
-                memoLenDict[iso][2] += Ele[10]
-                memoLenDict[iso][3].append(PeakNum)
-                isoCountD[iso].append(Ele)
-
+            for Ele in DBInfo:
+                iso = Ele[-1]
+                if iso not in memoLenDict:
+                    memoLenDict[iso]=[len(GetIntensities(conexion,tMinE,tMaxE,iso)),1,Ele[10],[PeakNum]]
+                    isoCountD[iso] = [Ele]
+                else:
+                    memoLenDict[iso][1] += 1 
+                    memoLenDict[iso][2] += Ele[10]
+                    memoLenDict[iso][3].append(PeakNum)
+                    isoCountD[iso].append(Ele)
+    
+    idxPairL=list(map(idxPairL.__getitem__,IdxRemove))
     memoLenDictKeys = memoLenDict.copy().keys()
     for Ele in memoLenDictKeys:
         if memoLenDict[Ele][0] == 0 or memoLenDict[Ele][2] == 0:

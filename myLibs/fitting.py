@@ -65,7 +65,7 @@ def doFittingStuff(infoDict,myDataList):
             popt,_ = curve_fit(gaus,xVals,myDataList[1],p0=[a,mean,sigma,c])
             #popt,pcov = curve_fit(gaus,xVals,myDataList[1],p0=[a,mean,sigma,c])
         except:
-            print("Fit failed for %s" %(e))
+            print("Fit failed for %s in fiting.py" %(e))
             fittingDict[e]=[None,None,None,None,None,None,None]
             continue
 
@@ -138,11 +138,15 @@ def MeanDistance(DBInfo,FittingVector):
     Diff = []
     Prob = []
     for Iso in DBInfo:
-        diffVal = Iso[1]-FittingVector[1]
-        Diff.append([Iso[-1],diffVal])
-        if diffVal > 0:
-            diffVal *= -1
-        Prob.append([Iso[-1],2*norm.cdf(diffVal,scale=FittingVector[2])])    
+        try:
+            diffVal = Iso[1]-FittingVector[1]
+        except:
+            return None,None
+        else:
+            Diff.append([Iso[-1],diffVal])
+            if diffVal > 0:
+                diffVal *= -1
+            Prob.append([Iso[-1],2*norm.cdf(diffVal,scale=FittingVector[2])])    
     
     return Diff,Prob
 
