@@ -73,6 +73,7 @@ def rankDist(ListOpt):
 
     rankOp = removeDuplicates(rankOp)    
     #rankOp2 = [x-4 for x in rankOp]
+    #rankOp2 = [-1,-3]
     rankOp2 = [-1,-3]
     if len(List) == 0:
         print("error: --rank option needs an argument")
@@ -178,40 +179,48 @@ def rankDist(ListOpt):
     #print(dfG)
     fittingDictKeys = list(fittingDict.keys())
 
-
     PeakNum = -1
+    IdxRemove=[]
+    #idxPairL_copy=idxPairL.copy()
     for idxR in idxPairL:
         PeakNum += 1
         iEner = idxR[0]
         fEner = idxR[1]
-        DBInfoL.append(GetIntensities(conexion,iEner,fEner))
-        DBInfo = DBInfoL[-1]
+        # DBInfoL.append(GetIntensities(conexion,iEner,fEner))
+        # DBInfo = DBInfoL[-1]
+        DBInfo = GetIntensities(conexion,iEner,fEner)
         DiffL, ProbL = MeanDistance(DBInfo,fittingDict[fittingDictKeys[PeakNum]])
-        DiffLL.append(DiffL)
-        ProbLL.append(ProbL)
-        DBInfoD = {}
-        for e,fs,gs in zip(DBInfo,DiffL,ProbL): 
-            if e[-1] not in DBInfoD:
-                DBInfoD[e[-1]] = [e]
-                ProbDL[gs[0]] = [gs]
-                DiffDL[fs[0]] = [fs]
-            else:
-                DBInfoD[e[-1]].append(e)
-                ProbDL[gs[0]].append(gs)
-                DiffDL[fs[0]].append(fs)
-        DBInfoDL.append(DBInfoD)   
+        if DiffL == None or ProbL == None:
+            continue
+        else:
+            IdxRemove.append(PeakNum)
+            DBInfoL.append(DBInfo)
+            DiffLL.append(DiffL)
+            ProbLL.append(ProbL)
+            DBInfoD = {}
+            for e,fs,gs in zip(DBInfo,DiffL,ProbL): 
+                if e[-1] not in DBInfoD:
+                    DBInfoD[e[-1]] = [e]
+                    ProbDL[gs[0]] = [gs]
+                    DiffDL[fs[0]] = [fs]
+                else:
+                    DBInfoD[e[-1]].append(e)
+                    ProbDL[gs[0]].append(gs)
+                    DiffDL[fs[0]].append(fs)
+            DBInfoDL.append(DBInfoD)   
         
-        for Ele in DBInfo:
-            iso = Ele[-1]
-            if iso not in memoLenDict:
-                memoLenDict[iso]=[len(GetIntensities(conexion,tMinE,tMaxE,iso)),1,Ele[10],[PeakNum]]
-                isoCountD[iso] = [Ele]
-            else:
-                memoLenDict[iso][1] += 1 
-                memoLenDict[iso][2] += Ele[10]
-                memoLenDict[iso][3].append(PeakNum)
-                isoCountD[iso].append(Ele)
-
+            for Ele in DBInfo:
+                iso = Ele[-1]
+                if iso not in memoLenDict:
+                    memoLenDict[iso]=[len(GetIntensities(conexion,tMinE,tMaxE,iso)),1,Ele[10],[PeakNum]]
+                    isoCountD[iso] = [Ele]
+                else:
+                    memoLenDict[iso][1] += 1 
+                    memoLenDict[iso][2] += Ele[10]
+                    memoLenDict[iso][3].append(PeakNum)
+                    isoCountD[iso].append(Ele)
+    
+    idxPairL=list(map(idxPairL.__getitem__,IdxRemove))
     memoLenDictKeys = memoLenDict.copy().keys()
     for Ele in memoLenDictKeys:
         if memoLenDict[Ele][0] == 0 or memoLenDict[Ele][2] == 0:
@@ -236,10 +245,10 @@ def rankDist(ListOpt):
             myfilename = infoFile.strip('.info') + '_rank_C.txt'
         
         elif rankOp[0] == 3:
-            myfilename = infoFile.strip('.info') + '_rank_Dist.txt'
+            myfilename = infoFile.strip('.info') + '_rank_Prob.txt'
 
         else:
-            myfilename = infoFile.strip('.info') + '_rank_Dist.txt'
+            myfilename = infoFile.strip('.info') + '_rank_Prob.txt'
     except:
         myfilename = 'FileNameCouldNotBeRecovered.txt'
 
@@ -267,7 +276,7 @@ def rankDist(ListOpt):
                 ProbRank.append(ProbEle[1])
                 DiffRank.append(DiffEle[1])
 
-        Eg,Ig,Decay,Half,Parent,rank3,ProbRank,DiffRank = (list(t) for t in zip(*sorted(zip(Eg,Ig,Decay,Half,Parent,rank3,ProbRank,DiffRank),key=itemgetter(*rankOp2) ,reverse=True))) #verificar que ordene correctamente
+        #Eg,Ig,Decay,Half,Parent,rank3,ProbRank,DiffRank = (list(t) for t in zip(*sorted(zip(Eg,Ig,Decay,Half,Parent,rank3,ProbRank,DiffRank),key=itemgetter(*rankOp2) ,reverse=False)))
 
         print('\nThe energy range consulted is between %.2f keV and %.2f keV.\n' % (iEner,fEner))
         
@@ -275,12 +284,14 @@ def rankDist(ListOpt):
             pd.set_option('display.max_rows', None) #imprime todas las filas
             pd.options.display.float_format = '{:,.5f}'.format
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank3,ProbRank,DiffRank)),columns=['Eg [keV]','Ig (%)','Decay m','Half Life','Parent','Rank3','Probability','Distance'])#crea  la tabla
+            df = df.sort_values(by=['Distance','Rank3'],ascending=[True,False],ignore_index=True)
             print(df)
             
         else:
             pd.set_option('display.max_rows', len(Ele))
             df = pd.DataFrame(list(zip(Eg,Ig,Decay,Half,Parent,rank3,ProbRank,DiffRank)),columns=['Eg [keV]','Ig (%)','Decay mode','Half Life','Parent','Rank3','Probability','Distance'])#crea  la tabla
-            print(df)
+            df = df.sort_values(by=['Distance','Rank3'],ascending=[True,False],ignore_index=True)
+            print(df.head(n=10))
             
         if wofFlag:
             try:

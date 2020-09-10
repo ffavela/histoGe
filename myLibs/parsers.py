@@ -291,7 +291,8 @@ def MultiCommandParser(lista):
 
 def getDictFromInfoFile(infoFileName,noCalFlag=None):
     infoDict={}
-    newTable=pd.read_table(infoFileName, delim_whitespace=True, index_col=0,comment='#',skip_blank_lines=True)
+    #newTable=pd.read_table(infoFileName, delim_whitespace=True, index_col=0,comment='#',skip_blank_lines=True)
+    newTable=pd.read_table(infoFileName,sep='\s+', index_col=0,comment='#',skip_blank_lines=True)
     infoDict=newTable.to_dict('index')
     ObjFile = open(infoFileName)
     Line = ObjFile.readline()

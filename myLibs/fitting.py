@@ -62,7 +62,11 @@ def doFittingStuff(infoDict,myDataList):
         c=(yVals[minIdx]+yVals[maxIdx])/2
         #need to handle cases where fit fails
         try:
-            popt,_ = curve_fit(gaus,xVals,myDataList[1],p0=[a,mean,sigma,c])
+            popt,_ = curve_fit(gaus,xVals[minIdx:maxIdx],myDataList[1][minIdx:maxIdx],p0=[a,mean,sigma,c])
+            # popt,_ = curve_fit(gaus,xVals,myDataList[1],p0=[a,mean,sigma,c])
+            # if popt[1] > xMax or popt[1] < xMin:
+            #     popt,_ = curve_fit(gaus,xVals[minIdx:maxIdx],myDataList[1][minIdx:maxIdx],p0=[a,mean,sigma,c])
+            
             #popt,pcov = curve_fit(gaus,xVals,myDataList[1],p0=[a,mean,sigma,c])
         except:
             print("Fit failed for %s in fiting.py" %(e))
@@ -143,10 +147,10 @@ def MeanDistance(DBInfo,FittingVector):
         except:
             return None,None
         else:
-            Diff.append([Iso[-1],diffVal])
+            Diff.append([Iso[-1],abs(diffVal)])
             if diffVal > 0:
                 diffVal *= -1
-            Prob.append([Iso[-1],2*norm.cdf(diffVal,scale=FittingVector[2])])    
+            Prob.append([Iso[-1],2*norm.cdf(diffVal,scale=abs(FittingVector[2]))])    
     
     return Diff,Prob
 
