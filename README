@@ -1,61 +1,7 @@
-This is a simple program (still in alpha) for making spectra analysis
-from germanium detectors. The name is still tentative and we'll
-probably change the repo location.
+PLEARE VISIT LABChico's repository for downloading the latest version
+ok histoGe:
 
-The program accepts 3 different file formats, ("mca" the pocket
-version, "Txt" gamma view format, "SPE" Boulby format.)
+https://github.com/LABChico/histoGe
 
-IT'S NECESARY PYTHON>=3.6
 
-For install, simply:
-
-	1. Run:
-
-			sudo python3 install_sudo.py
-	
-	2. Or as 'su', run:
-
-			apt upgrade python3-pip && pip3 install -r requirements.txt
-
-	   and run out of root:
-		
-			python3 install_su.py
-
-For update, simply:
-
-	1. Run:
-
-			python3 update.py
-
-	2. Or run:
-
-			git pull
-
-	   and run as 'su':
-		
-			pip3 install -r requirements.txt
-
-Download the database from this link:
-
-https://bit.ly/2VOzuO1
-
-Save it under the "Path/to/histoGe/myDatabase/" folder.
-
-Open a new terminal and you should be
-able to do a:
-
-$ histoGe
-usage: histoGe file.extension [-c data4fits.info]
-Valid extensions are:
-		SPE
-		mca
-		Txt
-
-You should be able to see a similar output.
-
-I'll edit this document later to show a couple of examples. Remember
-this is still alpha!!
-
-You can find the tutorial in the following link
-
-https://docs.google.com/document/d/1uJFUylDsRrZgDNq3LurjP1XlhqiJvKm606XkQqTPGvI/edit?usp=sharing
+This version is deprecated.
